@@ -43,14 +43,21 @@ final class UserController
     {
         $userId = (int) $request->userId();
         return Response::ok([
-            'quota'         => $this->usage->status($userId),
-            'subscription'  => $this->subs->activeForUser($userId),
-            'saved_count'   => count($this->engagement->savedCoupons($userId)),
-            'watch_count'   => count($this->engagement->watchlist($userId)),
-            'unread'        => $this->engagement->unreadCount($userId),
-            'recent_search' => $this->searchLogs->recentForUser($userId, 8),
-            'saved'         => array_slice($this->engagement->savedCoupons($userId), 0, 6),
+            'quota'           => $this->usage->status($userId),
+            'subscription'    => $this->subs->activeForUser($userId),
+            'saved_count'     => count($this->engagement->savedCoupons($userId)),
+            'watch_count'     => count($this->engagement->watchlist($userId)),
+            'unread'          => $this->engagement->unreadCount($userId),
+            'recent_search'   => $this->searchLogs->recentForUser($userId, 8),
+            'saved'           => array_slice($this->engagement->savedCoupons($userId), 0, 6),
+            'recommendations' => (new \CouponFind\Services\RecommendationService())->forUser($userId, 6),
         ]);
+    }
+
+    public function recommendations(Request $request): Response
+    {
+        $limit = (int) $request->query('limit', 8);
+        return Response::ok((new \CouponFind\Services\RecommendationService())->forUser((int) $request->userId(), $limit));
     }
 
     // ---- Saved coupons ----
@@ -157,6 +164,46 @@ final class UserController
         return Response::ok([
             'invoices' => $this->billing->invoicesForUser($userId),
             'payments' => $this->billing->paymentsForUser($userId),
+        ]);
+    }
+
+    /** Generate a downloadable PDF invoice. */
+    public function invoicePdf(Request $request, array $params): Response
+    {
+        $number = (string) $params['number'];
+        $inv = $this->billing->invoiceForUser((int) $request->userId(), $number);
+        if ($inv === null) {
+            throw HttpException::notFound('Invoice not found');
+        }
+
+        $currency = strtoupper((string) ($inv['currency'] ?? 'USD'));
+        $amount = number_format(((int) $inv['amount_cents']) / 100, 2);
+        $desc = $inv['plan_name'] ? ($inv['plan_name'] . ' plan subscription') : 'CouponFind subscription';
+
+        $pdf = new \CouponFind\Support\Pdf();
+        $pdf->line('CouponFind', 22)->gap(2)
+            ->line('AI Coupon Search SaaS', 10)->gap(14)
+            ->line('INVOICE', 16)->gap(6)
+            ->line('Invoice #: ' . $inv['number'], 11)
+            ->line('Issued:    ' . date('M j, Y', strtotime((string) ($inv['issued_at'] ?? $inv['created_at']))), 11)
+            ->line('Status:    ' . strtoupper((string) $inv['status']), 11)
+            ->line('Gateway:   ' . strtoupper((string) $inv['gateway']), 11)
+            ->gap(10)
+            ->line('Bill to', 12)
+            ->line((string) $inv['user_name'], 11)
+            ->line((string) $inv['user_email'], 11)
+            ->gap(12)->rule()
+            ->line('Description                                         Amount', 11)
+            ->rule()
+            ->line(str_pad(substr($desc, 0, 44), 48) . $currency . ' ' . $amount, 11)
+            ->gap(8)->rule()
+            ->line(str_pad('TOTAL', 48) . $currency . ' ' . $amount, 13)
+            ->gap(24)
+            ->line('Thank you for your business.', 10)
+            ->line('CouponFind - billing@couponfind.example', 9);
+
+        return Response::raw($pdf->render(), 'application/pdf', [
+            'Content-Disposition' => 'attachment; filename="' . $inv['number'] . '.pdf"',
         ]);
     }
 

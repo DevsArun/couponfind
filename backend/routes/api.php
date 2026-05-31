@@ -65,6 +65,7 @@ return function (Router $router, Container $container): void {
         // ---- Authenticated user area ----
         $r->group('/me', [$auth], function (Router $r) use ($c): void {
             $r->get('/dashboard', $c('UserController@dashboard'));
+            $r->get('/recommendations', $c('UserController@recommendations'));
             $r->get('/saved', $c('UserController@saved'));
             $r->post('/saved', $c('UserController@save'));
             $r->delete('/saved/{id}', $c('UserController@unsave'));
@@ -83,6 +84,7 @@ return function (Router $router, Container $container): void {
 
             $r->get('/search-history', $c('UserController@searchHistory'));
             $r->get('/invoices', $c('UserController@invoices'));
+            $r->get('/invoices/{number}/pdf', $c('UserController@invoicePdf'));
 
             $r->get('/profile', $c('UserController@profile'));
             $r->put('/profile', $c('UserController@updateProfile'));
@@ -129,6 +131,9 @@ return function (Router $router, Container $container): void {
 
             $r->get('/analytics/search', $c('AdminController@searchAnalytics'));
             $r->get('/analytics/revenue', $c('AdminController@revenueAnalytics'));
+
+            $r->get('/payments', $c('AdminController@payments'));
+            $r->post('/payments/{id}/refund', $c('AdminController@refundPayment'));
 
             $r->get('/ai/providers', $c('AdminController@aiProviders'));
             $r->put('/ai/providers/{id}', $c('AdminController@updateAiProvider'));

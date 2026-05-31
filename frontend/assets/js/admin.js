@@ -12,6 +12,7 @@
     { id: 'plans', label: 'Plans', icon: 'card' },
     { id: 'subscriptions', label: 'Subscriptions', icon: 'list' },
     { id: 'revenue', label: 'Revenue', icon: 'chart' },
+    { id: 'payments', label: 'Payments', icon: 'card' },
     { id: 'coupons', label: 'Coupons', icon: 'tag' },
     { id: 'merchants', label: 'Merchants', icon: 'store' },
     { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
@@ -197,6 +198,27 @@
           h('tbody', {}, (d.by_plan || []).map(p => h('tr', {}, [h('td', {}, p.name), h('td', {}, fmt.num(p.subscribers))]))),
         ])),
       ]));
+    },
+
+    async payments() {
+      loading();
+      const d = await API.get('/admin/payments');
+      const wrap = h('div', {}, [title('Payments', d.payments.length + ' recent transactions')]);
+      wrap.appendChild(h('div', { class: 'card', style: 'overflow:auto;' }, h('table', { class: 'table' }, [
+        h('thead', {}, h('tr', {}, ['User', 'Gateway', 'Amount', 'Status', 'When', 'Actions'].map(x => h('th', {}, x)))),
+        h('tbody', {}, d.payments.map(p => h('tr', {}, [
+          h('td', {}, [h('div', { class: 'font-semibold' }, p.user_name || '—'), h('div', { class: 'text-muted text-xs' }, p.user_email || '')]),
+          h('td', {}, h('span', { class: 'badge badge-muted' }, p.gateway)),
+          h('td', {}, fmt.money(p.amount_cents, p.currency) + (p.refunded_cents > 0 ? ' (−' + fmt.money(p.refunded_cents, p.currency) + ')' : '')),
+          h('td', {}, h('span', { class: 'badge ' + ({ succeeded: 'badge-green', failed: 'badge-red', refunded: 'badge-blue', partially_refunded: 'badge-blue' }[p.status] || 'badge-muted') }, p.status)),
+          h('td', { class: 'text-muted' }, fmt.ago(p.created_at)),
+          h('td', {}, p.status === 'succeeded'
+            ? h('button', { class: 'btn btn-danger btn-sm', onclick: () => confirmDialog('Refund ' + fmt.money(p.amount_cents, p.currency) + ' to ' + (p.user_email || 'user') + '?', async () => { try { await API.post('/admin/payments/' + p.id + '/refund', {}); toast('Refund issued', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }) }, 'Refund')
+            : h('span', { class: 'text-muted text-xs' }, '—')),
+        ]))),
+      ])));
+      if (!d.payments.length) wrap.appendChild(h('div', { class: 'card p-10 text-center text-muted mt-2' }, 'No payments yet.'));
+      setView(wrap);
     },
 
     async coupons() {

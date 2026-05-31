@@ -134,14 +134,36 @@ All endpoints are under `/api`. Responses use a consistent envelope:
 | Auth | `POST /api/auth/register`, `/login`, `/refresh`, `/logout`, `/forgot-password`, `/reset-password`; `GET /api/auth/me` |
 | Search | `POST /api/search`, `GET /api/search/suggest` |
 | Catalog | `GET /api/plans`, `/merchants`, `/merchants/{slug}`, `/coupons/featured`, `/coupons/{id}` |
-| User | `GET/POST /api/me/...` (saved, watchlist, alerts, notifications, history, invoices, profile, referrals) |
+| User | `GET/POST /api/me/...` (saved, watchlist, alerts, notifications, history, invoices, **invoice PDF**, **recommendations**, profile, referrals) |
 | Billing | `GET /api/subscription`, `POST /api/subscription/checkout|cancel` |
 | Webhooks | `POST /api/webhooks/stripe`, `/api/webhooks/razorpay` |
-| Admin | `GET/POST/PUT/DELETE /api/admin/...` (users, plans, subscriptions, merchants, coupons, sources, analytics, ai, engine, flags, settings, logs, health) |
+| Admin | `GET/POST/PUT/DELETE /api/admin/...` (users, plans, subscriptions, **payments + refunds**, merchants, coupons, sources, analytics, ai, engine, flags, settings, logs, health) |
 
 Auth uses short-lived **JWT access tokens** (Bearer or HttpOnly cookie) +
 rotating opaque **refresh tokens** stored hashed. Cookie-based mutating requests
 are CSRF-protected (double-submit); Bearer API calls are exempt by design.
+
+## Email (SMTP)
+
+Configure `MAIL_*` in `.env` to enable real email (password-reset links + deal
+alerts). Leave `MAIL_HOST` empty to disable sending (messages are logged; the
+reset flow still works via the link returned when `APP_DEBUG=true`). Verify with:
+
+```bash
+php backend/console.php mail:test you@example.com
+```
+
+## Background jobs (cron)
+
+The Python engine handles coupon discovery/validation/scoring/indexing. Two
+PHP-side periodic tasks complete the loop — add these to crontab on your VPS:
+
+```cron
+# Notify users when newly-imported coupons match their alerts/watchlists
+*/10 * * * *  php /var/www/couponfind/backend/console.php alerts:dispatch
+# Expire coupons past their valid_until
+*/30 * * * *  php /var/www/couponfind/backend/console.php coupons:expire
+```
 
 ## Python engine commands
 

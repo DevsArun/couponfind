@@ -137,6 +137,19 @@ final class BillingService
         );
     }
 
+    public function invoiceForUser(int $userId, string $number): ?array
+    {
+        return $this->db->first(
+            'SELECT i.*, p.name AS plan_name, u.name AS user_name, u.email AS user_email
+             FROM invoices i
+             LEFT JOIN subscriptions s ON s.id = i.subscription_id
+             LEFT JOIN plans p ON p.id = s.plan_id
+             JOIN users u ON u.id = i.user_id
+             WHERE i.user_id = ? AND i.number = ? LIMIT 1',
+            [$userId, $number]
+        );
+    }
+
     public function paymentsForUser(int $userId): array
     {
         return $this->db->all(
@@ -144,6 +157,57 @@ final class BillingService
              FROM payments WHERE user_id = ? ORDER BY id DESC LIMIT 100',
             [$userId]
         );
+    }
+
+    // ---- Admin: payments + refunds ----------------------------------------
+
+    public function listPayments(int $limit = 200): array
+    {
+        $limit = max(1, min(500, $limit));
+        return $this->db->all(
+            'SELECT p.id, p.gateway, p.gateway_payment_id, p.amount_cents, p.currency, p.status,
+                    p.failure_reason, p.retry_count, p.refunded_cents, p.created_at,
+                    u.name AS user_name, u.email AS user_email
+             FROM payments p JOIN users u ON u.id = p.user_id
+             ORDER BY p.id DESC LIMIT ' . $limit
+        );
+    }
+
+    /**
+     * Issue a refund through the originating gateway and update local state.
+     * @return array{payment_id:int, refunded_cents:int}
+     */
+    public function refundPayment(int $paymentId, ?int $amountCents = null): array
+    {
+        $p = $this->db->first('SELECT * FROM payments WHERE id = ? LIMIT 1', [$paymentId]);
+        if ($p === null) {
+            throw new \CouponFind\Support\HttpException('Payment not found', 404);
+        }
+        if ($p['status'] === 'refunded') {
+            throw new \CouponFind\Support\HttpException('Payment already refunded', 409);
+        }
+        if ($p['status'] !== 'succeeded') {
+            throw new \CouponFind\Support\HttpException('Only succeeded payments can be refunded', 422);
+        }
+
+        $ok = $p['gateway'] === 'stripe'
+            ? $this->stripe->refund((string) $p['gateway_payment_id'], $amountCents)
+            : $this->razorpay->refund((string) $p['gateway_payment_id'], $amountCents);
+
+        if (!$ok) {
+            throw new \CouponFind\Support\HttpException('Gateway refused the refund (check gateway keys/mode)', 502);
+        }
+
+        $refunded = $amountCents ?? (int) $p['amount_cents'];
+        $full = $refunded >= (int) $p['amount_cents'];
+        $this->db->execute(
+            'UPDATE payments SET status = ?, refunded_cents = ? WHERE id = ?',
+            [$full ? 'refunded' : 'partially_refunded', $refunded, $paymentId]
+        );
+        if ($p['invoice_id']) {
+            $this->db->execute("UPDATE invoices SET status = 'refunded' WHERE id = ?", [$p['invoice_id']]);
+        }
+        return ['payment_id' => $paymentId, 'refunded_cents' => $refunded];
     }
 
     // ---- Webhook processing -----------------------------------------------

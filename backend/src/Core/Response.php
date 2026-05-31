@@ -12,6 +12,7 @@ final class Response
     private int $status = 200;
     private array $headers = [];
     private mixed $body = null;
+    private ?string $rawBody = null;
     private array $cookies = [];
 
     public static function json(mixed $data, int $status = 200): self
@@ -46,6 +47,19 @@ final class Response
     {
         $r = new self();
         $r->status = 204;
+        return $r;
+    }
+
+    /** Raw response (binary or non-JSON), e.g. a generated PDF download. */
+    public static function raw(string $content, string $contentType, array $headers = [], int $status = 200): self
+    {
+        $r = new self();
+        $r->status = $status;
+        $r->headers['Content-Type'] = $contentType;
+        foreach ($headers as $name => $value) {
+            $r->headers[$name] = $value;
+        }
+        $r->rawBody = $content;
         return $r;
     }
 
@@ -97,6 +111,11 @@ final class Response
             foreach ($this->cookies as $c) {
                 setcookie($c['name'], $c['value'], $c['options']);
             }
+        }
+
+        if ($this->rawBody !== null) {
+            echo $this->rawBody;
+            return;
         }
 
         if ($this->status === 204 || $this->body === null) {

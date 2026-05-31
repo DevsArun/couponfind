@@ -16,6 +16,7 @@ use CouponFind\Security\Password;
 use CouponFind\Services\Billing\BillingService;
 use CouponFind\Support\Audit;
 use CouponFind\Support\HttpException;
+use CouponFind\Support\Mailer;
 use CouponFind\Support\Validator;
 
 final class AuthController
@@ -144,10 +145,23 @@ final class AuthController
                 'INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?,?, DATE_ADD(NOW(), INTERVAL 1 HOUR))',
                 [$user['id'], Password::hashToken($token)]
             );
-            // In production this is emailed. For dev/demo we return it when APP_DEBUG.
+
+            $appUrl = rtrim(Env::string('APP_URL', 'http://localhost:8080'), '/');
+            $link = $appUrl . '/reset-password?token=' . $token;
+            $html = Mailer::render(
+                'Reset your password',
+                'We received a request to reset your CouponFind password. This link expires in 1 hour. '
+                . 'If you did not request this, you can safely ignore this email.',
+                ['label' => 'Reset password', 'url' => $link]
+            );
+            $sent = Mailer::send($user['email'], 'Reset your CouponFind password', $html, $user['name']);
+
             $payload = ['message' => 'If the email exists, a reset link has been sent.'];
-            if (Env::bool('APP_DEBUG', false)) {
+            // When email delivery is not configured (e.g. local dev), surface the
+            // token so the flow remains usable. Never exposed once SMTP is set up.
+            if (!$sent && Env::bool('APP_DEBUG', false)) {
                 $payload['reset_token'] = $token;
+                $payload['reset_url'] = $link;
             }
             return Response::ok($payload, 'Reset requested');
         }

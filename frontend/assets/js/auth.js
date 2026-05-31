@@ -69,5 +69,44 @@
     });
   }
 
-  global.CFAuth = { initLogin, initRegister };
+  global.CFAuth = { initLogin, initRegister, initForgot, initReset };
+
+  function initForgot() {
+    const b = el('#submit'); b.dataset.label = b.textContent;
+    el('#form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      el('#err').classList.add('hide'); el('#ok').classList.add('hide');
+      busy(true);
+      try {
+        const data = await API.post('/auth/forgot-password', { email: el('#email').value.trim() }, { noAuth: true });
+        const ok = el('#ok');
+        ok.textContent = (data && data.message) ? data.message : 'If the email exists, a reset link has been sent.';
+        ok.classList.remove('hide');
+        // Dev convenience: if SMTP is off and debug is on, the API returns a reset URL.
+        if (data && data.reset_url) {
+          ok.innerHTML += ' <a href="' + data.reset_url + '" style="color:var(--accent);">Open reset link</a>';
+        }
+        busy(false);
+      } catch (err) { showError(err.message, err.errors); busy(false); }
+    });
+  }
+
+  function initReset() {
+    const b = el('#submit'); b.dataset.label = b.textContent;
+    const token = new URLSearchParams(location.search).get('token');
+    if (!token) { showError('Missing or invalid reset token. Request a new link.'); }
+    el('#form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      el('#err').classList.add('hide');
+      if (el('#password').value !== el('#password_confirmation').value) {
+        showError('Passwords do not match.'); return;
+      }
+      busy(true);
+      try {
+        await API.post('/auth/reset-password', { token, password: el('#password').value, password_confirmation: el('#password_confirmation').value }, { noAuth: true });
+        toast('Password updated! Please sign in.', 'ok');
+        setTimeout(() => location.href = '/login', 800);
+      } catch (err) { showError(err.message, err.errors); busy(false); }
+    });
+  }
 })(window);

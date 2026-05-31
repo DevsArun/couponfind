@@ -292,6 +292,23 @@ final class AdminController
         return Response::ok(null, 'AI provider updated');
     }
 
+    // ---- Payments + refunds ----
+    public function payments(Request $request): Response
+    {
+        return Response::ok(['payments' => (new \CouponFind\Services\Billing\BillingService())->listPayments()]);
+    }
+
+    public function refundPayment(Request $request, array $params): Response
+    {
+        $amount = $request->input('amount_cents');
+        $result = (new \CouponFind\Services\Billing\BillingService())->refundPayment(
+            (int) $params['id'],
+            $amount !== null ? (int) $amount : null
+        );
+        Audit::log((int) $request->userId(), 'admin.payment.refund', 'payment', (string) $params['id'], $result, $request->ip());
+        return Response::ok($result, 'Refund issued');
+    }
+
     // ---- Engine control (crawler / validation / indexer) ----
     public function dispatchJob(Request $request): Response
     {

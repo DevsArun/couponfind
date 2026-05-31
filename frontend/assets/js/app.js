@@ -141,6 +141,19 @@
           })(),
         ]),
       ]);
+
+      // Recommended for you
+      const recs = (d.recommendations && d.recommendations.coupons) || [];
+      if (recs.length) {
+        wrap.appendChild(h('div', { class: 'mt-7' }, [
+          h('div', { class: 'flex items-center justify-between mb-3' }, [
+            h('h3', { class: 'font-bold' }, 'Recommended for you'),
+            h('span', { class: 'badge badge-muted' }, d.recommendations.reason === 'based_on_activity' ? 'based on your activity' : 'trending'),
+          ]),
+          h('div', { class: 'grid md:grid-cols-2 lg:grid-cols-3 gap-3 stagger' }, recs.map(c => couponCard(c))),
+        ]));
+      }
+
       setView(wrap);
     },
 
@@ -325,7 +338,10 @@
           h('td', {}, fmt.money(i.amount_cents, i.currency)),
           h('td', {}, h('span', { class: 'badge ' + (i.status === 'paid' ? 'badge-green' : 'badge-muted') }, i.status)),
           h('td', { class: 'text-muted' }, fmt.date(i.issued_at)),
-          h('td', {}, i.hosted_url ? h('a', { href: i.hosted_url, target: '_blank', class: 'text-accent', style: 'text-decoration:none;' }, 'View') : ''),
+          h('td', {}, h('div', { class: 'flex gap-2' }, [
+            h('button', { class: 'btn btn-soft btn-sm', onclick: () => downloadInvoice(i.number) }, 'PDF'),
+            i.hosted_url ? h('a', { href: i.hosted_url, target: '_blank', class: 'btn btn-ghost btn-sm', style: 'text-decoration:none;' }, 'View') : null,
+          ])),
         ]))),
       ])));
       setView(wrap);
@@ -403,6 +419,22 @@
 
   async function refreshBell() {
     try { const d = await API.get('/me/notifications'); el('#bell-dot').classList.toggle('hide', !d.unread); } catch (e) {}
+  }
+
+  async function downloadInvoice(number) {
+    try {
+      const res = await fetch('/api/me/invoices/' + encodeURIComponent(number) + '/pdf', {
+        headers: API.store.access ? { Authorization: 'Bearer ' + API.store.access } : {},
+        credentials: 'same-origin',
+      });
+      if (!res.ok) { toast('Could not download invoice', 'err'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = number + '.pdf';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) { toast('Download failed', 'err'); }
   }
 
   // ---- Router ----

@@ -73,6 +73,30 @@ final class CouponRepository
         );
     }
 
+    /**
+     * Recommendation query: top-scored active coupons from a set of merchant
+     * ids, excluding coupons the user already saved. Both id lists are cast to
+     * ints and inlined safely (no user-supplied strings).
+     */
+    public function recommended(array $merchantIds, array $excludeCouponIds, int $limit = 8): array
+    {
+        $merchantIds = array_values(array_unique(array_map('intval', $merchantIds)));
+        if ($merchantIds === []) {
+            return [];
+        }
+        $excludeCouponIds = array_values(array_unique(array_map('intval', $excludeCouponIds)));
+        $limit = max(1, min(50, $limit));
+
+        $inMerchants = implode(',', $merchantIds);
+        $where = "c.status = 'active' AND (c.valid_until IS NULL OR c.valid_until > NOW()) AND c.merchant_id IN ($inMerchants)";
+        if ($excludeCouponIds !== []) {
+            $where .= ' AND c.id NOT IN (' . implode(',', $excludeCouponIds) . ')';
+        }
+        return $this->db->all(
+            self::SELECT . " WHERE $where ORDER BY score DESC, c.is_featured DESC LIMIT $limit"
+        );
+    }
+
     public function byMerchant(int $merchantId, int $limit = 40): array
     {
         $limit = max(1, min(100, $limit));
