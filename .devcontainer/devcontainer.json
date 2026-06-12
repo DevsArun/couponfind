@@ -1,0 +1,24 @@
+{
+  "name": "CouponFind (full stack)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "forwardPorts": [8080, 7700],
+  "portsAttributes": {
+    "8080": {
+      "label": "CouponFind App",
+      "onAutoForward": "notify"
+    },
+    "7700": {
+      "label": "Meilisearch",
+      "onAutoForward": "silent"
+    }
+  },
+  "onCreateCommand": "bash .devcontainer/setup-env.sh",
+  "postAttachCommand": "bash .devcontainer/welcome.sh",
+  "remoteUser": "vscode"
+}
