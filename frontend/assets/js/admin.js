@@ -17,6 +17,7 @@
     { id: 'revenue', label: 'Revenue', icon: 'chart' },
     { id: 'payments', label: 'Payments', icon: 'card' },
     { id: 'gateway', label: 'Payment Gateway', icon: 'lock' },
+    { id: 'ads', label: 'Ads & Monetization', icon: 'chart' },
     { id: 'coupons', label: 'Coupons', icon: 'tag' },
     { id: 'merchants', label: 'Merchants', icon: 'store' },
     { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
@@ -556,6 +557,48 @@
       }
       tick();
       livePoll = setInterval(tick, 3000);
+    },
+
+    async ads() {
+      loading();
+      const d = await API.get('/admin/ads');
+      const f = {};
+      const enabled = h('input', { type: 'checkbox' }); enabled.checked = !!d.enabled;
+      const net = h('select', { class: 'input' }, [['adsense', 'Google AdSense'], ['ezoic', 'Ezoic'], ['custom', 'Custom / other network']].map(([v, l]) => h('option', { value: v, selected: d.network === v ? 'selected' : null }, l)));
+      const field = (k, label, val, ph) => { const i = h('input', { class: 'input', value: val || '', placeholder: ph }); f[k] = i; return h('div', {}, [h('label', { class: 'label' }, label), i]); };
+      const freq = h('input', { class: 'input', type: 'number', min: '1', value: d.frequency || 1 });
+      const custom = h('textarea', { class: 'input', rows: '5', placeholder: '<!-- paste any ad network embed code (HTML/JS) here -->' }, d.custom_code || '');
+      const adsenseSec = h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('adsense_client', 'AdSense client', d.adsense_client, 'ca-pub-XXXXXXXXXXXXXXXX'), field('adsense_slot', 'Ad slot ID', d.adsense_slot, '1234567890')]);
+      const ezoicSec = field('ezoic_id', 'Ezoic placeholder ID', d.ezoic_id, 'e.g. 101');
+      const customSec = h('div', {}, [h('label', { class: 'label' }, 'Custom ad code (HTML/JS)'), custom]);
+      const syncVis = () => { adsenseSec.style.display = net.value === 'adsense' ? '' : 'none'; ezoicSec.style.display = net.value === 'ezoic' ? '' : 'none'; customSec.style.display = net.value === 'custom' ? '' : 'none'; };
+      net.addEventListener('change', syncVis);
+      const wrap = h('div', {}, [
+        title('Ads & Monetization', 'Show an ad after each chat response (like premium AI chat apps). Off by default — enable when ready.'),
+        h('div', { class: 'card p-6 grid gap-5', style: 'max-width:700px;' }, [
+          h('label', { class: 'flex items-center gap-3', style: 'cursor:pointer;' }, [enabled, h('span', { class: 'font-semibold' }, 'Enable ads after chat responses')]),
+          h('div', {}, [h('label', { class: 'label' }, 'Ad network'), net]),
+          adsenseSec, ezoicSec, customSec,
+          h('div', { style: 'max-width:220px;' }, [h('label', { class: 'label' }, 'Show ad every N responses'), freq]),
+          h('div', { class: 'flex items-center gap-3 mt-1' }, [
+            h('button', { class: 'btn btn-primary', onclick: save }, 'Save ad settings'),
+            h('span', { class: 'badge ' + (d.enabled ? 'badge-green' : 'badge-muted') }, d.enabled ? 'Ads ON' : 'Ads OFF'),
+          ]),
+          h('p', { class: 'text-muted text-xs' }, 'Note: networks like AdSense/Ezoic must approve your live domain before real ads render. Custom code works with any network (Media.net, PropellerAds, etc.).'),
+        ]),
+      ]);
+      setView(wrap); syncVis();
+
+      async function save() {
+        try {
+          await API.put('/admin/ads', {
+            enabled: enabled.checked, network: net.value,
+            adsense_client: f.adsense_client.value, adsense_slot: f.adsense_slot.value,
+            ezoic_id: f.ezoic_id.value, custom_code: custom.value, frequency: Number(freq.value) || 1,
+          });
+          toast('Ad settings saved', 'ok'); route();
+        } catch (e) { toast(e.message, 'err'); }
+      }
     },
 
     async messages() {

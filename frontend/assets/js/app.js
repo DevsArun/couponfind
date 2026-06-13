@@ -283,6 +283,7 @@
           thread.appendChild(botFromData(msg));
           conv.messages.push(msg);
           ChatStore.upsert(conv); renderHistory();
+          UI.Ads.afterResponse(thread);
         } catch (e) {
           typing.remove();
           thread.appendChild(botRow(h('div', {}, [

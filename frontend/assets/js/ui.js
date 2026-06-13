@@ -196,5 +196,69 @@
     return true;
   }
 
-  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect };
+  // ---- Ads / monetization (admin-controlled; renders after chat responses) ----
+  const Ads = {
+    _cfg: null,
+    _adsense: false,
+    _ezoic: false,
+    count: 0,
+    async config() {
+      if (this._cfg) return this._cfg;
+      try { this._cfg = await API.get('/ads', { noAuth: true }); }
+      catch (e) { this._cfg = { enabled: false }; }
+      return this._cfg;
+    },
+    // Call after each assistant response; honors the configured frequency.
+    async afterResponse(target) {
+      const c = await this.config();
+      if (!c || !c.enabled) return;
+      this.count += 1;
+      const freq = Math.max(1, parseInt(c.frequency, 10) || 1);
+      if (this.count % freq !== 0) return;
+      this.render(target, c);
+    },
+    render(target, c) {
+      const box = h('div', { class: 'chat-ad' }, [h('div', { class: 'chat-ad-label' }, 'Sponsored')]);
+      const slot = h('div', { class: 'chat-ad-slot' });
+      box.appendChild(slot);
+      target.appendChild(box);
+      try {
+        if (c.network === 'adsense' && c.adsense_client) {
+          if (!this._adsense) {
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(c.adsense_client);
+            s.crossOrigin = 'anonymous';
+            document.head.appendChild(s);
+            this._adsense = true;
+          }
+          const ins = document.createElement('ins');
+          ins.className = 'adsbygoogle';
+          ins.style.display = 'block';
+          ins.setAttribute('data-ad-client', c.adsense_client);
+          if (c.adsense_slot) ins.setAttribute('data-ad-slot', c.adsense_slot);
+          ins.setAttribute('data-ad-format', 'auto');
+          ins.setAttribute('data-full-width-responsive', 'true');
+          slot.appendChild(ins);
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } else if (c.network === 'ezoic' && c.ezoic_id) {
+          slot.id = 'ezoic-pub-ad-placeholder-' + c.ezoic_id;
+          window.ezstandalone = window.ezstandalone || { cmd: [] };
+          window.ezstandalone.cmd.push(function () { try { window.ezstandalone.showAds(parseInt(c.ezoic_id, 10)); } catch (e) {} });
+        } else if (c.network === 'custom' && c.custom_code) {
+          slot.innerHTML = c.custom_code;
+          // Re-execute any <script> tags in the custom snippet.
+          Array.from(slot.querySelectorAll('script')).forEach(old => {
+            const sc = document.createElement('script');
+            if (old.src) sc.src = old.src; else sc.textContent = old.textContent;
+            document.head.appendChild(sc);
+          });
+        } else {
+          box.remove(); // enabled but not configured for this network
+        }
+      } catch (e) { /* never break the chat on an ad error */ }
+    },
+  };
+
+  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect, Ads };
 })(window);

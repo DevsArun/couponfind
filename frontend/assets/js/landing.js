@@ -119,6 +119,7 @@
     block.appendChild(h('div', { class: 'chat-meta' },
       `via ${data.source}${data.cache_hit ? ' · cached' : ''}${data.intent && data.intent.confidence ? ' · intent ' + Math.round(data.intent.confidence * 100) + '%' : ''}`));
     thread.appendChild(botRow(block, true));
+    UI.Ads.afterResponse(thread);
     scrollDown();
   }
 

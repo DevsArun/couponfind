@@ -411,6 +411,29 @@ final class AdminController
         return Response::ok(['sent' => true], 'Email sent to ' . $user['email']);
     }
 
+    // ---- Ads / monetization (admin-controlled) ----
+    public function ads(Request $request): Response
+    {
+        return Response::ok(\CouponFind\Controllers\AdsController::publicConfig());
+    }
+
+    public function updateAds(Request $request): Response
+    {
+        $data = Validator::make($request->all(), [
+            'network' => 'required|in:adsense,ezoic,custom',
+        ]);
+        \CouponFind\Core\Settings::set('ads_enabled', filter_var($request->input('enabled', false), FILTER_VALIDATE_BOOLEAN) ? '1' : '0');
+        \CouponFind\Core\Settings::set('ads_network', (string) $data['network']);
+        \CouponFind\Core\Settings::set('ads_adsense_client', (string) $request->input('adsense_client', ''));
+        \CouponFind\Core\Settings::set('ads_adsense_slot', (string) $request->input('adsense_slot', ''));
+        \CouponFind\Core\Settings::set('ads_ezoic_id', (string) $request->input('ezoic_id', ''));
+        \CouponFind\Core\Settings::set('ads_custom_code', (string) $request->input('custom_code', ''));
+        \CouponFind\Core\Settings::set('ads_frequency', (string) max(1, (int) $request->input('frequency', 1)));
+        \CouponFind\Core\Settings::clearCache();
+        Audit::log((int) $request->userId(), 'admin.ads.update', 'setting', 'ads', ['network' => $data['network']], $request->ip());
+        return Response::ok(\CouponFind\Controllers\AdsController::publicConfig(), 'Ad settings saved');
+    }
+
     // ---- Contact messages (from the public contact form) ----
     public function contactMessages(Request $request): Response
     {

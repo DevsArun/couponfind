@@ -47,6 +47,7 @@ return function (Router $router, Container $container): void {
         // ---- Catalog (public) ----
         $r->get('/plans', $c('PlanController@index'));
         $r->post('/contact', $c('ContactController@submit'));
+        $r->get('/ads', $c('AdsController@config'));
         $r->get('/merchants', $c('MerchantController@index'));
         $r->get('/merchants/{slug}', $c('MerchantController@show'));
         $r->get('/coupons/featured', $c('CouponController@featured'));
@@ -148,6 +149,8 @@ return function (Router $router, Container $container): void {
             $r->get('/contact-messages', $c('AdminController@contactMessages'));
             $r->post('/contact-messages/{id}/status', $c('AdminController@updateContactMessage'));
             $r->delete('/contact-messages/{id}', $c('AdminController@deleteContactMessage'));
+            $r->get('/ads', $c('AdminController@ads'));
+            $r->put('/ads', $c('AdminController@updateAds'));
             $r->post('/coupons/purge', $c('AdminController@purgeCoupons'));
             $r->post('/users/{id}/email', $c('AdminController@emailUser'));
 
