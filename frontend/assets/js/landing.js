@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind — landing page
+   Couponaut — landing page
    ChatGPT-style conversational coupon search + features + pricing
    ===================================================================== */
 (function () {

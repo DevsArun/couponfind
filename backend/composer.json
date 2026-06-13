@@ -1,6 +1,6 @@
 {
     "name": "couponfind/backend",
-    "description": "CouponFind — AI Coupon Search SaaS (PHP primary backend)",
+    "description": "Couponaut — AI Coupon Search SaaS (PHP primary backend)",
     "type": "project",
     "license": "MIT",
     "require": {

@@ -1,4 +1,4 @@
-# CouponFind — AI Coupon Search SaaS
+# Couponaut — AI Coupon Search SaaS
 
 A production-grade, AI-powered coupon search platform. **PHP** is the primary
 application backend (auth, dashboards, search, billing, admin, APIs). **Python**

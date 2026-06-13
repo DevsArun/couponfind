@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * CouponFind API front controller.
+ * Couponaut API front controller.
  * All /api/* traffic is routed here (via nginx or the dev router).
  */
 

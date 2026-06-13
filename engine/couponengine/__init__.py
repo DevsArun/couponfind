@@ -1,4 +1,4 @@
-"""CouponFind — Python Coupon Intelligence Engine.
+"""Couponaut — Python Coupon Intelligence Engine.
 
 An isolated worker system responsible for coupon discovery, extraction,
 AI structuring, validation, deduplication, scoring, import into MySQL, and

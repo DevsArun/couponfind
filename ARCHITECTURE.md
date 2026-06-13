@@ -1,4 +1,4 @@
-# CouponFind — System Architecture
+# Couponaut — System Architecture
 
 > An AI-powered coupon search SaaS. **PHP** is the primary application backend.
 > **Python** is a dedicated, isolated *Coupon Intelligence Engine* (discovery, extraction,

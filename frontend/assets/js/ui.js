@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind — shared UI helpers
+   Couponaut — shared UI helpers
    toasts · modals · command palette · formatting · icons · skeletons
    ===================================================================== */
 (function (global) {

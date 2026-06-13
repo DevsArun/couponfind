@@ -63,12 +63,12 @@ final class AuthController
         try {
             $appUrl = rtrim(Env::string('APP_URL', 'http://localhost:8080'), '/');
             $html = Mailer::render(
-                'Welcome to CouponFind 🎉',
-                'Hi ' . htmlspecialchars($data['name']) . ',<br><br>Your CouponFind account is ready. '
+                'Welcome to Couponaut 🎉',
+                'Hi ' . htmlspecialchars($data['name']) . ',<br><br>Your Couponaut account is ready. '
                 . 'Just ask for any brand or deal in plain language — we will find the best working coupon for you.',
                 ['label' => 'Start saving', 'url' => $appUrl . '/app']
             );
-            Mailer::send($data['email'], 'Welcome to CouponFind', $html, $data['name']);
+            Mailer::send($data['email'], 'Welcome to Couponaut', $html, $data['name']);
         } catch (\Throwable $e) {
             error_log('[register:mail] ' . $e->getMessage());
         }
@@ -164,11 +164,11 @@ final class AuthController
             $link = $appUrl . '/reset-password?token=' . $token;
             $html = Mailer::render(
                 'Reset your password',
-                'We received a request to reset your CouponFind password. This link expires in 1 hour. '
+                'We received a request to reset your Couponaut password. This link expires in 1 hour. '
                 . 'If you did not request this, you can safely ignore this email.',
                 ['label' => 'Reset password', 'url' => $link]
             );
-            $sent = Mailer::send($user['email'], 'Reset your CouponFind password', $html, $user['name']);
+            $sent = Mailer::send($user['email'], 'Reset your Couponaut password', $html, $user['name']);
 
             $payload = ['message' => 'If the email exists, a reset link has been sent.'];
             // When email delivery is not configured (e.g. local dev), surface the

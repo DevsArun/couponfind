@@ -22,8 +22,8 @@ final class Mailer
     public static function send(string $toEmail, string $subject, string $htmlBody, ?string $toName = null, ?array $from = null): bool
     {
         $host = Settings::get('mail_host', 'MAIL_HOST');
-        $fromAddr = !empty($from['address']) ? $from['address'] : Settings::get('mail_from_address', 'MAIL_FROM_ADDRESS', 'no-reply@couponfind.example');
-        $fromName = !empty($from['name']) ? $from['name'] : Settings::get('mail_from_name', 'MAIL_FROM_NAME', 'CouponFind');
+        $fromAddr = !empty($from['address']) ? $from['address'] : Settings::get('mail_from_address', 'MAIL_FROM_ADDRESS', 'no-reply@couponaut.example');
+        $fromName = !empty($from['name']) ? $from['name'] : Settings::get('mail_from_name', 'MAIL_FROM_NAME', 'Couponaut');
 
         if ($host === '') {
             // No SMTP configured — log so it's observable in dev.
@@ -127,7 +127,7 @@ final class Mailer
             'Content-Type: text/html; charset=UTF-8',
             'Content-Transfer-Encoding: 8bit',
             'Date: ' . date('r'),
-            'Message-ID: <' . bin2hex(random_bytes(12)) . '@couponfind>',
+            'Message-ID: <' . bin2hex(random_bytes(12)) . '@couponaut>',
         ];
         // Dot-stuffing per RFC 5321.
         $body = preg_replace('/^\./m', '..', $htmlBody) ?? $htmlBody;
@@ -164,11 +164,11 @@ final class Mailer
         return '<!DOCTYPE html><html><body style="margin:0;background:#f4f4f5;font-family:Inter,Arial,sans-serif;color:#0d0d0d;padding:32px;">'
             . '<div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid rgba(13,13,13,0.1);border-radius:16px;padding:32px;">'
             . '<div style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:#0d0d0d;color:#fff;font-weight:900;margin-bottom:8px;">C</div>'
-            . '<div style="font-weight:800;font-size:18px;margin-bottom:2px;">CouponFind</div>'
+            . '<div style="font-weight:800;font-size:18px;margin-bottom:2px;">Couponaut</div>'
             . '<h1 style="font-size:22px;margin:16px 0 8px;color:#0d0d0d;">' . htmlspecialchars($heading) . '</h1>'
             . '<div style="color:#555;font-size:15px;line-height:1.6;">' . $bodyHtml . '</div>'
             . $button
-            . '<div style="color:#9b9b9b;font-size:12px;margin-top:28px;border-top:1px solid rgba(13,13,13,0.08);padding-top:16px;">You received this email from CouponFind.</div>'
+            . '<div style="color:#9b9b9b;font-size:12px;margin-top:28px;border-top:1px solid rgba(13,13,13,0.08);padding-top:16px;">You received this email from Couponaut.</div>'
             . '</div></body></html>';
     }
 }

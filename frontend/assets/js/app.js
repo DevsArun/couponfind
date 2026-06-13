@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind — user dashboard application (hash-routed SPA)
+   Couponaut — user dashboard application (hash-routed SPA)
    ===================================================================== */
 (function () {
   const { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, copyToClipboard, skeletonList } = UI;

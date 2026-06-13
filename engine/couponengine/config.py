@@ -70,7 +70,7 @@ class Config:
     OPENAI_MODEL = env("OPENAI_MODEL", "gpt-4o-mini")
 
     # Crawler behaviour
-    USER_AGENT = env("ENGINE_USER_AGENT", "CouponFindBot/1.0 (+https://couponfind.example)")
+    USER_AGENT = env("ENGINE_USER_AGENT", "CouponautBot/1.0 (+https://couponaut.example)")
     CONCURRENCY = env_int("ENGINE_CRAWL_CONCURRENCY", 4)
     REQUEST_TIMEOUT = env_int("ENGINE_REQUEST_TIMEOUT", 20)
 

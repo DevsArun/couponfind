@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind — Super Admin Mission Control (hash-routed SPA)
+   Couponaut — Super Admin Mission Control (hash-routed SPA)
    ===================================================================== */
 (function () {
   const { el, els, h, esc, toast, fmt, icon, modal, confirmDialog } = UI;
@@ -566,9 +566,9 @@
         title('Email & SMTP', 'Sender + SMTP server used for verification, welcome and all outbound email'),
         h('div', { class: 'card p-6 grid gap-5', style: 'max-width:680px;' }, [
           h('div', {}, [h('h3', { class: 'font-bold' }, 'System sender (verification & welcome)'), h('p', { class: 'text-muted text-sm mt-1' }, 'Used for account verification, welcome and system emails.')]),
-          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_from_address', 'From address', 'no-reply@yourdomain.com'), field('mail_from_name', 'From name', 'CouponFind')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_from_address', 'From address', 'no-reply@yourdomain.com'), field('mail_from_name', 'From name', 'Couponaut')]),
           h('div', { class: 'border-t hairline', style: 'border-top-width:1px;padding-top:1rem;' }, [h('h3', { class: 'font-bold' }, 'Outreach sender (admin → user emails)'), h('p', { class: 'text-muted text-sm mt-1' }, 'Used when you email a user from the panel. Leave blank to reuse the system sender.')]),
-          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_user_from_address', 'From address', 'team@yourdomain.com'), field('mail_user_from_name', 'From name', 'CouponFind Team')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_user_from_address', 'From address', 'team@yourdomain.com'), field('mail_user_from_name', 'From name', 'Couponaut Team')]),
           h('div', { class: 'border-t hairline', style: 'border-top-width:1px;padding-top:1rem;' }, [h('h3', { class: 'font-bold' }, 'SMTP server')]),
           h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_host', 'Host', 'smtp.gmail.com'), field('mail_port', 'Port', '587')]),
           h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_username', 'Username', 'you@gmail.com'), field('mail_password', 'Password / app password', 'leave blank to keep current', 'password')]),

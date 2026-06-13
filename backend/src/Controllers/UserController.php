@@ -178,10 +178,10 @@ final class UserController
 
         $currency = strtoupper((string) ($inv['currency'] ?? 'USD'));
         $amount = number_format(((int) $inv['amount_cents']) / 100, 2);
-        $desc = $inv['plan_name'] ? ($inv['plan_name'] . ' plan subscription') : 'CouponFind subscription';
+        $desc = $inv['plan_name'] ? ($inv['plan_name'] . ' plan subscription') : 'Couponaut subscription';
 
         $pdf = new \CouponFind\Support\Pdf();
-        $pdf->line('CouponFind', 22)->gap(2)
+        $pdf->line('Couponaut', 22)->gap(2)
             ->line('AI Coupon Search SaaS', 10)->gap(14)
             ->line('INVOICE', 16)->gap(6)
             ->line('Invoice #: ' . $inv['number'], 11)
@@ -200,7 +200,7 @@ final class UserController
             ->line(str_pad('TOTAL', 48) . $currency . ' ' . $amount, 13)
             ->gap(24)
             ->line('Thank you for your business.', 10)
-            ->line('CouponFind - billing@couponfind.example', 9);
+            ->line('Couponaut - billing@couponaut.example', 9);
 
         return Response::raw($pdf->render(), 'application/pdf', [
             'Content-Disposition' => 'attachment; filename="' . $inv['number'] . '.pdf"',

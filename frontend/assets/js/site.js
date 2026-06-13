@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind — shared marketing site chrome (header + footer)
+   Couponaut — shared marketing site chrome (header + footer)
    Injected into static pages (about, contact, privacy, terms, pricing).
    ===================================================================== */
 (function () {
@@ -24,7 +24,7 @@
         <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);">
             <span class="brand-mark" style="width:30px;height:30px;">C</span>
-            <span class="font-extrabold tracking-tight" style="font-size:1.1rem;">CouponFind</span>
+            <span class="font-extrabold tracking-tight" style="font-size:1.1rem;">Couponaut</span>
           </a>
           <nav class="hidden md:flex items-center gap-7 text-sm">${navLinks('')}</nav>
           <div class="hidden md:flex items-center gap-2">
@@ -58,7 +58,7 @@
         <div class="max-w-6xl mx-auto px-5 py-12 grid md:grid-cols-4 gap-8">
           <div>
             <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);">
-              <span class="brand-mark" style="width:28px;height:28px;">C</span><span class="font-extrabold">CouponFind</span>
+              <span class="brand-mark" style="width:28px;height:28px;">C</span><span class="font-extrabold">Couponaut</span>
             </a>
             <p class="text-muted text-sm mt-3" style="max-width:240px;">The AI coupon search that works like a conversation.</p>
           </div>
@@ -88,7 +88,7 @@
         </div>
         <div class="border-t hairline">
           <div class="max-w-6xl mx-auto px-5 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-muted text-sm">
-            <span>© ${year} CouponFind. Built for speed.</span>
+            <span>© ${year} Couponaut. Built for speed.</span>
             <span>Made for people who hate paying full price.</span>
           </div>
         </div>

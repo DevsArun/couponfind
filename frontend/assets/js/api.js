@@ -1,5 +1,5 @@
 /* =====================================================================
-   CouponFind API client (vanilla JS)
+   Couponaut API client (vanilla JS)
    - JSON fetch wrapper with bearer token + CSRF handling
    - transparent access-token refresh on 401
    ===================================================================== */

@@ -13,7 +13,7 @@ final class HealthController
     public function index(Request $request): Response
     {
         return Response::ok([
-            'service' => 'couponfind-api',
+            'service' => 'couponaut-api',
             'status'  => 'ok',
             'db'      => Database::instance()->healthy(),
             'time'    => gmdate('c'),

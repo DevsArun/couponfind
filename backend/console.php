@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * CouponFind PHP console — maintenance + background tasks for cron.
+ * Couponaut PHP console — maintenance + background tasks for cron.
  *
  * Usage:
  *   php backend/console.php alerts:dispatch     match new coupons -> notify users (in-app + email)
@@ -48,14 +48,14 @@ try {
                 fwrite(STDERR, "Usage: php console.php mail:test <email>" . PHP_EOL);
                 exit(1);
             }
-            $html = Mailer::render('SMTP test', 'If you can read this, your CouponFind SMTP configuration works.');
-            $ok = Mailer::send($to, 'CouponFind SMTP test', $html);
+            $html = Mailer::render('SMTP test', 'If you can read this, your Couponaut SMTP configuration works.');
+            $ok = Mailer::send($to, 'Couponaut SMTP test', $html);
             fwrite(STDOUT, '[mail:test] sent=' . ($ok ? 'true' : 'false (check MAIL_* env)') . PHP_EOL);
             exit($ok ? 0 : 1);
 
         case 'help':
         default:
-            fwrite(STDOUT, "CouponFind console commands:\n"
+            fwrite(STDOUT, "Couponaut console commands:\n"
                 . "  alerts:dispatch    notify users about new coupons matching alerts/watchlists\n"
                 . "  coupons:expire     expire coupons past their valid_until\n"
                 . "  mail:test <email>  send a test email\n");

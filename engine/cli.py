@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CouponFind Coupon Intelligence Engine — command-line entrypoint.
+"""Couponaut Coupon Intelligence Engine — command-line entrypoint.
 
 Usage:
     python cli.py schedule        # run scheduler loop (default in Docker)

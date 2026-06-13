@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact — CouponFind</title>
-  <meta name="description" content="Get in touch with the CouponFind team — support, partnerships, press and feedback." />
+  <title>Contact — Couponaut</title>
+  <meta name="description" content="Get in touch with the Couponaut team — support, partnerships, press and feedback." />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/app.css" />
@@ -22,16 +22,16 @@
     <div class="md:col-span-1 grid gap-4 content-start">
       <div class="card p-5">
         <div class="font-bold mb-1">Email</div>
-        <a href="mailto:hello@couponfind.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">hello@couponfind.app</a>
+        <a href="mailto:hello@couponaut.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">hello@couponaut.app</a>
       </div>
       <div class="card p-5">
         <div class="font-bold mb-1">Support</div>
-        <a href="mailto:support@couponfind.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">support@couponfind.app</a>
+        <a href="mailto:support@couponaut.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">support@couponaut.app</a>
         <p class="text-muted text-sm mt-2" style="margin:0.5rem 0 0;">For account &amp; billing help.</p>
       </div>
       <div class="card p-5">
         <div class="font-bold mb-1">Partnerships</div>
-        <a href="mailto:partners@couponfind.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">partners@couponfind.app</a>
+        <a href="mailto:partners@couponaut.app" style="color:var(--accent);text-decoration:none;font-size:0.95rem;">partners@couponaut.app</a>
       </div>
     </div>
 
@@ -62,10 +62,10 @@
         e.preventDefault();
         var name = document.getElementById('c-name').value.trim();
         var email = document.getElementById('c-email').value.trim();
-        var subject = encodeURIComponent(document.getElementById('c-subject').value.trim() || 'CouponFind enquiry');
+        var subject = encodeURIComponent(document.getElementById('c-subject').value.trim() || 'Couponaut enquiry');
         var body = encodeURIComponent('From: ' + name + ' <' + email + '>\n\n' + document.getElementById('c-message').value.trim());
         UI.toast('Opening your email app…', 'info');
-        window.location.href = 'mailto:hello@couponfind.app?subject=' + subject + '&body=' + body;
+        window.location.href = 'mailto:hello@couponaut.app?subject=' + subject + '&body=' + body;
       });
     })();
   </script>
