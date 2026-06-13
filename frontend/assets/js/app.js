@@ -15,9 +15,18 @@
   el('#bell-ico').innerHTML = icon('bell');
   el('#logout-ico').innerHTML = icon('logout');
 
+  // ---- Running "coupons found" counter (ChatGPT-style, lives in the header) ----
+  let sessionFound = 0;
+  function bumpFound(n) {
+    sessionFound += (n || 0);
+    const label = sessionFound + ' coupon' + (sessionFound === 1 ? '' : 's') + ' found';
+    const hdr = el('#found-counter'); if (hdr) hdr.textContent = label;
+    const inView = el('#view-found'); if (inView) inView.textContent = sessionFound + ' found';
+  }
+
   const NAV = [
+    { id: 'search', label: 'AI Search', icon: 'sparkles' },
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-    { id: 'search', label: 'AI Search', icon: 'search' },
     { id: 'saved', label: 'Saved Coupons', icon: 'bookmark' },
     { id: 'watchlist', label: 'Watchlist', icon: 'eye' },
     { id: 'alerts', label: 'Deal Alerts', icon: 'bolt' },
@@ -158,46 +167,92 @@
     },
 
     async search(params) {
-      const wrap = h('div', {}, [
-        pageTitle('AI Search', 'Type naturally — typos welcome.'),
-        h('div', { class: 'card p-2 flex items-center gap-2 mb-5' }, [
-          h('span', { style: 'padding-left:0.5rem;width:20px;color:var(--muted);', html: icon('search') }),
-          h('input', { id: 'sq', class: 'input', style: 'border:none;background:transparent;font-size:1.05rem;', placeholder: 'best amazon coupon today…' }),
-          h('button', { class: 'btn btn-primary', onclick: doSearch }, 'Search'),
+      // Full-height ChatGPT-style chat: details live in the left sidebar,
+      // the conversation runs here on the right, and the header keeps a running count.
+      const thread = h('div', { class: 'chat-thread', id: 'chat-thread', style: 'flex:1;' });
+      const ta = h('textarea', { id: 'sq', rows: '1', placeholder: 'Ask for a coupon… e.g. best amazon coupon today' });
+      const sendBtn = h('button', { class: 'chat-send', html: icon('send'), onclick: () => send() });
+      const shell = h('div', { class: 'chat-shell', style: 'height:calc(100vh - 8.5rem);' }, [
+        thread,
+        h('div', { class: 'chat-composer' }, [
+          h('div', { class: 'input-wrap' }, [ta]),
+          sendBtn,
         ]),
-        h('div', { id: 'sresults' }),
+      ]);
+      const wrap = h('div', {}, [
+        h('div', { class: 'flex items-center justify-between mb-4 fade-up' }, [
+          h('div', {}, [
+            h('h1', { class: 'h-display', style: 'font-size:1.5rem;' }, 'AI Search'),
+            h('p', { class: 'text-muted text-sm mt-1' }, 'Ask naturally — typos welcome.'),
+          ]),
+          h('span', { id: 'view-found', class: 'badge badge-muted' }, sessionFound + ' found'),
+        ]),
+        shell,
       ]);
       setView(wrap);
-      const input = el('#sq');
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-      const q = params.get('q');
-      if (q) { input.value = q; doSearch(); } else input.focus();
 
-      async function doSearch() {
-        const query = input.value.trim();
-        const box = el('#sresults');
-        if (!query) return;
-        box.innerHTML = ''; box.appendChild(skeletonList(4, '96px'));
+      // greeting / empty state
+      thread.appendChild(h('div', { class: 'chat-empty', id: 'empty-state' }, [
+        h('div', { class: 'brand-mark mx-auto', style: 'width:46px;height:46px;font-size:1.1rem;margin-bottom:0.9rem;' }, 'C'),
+        h('div', { class: 'font-bold', style: 'font-size:1.05rem;color:var(--text);' }, 'Hi ' + (me.name ? me.name.split(' ')[0] : 'there') + ' 👋 what are we saving on?'),
+        h('p', { class: 'text-sm mt-1', style: 'max-width:360px;margin:0.4rem auto 0;' }, 'Ask for any brand, deal or category. I understand typos, slang and intent.'),
+        h('div', { class: 'chat-suggest justify-center mt-4' },
+          ['best amazon coupon today', 'nike offer', 'best vpn deal', 'bst niek coupn'].map(x =>
+            h('button', { class: 'chip', onclick: () => { ta.value = x; send(); } }, x))),
+      ]));
+
+      let busy = false;
+      function scrollDown() { thread.scrollTop = thread.scrollHeight; }
+      function autogrow() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; }
+      ta.addEventListener('input', autogrow);
+      ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+
+      function userRow(text) {
+        return h('div', { class: 'chat-row user' }, [h('div', { class: 'chat-avatar user' }, (me.name || 'U').trim()[0].toUpperCase()), h('div', { class: 'chat-bubble' }, text)]);
+      }
+      function botRow(node, full) {
+        return h('div', { class: 'chat-row bot' }, [h('div', { class: 'chat-avatar bot', html: icon('sparkles') }), h('div', { class: 'chat-bubble' + (full ? ' full' : '') }, node)]);
+      }
+
+      async function send() {
+        const query = ta.value.trim();
+        if (!query || busy) return;
+        busy = true;
+        const es = el('#empty-state'); if (es) es.remove();
+        thread.appendChild(userRow(query));
+        ta.value = ''; autogrow();
+        const typing = h('div', { class: 'chat-row bot' }, [h('div', { class: 'chat-avatar bot', html: icon('sparkles') }), h('div', { class: 'chat-bubble' }, h('div', { class: 'typing' }, [h('span'), h('span'), h('span')]))]);
+        thread.appendChild(typing); scrollDown();
         try {
           const data = await API.post('/search', { q: query });
-          box.innerHTML = '';
-          box.appendChild(h('div', { class: 'flex items-center justify-between text-sm text-muted mb-3' }, [
-            h('span', {}, fmt.num(data.count) + ' results · ' + data.took_ms + 'ms · via ' + data.source + (data.cache_hit ? ' (cached)' : '')),
-            data.quota ? h('span', {}, data.quota.unlimited ? '∞ searches' : (data.quota.remaining + ' left today')) : h('span'),
-          ]));
-          if (!data.results.length) { box.appendChild(h('div', { class: 'card p-8 text-center text-muted' }, 'No results. Try another query.')); return; }
-          const grid = h('div', { class: 'grid md:grid-cols-2 gap-3 stagger' });
-          data.results.forEach(c => grid.appendChild(couponCard(c)));
-          box.appendChild(grid);
+          typing.remove();
+          bumpFound(data.count || 0);
+          const n = data.count || 0;
+          const brand = data.intent && data.intent.merchant ? data.intent.merchant : null;
+          const line = !n
+            ? `I couldn't find live coupons for "${query}" right now. Try a brand name or broader term.`
+            : `Found ${n} working coupon${n === 1 ? '' : 's'} ${brand ? 'for ' + brand : 'matching "' + query + '"'} in ${data.took_ms}ms. ${n === 1 ? "Here's the best one" : 'Here are the best ones'} 👇`;
+          const block = h('div', {}, [h('p', { style: 'margin:0 0 0.4rem;' }, line)]);
+          if (data.results && data.results.length) {
+            const grid = h('div', { class: 'grid sm:grid-cols-2 gap-3 mt-2 stagger' });
+            data.results.forEach(c => grid.appendChild(couponCard(c)));
+            block.appendChild(grid);
+          }
+          block.appendChild(h('div', { class: 'chat-meta' }, `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '')));
+          thread.appendChild(botRow(block, true));
         } catch (e) {
-          box.innerHTML = '';
-          box.appendChild(h('div', { class: 'card p-6 text-center' }, [
-            h('p', { class: 'font-semibold' }, e.status === 402 ? 'Search limit reached' : 'Search failed'),
-            h('p', { class: 'text-muted text-sm mt-1' }, e.message),
-            e.status === 402 ? h('a', { href: '#billing', class: 'btn btn-primary mt-3', style: 'display:inline-flex;' }, 'Upgrade plan') : null,
-          ]));
+          typing.remove();
+          thread.appendChild(botRow(h('div', {}, [
+            h('p', { style: 'margin:0;' }, e.status === 402 ? 'You have used all your searches for today.' : (e.message || 'Search failed.')),
+            e.status === 402 ? h('a', { href: '#billing', class: 'btn btn-primary btn-sm mt-3', style: 'display:inline-flex;' }, 'Upgrade plan') : null,
+          ])));
+        } finally {
+          busy = false; scrollDown(); ta.focus();
         }
       }
+
+      const q = params.get('q');
+      if (q) { ta.value = q; send(); } else ta.focus();
     },
 
     async saved() {
@@ -458,7 +513,7 @@
   (async function boot() {
     try { me = await API.me(); API.store.user = me; paintUser(); el('#user-plan').textContent = (me.role_name || 'Member'); }
     catch (e) { await API.logout(); location.href = '/login'; return; }
-    if (!location.hash) location.hash = 'dashboard';
+    if (!location.hash) location.hash = 'search';
     route();
     refreshBell();
   })();
