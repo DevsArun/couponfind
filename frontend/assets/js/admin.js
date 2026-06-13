@@ -11,6 +11,7 @@
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'users', label: 'Users', icon: 'users' },
+    { id: 'messages', label: 'Messages', icon: 'message' },
     { id: 'plans', label: 'Plans', icon: 'card' },
     { id: 'subscriptions', label: 'Subscriptions', icon: 'list' },
     { id: 'revenue', label: 'Revenue', icon: 'chart' },
@@ -94,10 +95,11 @@
       const d = await API.get('/admin/users');
       const wrap = h('div', {}, [title('Users', fmt.num(d.total) + ' total')]);
       const table = h('table', { class: 'table' }, [
-        h('thead', {}, h('tr', {}, ['User', 'Role', 'Status', 'Joined', 'Actions'].map(x => h('th', {}, x)))),
+        h('thead', {}, h('tr', {}, ['User', 'Role', 'Plan', 'Status', 'Joined', 'Actions'].map(x => h('th', {}, x)))),
         h('tbody', {}, d.data.map(u => h('tr', {}, [
           h('td', {}, [h('div', { class: 'font-semibold' }, u.name), h('div', { class: 'text-muted text-xs' }, u.email)]),
           h('td', {}, h('span', { class: 'badge badge-blue' }, u.role_name)),
+          h('td', {}, h('span', { class: 'badge ' + (u.plan_name ? 'badge-accent' : 'badge-muted') }, u.plan_name || 'Free')),
           h('td', {}, h('span', { class: 'badge ' + (u.status === 'active' ? 'badge-green' : 'badge-red') }, u.status)),
           h('td', { class: 'text-muted' }, fmt.date(u.created_at)),
           h('td', {}, h('div', { class: 'flex gap-2' }, [
@@ -554,6 +556,35 @@
       }
       tick();
       livePoll = setInterval(tick, 3000);
+    },
+
+    async messages() {
+      loading();
+      const d = await API.get('/admin/contact-messages');
+      const wrap = h('div', {}, [title('Messages', (d.new || 0) + ' new · ' + d.messages.length + ' total — queries from the contact form')]);
+      if (!d.messages.length) { wrap.appendChild(h('div', { class: 'card p-10 text-center text-muted' }, 'No messages yet.')); setView(wrap); return; }
+      const list = h('div', { class: 'grid gap-3' });
+      d.messages.forEach(m => list.appendChild(h('div', { class: 'card p-5', style: m.status === 'new' ? 'border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);' : '' }, [
+        h('div', { class: 'flex items-start justify-between gap-3' }, [
+          h('div', { style: 'min-width:0;' }, [
+            h('div', { class: 'font-bold' }, m.subject || '(no subject)'),
+            h('div', { class: 'text-muted text-sm mt-1' }, m.name + ' · ' + m.email + ' · ' + fmt.ago(m.created_at)),
+          ]),
+          h('span', { class: 'badge ' + (m.status === 'new' ? 'badge-accent' : m.status === 'archived' ? 'badge-muted' : 'badge-green') }, m.status),
+        ]),
+        h('p', { class: 'text-sm mt-3', style: 'white-space:pre-wrap;' }, m.message),
+        h('div', { class: 'flex flex-wrap gap-2 mt-4' }, [
+          h('a', { class: 'btn btn-soft btn-sm', href: 'mailto:' + m.email + '?subject=Re: ' + encodeURIComponent(m.subject || 'your message') }, 'Reply'),
+          m.status !== 'read' ? h('button', { class: 'btn btn-ghost btn-sm', onclick: () => upd(m.id, 'read') }, 'Mark read') : null,
+          m.status !== 'archived' ? h('button', { class: 'btn btn-ghost btn-sm', onclick: () => upd(m.id, 'archived') }, 'Archive') : null,
+          h('button', { class: 'btn btn-danger btn-sm', onclick: () => confirmDialog('Delete this message permanently?', () => del(m.id)) }, 'Delete'),
+        ]),
+      ])));
+      wrap.appendChild(list);
+      setView(wrap);
+
+      async function upd(id, status) { try { await API.post('/admin/contact-messages/' + id + '/status', { status }); toast('Updated', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }
+      async function del(id) { try { await API.del('/admin/contact-messages/' + id); toast('Deleted', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }
     },
 
     async email() {

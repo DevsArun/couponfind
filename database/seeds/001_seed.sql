@@ -122,9 +122,21 @@ JOIN (
 ) a ON a.s = m.slug
 ON DUPLICATE KEY UPDATE weight = VALUES(weight);
 
--- ---- Demo coupon sources ----
+-- ---- Coupon sources ----
+-- Per-merchant official offer pages (best-effort HTML extraction).
 INSERT INTO coupon_sources (merchant_id, type, url, is_active, crawl_frequency_minutes)
 SELECT m.id, 'offer_page', CONCAT(m.website_url, '/deals'), 1, 180 FROM merchants m
+ON DUPLICATE KEY UPDATE is_active = VALUES(is_active);
+
+-- Real-time RSS feeds (parsed by the engine on every discovery run).
+--  * The first is the app's OWN sample feed, served by our nginx — guarantees
+--    a handful of valid, parseable coupons on the very first discovery run.
+--  * The others are public deal feeds; some items are deals without codes,
+--    which is fine (stored as 'deal' type). Add affiliate feeds from the admin.
+INSERT INTO coupon_sources (merchant_id, type, url, is_active, crawl_frequency_minutes) VALUES
+    (NULL, 'rss', 'http://nginx/test-coupons.xml', 1, 60),
+    (NULL, 'rss', 'https://slickdeals.net/newsearch.php?mode=frontpage&searchin=first&rss=1', 1, 180),
+    (NULL, 'rss', 'https://www.dealnews.com/rss/c142/Computers/', 1, 240)
 ON DUPLICATE KEY UPDATE is_active = VALUES(is_active);
 
 -- ---- Default platform settings ----

@@ -1,6 +1,6 @@
 /* =====================================================================
    Couponaut — landing page
-   ChatGPT-style conversational coupon search + features + pricing
+   chat-style conversational coupon search + features + pricing
    ===================================================================== */
 (function () {
   const { h, el, fmt, icon, toast, copyToClipboard } = UI;

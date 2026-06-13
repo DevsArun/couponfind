@@ -78,10 +78,10 @@
         Ask for any coupon.<br/>Get the one that <span style="text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:8px;">actually works</span>.
       </h1>
       <p class="text-muted mx-auto mt-6" style="max-width:600px;font-size:1.12rem;line-height:1.6;">
-        Type it like you'd text a friend — even <span class="mono" style="color:var(--text);">"bst niek coupn"</span>. Couponaut fixes the typo, finds the brand, validates the codes, and ranks the best live deals. Like ChatGPT, but for savings.
+        Type it like you'd text a friend — even <span class="mono" style="color:var(--text);">"bst niek coupn"</span>. Couponaut fixes the typo, finds the brand, validates the codes, and ranks the best live deals. Conversational AI search — but for savings.
       </p>
 
-      <!-- ChatGPT-style search -->
+      <!-- chat-style search -->
       <div class="chat-shell mt-10 text-left" style="max-width:680px;margin-left:auto;margin-right:auto;min-height:340px;">
         <div class="flex items-center justify-between px-4 py-3" style="border-bottom:1px solid var(--border);">
           <div class="flex items-center gap-2">
@@ -168,32 +168,36 @@
   </section>
 
   <!-- Footer -->
-  <footer class="border-t hairline">
-    <div class="max-w-6xl mx-auto px-5 py-12 grid md:grid-cols-4 gap-8">
-      <div>
+  <footer class="site-footer">
+    <div class="max-w-6xl mx-auto px-5 py-14 grid gap-10 md:grid-cols-5">
+      <div class="md:col-span-2">
         <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);">
-          <span class="brand-mark" style="width:28px;height:28px;">C</span>
-          <span class="font-extrabold">Couponaut</span>
+          <span class="brand-mark" style="width:30px;height:30px;">C</span><span class="font-extrabold" style="font-size:1.1rem;">Couponaut</span>
         </a>
-        <p class="text-muted text-sm mt-3" style="max-width:240px;">The AI coupon search that works like a conversation.</p>
+        <p class="text-muted text-sm mt-3" style="max-width:300px;line-height:1.6;">The AI coupon search that finds the best working code — just ask, like a conversation.</p>
+        <div class="flex items-center gap-2 mt-5">
+          <a class="footer-social" aria-label="X (Twitter)" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21.5l-7.5 8.57L23 22h-6.844l-5.36-7.01L4.66 22H1.4l8.02-9.17L1 2h7.02l4.84 6.42L18.244 2Zm-1.2 18h1.9L7.04 4H5.02l12.024 16Z"/></svg></a>
+          <a class="footer-social" aria-label="GitHub" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg></a>
+          <a class="footer-social" aria-label="LinkedIn" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0ZM.5 8h4V24h-4V8Zm7.5 0h3.8v2.2h.05c.53-1 1.83-2.2 3.77-2.2 4.03 0 4.78 2.65 4.78 6.1V24h-4v-7.1c0-1.7-.03-3.88-2.36-3.88-2.36 0-2.72 1.84-2.72 3.75V24h-4V8Z"/></svg></a>
+        </div>
       </div>
       <div>
-        <div class="font-bold text-sm mb-3">Product</div>
-        <div class="grid gap-2 text-sm"><a href="#features" style="color:var(--muted);text-decoration:none;">Features</a><a href="/pricing" style="color:var(--muted);text-decoration:none;">Pricing</a><a href="#how" style="color:var(--muted);text-decoration:none;">How it works</a></div>
+        <div class="footer-col-title">Product</div>
+        <div class="grid gap-2.5"><a class="footer-link" href="#features">Features</a><a class="footer-link" href="/pricing">Pricing</a><a class="footer-link" href="#how">How it works</a></div>
       </div>
       <div>
-        <div class="font-bold text-sm mb-3">Company</div>
-        <div class="grid gap-2 text-sm"><a href="/about" style="color:var(--muted);text-decoration:none;">About us</a><a href="/contact" style="color:var(--muted);text-decoration:none;">Contact</a><a href="/login" style="color:var(--muted);text-decoration:none;">Sign in</a></div>
+        <div class="footer-col-title">Company</div>
+        <div class="grid gap-2.5"><a class="footer-link" href="/about">About us</a><a class="footer-link" href="/contact">Contact</a></div>
       </div>
       <div>
-        <div class="font-bold text-sm mb-3">Legal</div>
-        <div class="grid gap-2 text-sm"><a href="/privacy" style="color:var(--muted);text-decoration:none;">Privacy Policy</a><a href="/terms" style="color:var(--muted);text-decoration:none;">Terms &amp; Conditions</a></div>
+        <div class="footer-col-title">Get started</div>
+        <div class="grid gap-2.5"><a class="footer-link" href="/login">Sign in</a><a class="footer-link" href="/register">Create account</a><a class="footer-link" href="/privacy">Privacy</a><a class="footer-link" href="/terms">Terms</a></div>
       </div>
     </div>
-    <div class="border-t hairline">
-      <div class="max-w-6xl mx-auto px-5 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-muted text-sm">
-        <span>© <span id="year"></span> Couponaut. Built for speed.</span>
-        <span>Made for people who hate paying full price.</span>
+    <div class="footer-bottom">
+      <div class="max-w-6xl mx-auto px-5 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-muted" style="font-size:0.85rem;">
+        <span>© <span id="year"></span> Couponaut. All rights reserved.</span>
+        <span class="flex items-center gap-4"><a class="footer-link" href="/privacy">Privacy</a><a class="footer-link" href="/terms">Terms</a><a class="footer-link" href="/contact">Contact</a></span>
       </div>
     </div>
   </footer>

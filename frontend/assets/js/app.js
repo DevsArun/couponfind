@@ -23,7 +23,7 @@
     const inView = el('#view-found'); if (inView) inView.textContent = sessionFound + ' found';
   }
 
-  // ---- Secondary menu (lives in the bottom account popover, ChatGPT-style) ----
+  // ---- Secondary menu (lives in the bottom account popover, chat-style) ----
   const MENU = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'saved', label: 'Saved Coupons', icon: 'bookmark' },
@@ -67,7 +67,7 @@
 
   el('#new-chat').addEventListener('click', () => { activeConvId = null; location.hash = 'search?new=1'; });
 
-  // ---- Account popover (bottom-left, ChatGPT-style) ----
+  // ---- Account popover (bottom-left, chat-style) ----
   const acctMenu = el('#acct-menu');
   MENU.forEach(m => acctMenu.appendChild(h('a', { class: 'acct-item', href: '#' + m.id }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon(m.icon) }), h('span', {}, m.label)])));
   if (me.is_admin) acctMenu.appendChild(h('a', { class: 'acct-item', href: '/admin/' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('shield') }), h('span', {}, 'Admin console')]));

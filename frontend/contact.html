@@ -58,14 +58,24 @@
   <script>
     (function () {
       var f = document.getElementById('contact-form');
-      f.addEventListener('submit', function (e) {
+      var btn = f.querySelector('button[type="submit"]');
+      f.addEventListener('submit', async function (e) {
         e.preventDefault();
-        var name = document.getElementById('c-name').value.trim();
-        var email = document.getElementById('c-email').value.trim();
-        var subject = encodeURIComponent(document.getElementById('c-subject').value.trim() || 'Couponaut enquiry');
-        var body = encodeURIComponent('From: ' + name + ' <' + email + '>\n\n' + document.getElementById('c-message').value.trim());
-        UI.toast('Opening your email app…', 'info');
-        window.location.href = 'mailto:hello@couponaut.app?subject=' + subject + '&body=' + body;
+        var payload = {
+          name: document.getElementById('c-name').value.trim(),
+          email: document.getElementById('c-email').value.trim(),
+          subject: document.getElementById('c-subject').value.trim(),
+          message: document.getElementById('c-message').value.trim(),
+        };
+        if (!payload.name || !payload.email || !payload.message) { UI.toast('Please fill in your name, email and message.', 'err'); return; }
+        btn.disabled = true; btn.textContent = 'Sending…';
+        try {
+          await API.post('/contact', payload, { noAuth: true });
+          f.innerHTML = '<div class="text-center" style="padding:1rem 0;"><div class="h-display" style="font-size:1.4rem;">Thank you! 🎉</div><p class="text-muted mt-2">Your message has been received. We\'ll get back to you within 1–2 business days.</p></div>';
+        } catch (err) {
+          UI.toast(err.message || 'Could not send. Please try again.', 'err');
+          btn.disabled = false; btn.textContent = 'Send message';
+        }
       });
     })();
   </script>

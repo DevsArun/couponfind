@@ -1,6 +1,6 @@
 /* =====================================================================
    Couponaut — design system
-   Monochrome black & white theme · clean · minimal · ChatGPT-style search
+   Monochrome black & white theme · clean · minimal · chat-style search
    Palette: bg #FFFFFF · surface #F7F7F8 · ink #0D0D0D · line rgba(0,0,0,.1)
    ===================================================================== */
 
@@ -189,7 +189,7 @@ body {
 }
 
 /* =====================================================================
-   ChatGPT-style coupon search
+   chat-style coupon search
    ===================================================================== */
 .chat-shell {
   display: flex; flex-direction: column;
@@ -231,7 +231,7 @@ body {
 .typing span:nth-child(3) { animation-delay: 0.36s; }
 @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-5px); opacity: 1; } }
 
-/* chat composer (sticky input like ChatGPT) */
+/* chat composer (sticky input like a chat app) */
 .chat-composer {
   border-top: 1px solid var(--border); background: var(--card);
   padding: 0.75rem; display: flex; align-items: flex-end; gap: 0.6rem;
@@ -324,7 +324,7 @@ body {
 
 
 /* =====================================================================
-   ChatGPT-style sidebar: chat history + bottom account menu
+   chat-style sidebar: chat history + bottom account menu
    ===================================================================== */
 .app-sidebar #nav { scrollbar-width: thin; align-content: start; }
 .chat-hist { position: relative; padding-right: 2rem; }
@@ -358,7 +358,7 @@ body {
 .acct-sep { height: 1px; background: var(--border); margin: 0.35rem 0.3rem; }
 
 /* =====================================================================
-   Refined ChatGPT-style chat (centered, compact, calm)
+   Refined chat-style chat (centered, compact, calm)
    ===================================================================== */
 .chat-page { height: 100%; }
 .chat-thread { padding: 1.25rem 1rem; gap: 1.1rem; }
@@ -393,7 +393,7 @@ body {
 
 
 /* =====================================================================
-   Premium ChatGPT-style chat (final pass)
+   Premium chat-style chat (final pass)
    - Assistant replies render as clean text (no gray box), avatar at left
    - Dashboard chat is seamless/full-bleed (no surrounding card)
    - User messages keep a subtle solid bubble on the right
@@ -461,3 +461,19 @@ body {
 .live-line .ls-bad { color: var(--red); font-weight: 700; }
 .live-line .ls-run { color: var(--blue); font-weight: 700; }
 .live-line .ls-queue { color: var(--muted); }
+
+
+/* =====================================================================
+   Professional footer
+   ===================================================================== */
+.site-footer { margin-top: 4rem; background: var(--bg-2); border-top: 1px solid var(--border); }
+.footer-col-title { font-weight: 700; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 0.9rem; }
+.footer-link { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.15s; }
+.footer-link:hover { color: var(--text); }
+.footer-social {
+  width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-strong); color: var(--muted); transition: all 0.15s;
+}
+.footer-social:hover { background: var(--accent); color: var(--on-accent); border-color: var(--accent); transform: translateY(-2px); }
+.footer-social svg { width: 17px; height: 17px; }
+.footer-bottom { border-top: 1px solid var(--border); }

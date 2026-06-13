@@ -411,6 +411,33 @@ final class AdminController
         return Response::ok(['sent' => true], 'Email sent to ' . $user['email']);
     }
 
+    // ---- Contact messages (from the public contact form) ----
+    public function contactMessages(Request $request): Response
+    {
+        \CouponFind\Controllers\ContactController::ensureTable($this->db);
+        return Response::ok([
+            'messages' => $this->db->all('SELECT id, name, email, subject, message, status, ip, created_at FROM contact_messages ORDER BY id DESC LIMIT 300'),
+            'new'      => (int) $this->db->scalar("SELECT COUNT(*) FROM contact_messages WHERE status = 'new'"),
+        ]);
+    }
+
+    public function updateContactMessage(Request $request, array $params): Response
+    {
+        $status = (string) $request->input('status', 'read');
+        if (!in_array($status, ['new', 'read', 'archived'], true)) {
+            $status = 'read';
+        }
+        $this->db->execute('UPDATE contact_messages SET status = ? WHERE id = ?', [$status, (int) $params['id']]);
+        return Response::ok(null, 'Message updated');
+    }
+
+    public function deleteContactMessage(Request $request, array $params): Response
+    {
+        $this->db->execute('DELETE FROM contact_messages WHERE id = ?', [(int) $params['id']]);
+        Audit::log((int) $request->userId(), 'admin.contact.delete', 'contact_message', (string) $params['id'], [], $request->ip());
+        return Response::ok(null, 'Message deleted');
+    }
+
     // ---- Live activity feed (for the real-time backend log view) ----
     public function activity(Request $request): Response
     {

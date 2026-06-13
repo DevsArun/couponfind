@@ -80,7 +80,10 @@ final class UserRepository
         }
         $rows = $this->db->all(
             "SELECT u.id, u.uuid, u.name, u.email, u.status, u.created_at, u.last_login_at,
-                    r.slug AS role_slug, r.name AS role_name
+                    r.slug AS role_slug, r.name AS role_name,
+                    (SELECT p.name FROM subscriptions s JOIN plans p ON p.id = s.plan_id
+                       WHERE s.user_id = u.id AND s.status = 'active'
+                       ORDER BY s.id DESC LIMIT 1) AS plan_name
              FROM users u JOIN roles r ON r.id = u.role_id
              $where ORDER BY u.id DESC LIMIT $perPage OFFSET $offset",
             $params
