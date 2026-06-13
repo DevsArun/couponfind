@@ -226,13 +226,15 @@
       const d = await API.get('/admin/coupons');
       const wrap = h('div', {}, [title('Coupons', fmt.num(d.total) + ' total')]);
       wrap.appendChild(h('div', { class: 'card', style: 'overflow:auto;' }, h('table', { class: 'table' }, [
-        h('thead', {}, h('tr', {}, ['Title', 'Merchant', 'Code', 'Discount', 'Status', 'Actions'].map(x => h('th', {}, x)))),
+        h('thead', {}, h('tr', {}, ['Title', 'Merchant', 'Code', 'Discount', 'Status', 'Start', 'Expires', 'Actions'].map(x => h('th', {}, x)))),
         h('tbody', {}, d.data.map(c => h('tr', {}, [
           h('td', { style: 'max-width:260px;' }, c.title),
           h('td', {}, c.merchant_name),
           h('td', { class: 'mono' }, c.code || '—'),
           h('td', {}, h('span', { class: 'badge badge-accent' }, fmt.discount(c))),
           h('td', {}, h('span', { class: 'badge ' + (c.status === 'active' ? 'badge-green' : 'badge-muted') }, c.status)),
+          h('td', { class: 'text-muted', style: 'white-space:nowrap;' }, c.starts_at ? c.starts_at.slice(0, 10) : '—'),
+          h('td', { class: 'text-muted', style: 'white-space:nowrap;' }, c.valid_until ? c.valid_until.slice(0, 10) : '—'),
           h('td', {}, h('div', { class: 'flex gap-2' }, [
             h('button', { class: 'btn btn-ghost btn-sm', onclick: async () => { await API.post('/admin/coupons/' + c.id + '/status', { status: c.status === 'active' ? 'unverified' : 'active' }); toast('Updated', 'ok'); route(); } }, c.status === 'active' ? 'Unverify' : 'Activate'),
             h('button', { class: 'btn btn-danger btn-sm', onclick: async () => { await API.post('/admin/coupons/' + c.id + '/expire', {}); toast('Expired', 'ok'); route(); } }, 'Expire'),
@@ -447,7 +449,7 @@
   (async function boot() {
     let me;
     try { me = await API.me(); } catch (e) { await API.logout(); location.href = '/login'; return; }
-    if (!me.is_admin) { location.href = '/app'; return; }
+    if (!me.is_admin) { location.href = '/app/'; return; }
     el('#user-name').textContent = me.name;
     el('#avatar').textContent = (me.name || 'A')[0].toUpperCase();
     // Health indicator

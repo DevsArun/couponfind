@@ -4,9 +4,17 @@
 
   function redirectAfterAuth(user) {
     const params = new URLSearchParams(location.search);
-    const next = params.get('next');
-    if (next && next.startsWith('/')) { location.href = next; return; }
-    location.href = user && user.is_admin ? '/admin' : '/app';
+    let next = params.get('next');
+    // Always target the directory WITH a trailing slash. Behind a reverse proxy
+    // (e.g. GitHub Codespaces) nginx would otherwise 301 "/admin" -> "/admin/"
+    // using the internal Host header, bouncing the browser to localhost.
+    const home = user && user.is_admin ? '/admin/' : '/app/';
+    if (next && next.startsWith('/')) {
+      if (next === '/admin') next = '/admin/';
+      else if (next === '/app') next = '/app/';
+      location.href = next; return;
+    }
+    location.href = home;
   }
 
   function showError(msg, errors) {

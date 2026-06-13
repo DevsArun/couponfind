@@ -17,7 +17,7 @@ final class CouponRepository
 
     private const SELECT = "
         SELECT c.id, c.title, c.description, c.code, c.type, c.discount_type, c.discount_value,
-               c.currency, c.landing_url, c.terms, c.status, c.is_featured, c.valid_until,
+               c.currency, c.landing_url, c.terms, c.status, c.is_featured, c.starts_at, c.valid_until,
                c.success_count, c.fail_count, c.times_used,
                m.id AS merchant_id, m.name AS merchant_name, m.slug AS merchant_slug, m.logo_url AS merchant_logo,
                COALESCE(cs.score, 0) AS score

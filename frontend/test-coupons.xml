@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>CouponFind Test Deals</title>
+    <link>http://nginx/test-coupons.xml</link>
+    <description>Sample coupon feed for end-to-end testing of the CouponFind engine. Served by the app's own nginx, so it is never blocked by robots.txt.</description>
+    <language>en-us</language>
+
+    <item>
+      <title>Amazon: 30% off electronics with code TESTSAVE30</title>
+      <link>https://www.amazon.com/deals</link>
+      <description>Limited time deal! Use coupon code TESTSAVE30 at checkout to get 30% off select electronics.</description>
+    </item>
+    <item>
+      <title>Nike: Extra 25% off sale items - code RUNFAST25</title>
+      <link>https://www.nike.com/sale</link>
+      <description>Save an extra 25% on already discounted sale items. Apply coupon RUNFAST25 at checkout.</description>
+    </item>
+    <item>
+      <title>Hostinger: 75% off web hosting - use code HOSTDEAL75</title>
+      <link>https://www.hostinger.com/special</link>
+      <description>Get up to 75% off all web hosting plans. Use code HOSTDEAL75 to claim the discount.</description>
+    </item>
+    <item>
+      <title>NordVPN: 65% off 2-year plan with coupon NORDTEST65</title>
+      <link>https://www.nordvpn.com/offer</link>
+      <description>Protect yourself online and save 65%. Coupon code NORDTEST65 applied at checkout.</description>
+    </item>
+    <item>
+      <title>Adidas: 40% off running shoes - code STRIDE40</title>
+      <link>https://www.adidas.com/promo</link>
+      <description>Limited stock! 40% off select running shoes when you use coupon STRIDE40.</description>
+    </item>
+    <item>
+      <title>Free shipping on all orders this weekend - code SHIPFREE</title>
+      <link>https://www.amazon.com/freeshipping</link>
+      <description>Enjoy free shipping with no minimum spend. Use code SHIPFREE at checkout.</description>
+    </item>
+    <item>
+      <title>Flat $20 off your first order with code WELCOME20OFF</title>
+      <link>https://www.example-shop.com/welcome</link>
+      <description>New customers get a flat $20 off the first purchase. Apply coupon WELCOME20OFF.</description>
+    </item>
+  </channel>
+</rss>
