@@ -55,6 +55,15 @@
   if (footer) {
     footer.innerHTML = `
       <footer class="site-footer">
+        <div class="footer-cta">
+          <div class="max-w-6xl mx-auto px-5 py-12 flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
+            <div>
+              <div class="h-display" style="font-size:1.6rem;">Start saving in one message.</div>
+              <p class="text-muted mt-1">Free to start — no credit card required.</p>
+            </div>
+            <a href="/register" class="btn btn-primary" style="white-space:nowrap;">Get started free →</a>
+          </div>
+        </div>
         <div class="max-w-6xl mx-auto px-5 py-14 grid gap-10 md:grid-cols-5">
           <div class="md:col-span-2">
             <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);">
@@ -88,4 +97,19 @@
         </div>
       </footer>`;
   }
+})();
+
+
+/* ---- Premium scroll-reveal motion for marketing pages ---- */
+(function () {
+  function setupReveal() {
+    document.querySelectorAll('.page-hero, .card, .bento, .prose h2, .page-wrap > .prose').forEach(el => el.classList.add('reveal'));
+    if (!('IntersectionObserver' in window)) { document.querySelectorAll('.reveal').forEach(el => el.classList.add('in')); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+  }
+  setTimeout(setupReveal, 50);
+  setTimeout(setupReveal, 900);
 })();

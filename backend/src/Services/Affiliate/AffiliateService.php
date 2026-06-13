@@ -133,8 +133,11 @@ final class AffiliateService
         $config = json_decode((string) ($net['config_json'] ?? '{}'), true) ?: [];
         try {
             $coupons = match ($net['provider']) {
-                'impact' => ImpactAdapter::fetch($config),
-                default  => GenericAdapter::fetch($config),
+                'impact'     => ImpactAdapter::fetch($config),
+                'awin'       => AwinAdapter::fetch($config),
+                'cj'         => CjAdapter::fetch($config),
+                'shareasale' => ShareasaleAdapter::fetch($config),
+                default      => GenericAdapter::fetch($config),
             };
         } catch (\Throwable $e) {
             $this->db->execute('UPDATE affiliate_networks SET last_synced_at = NOW(), last_status = ? WHERE id = ?', [mb_substr('ERROR: ' . $e->getMessage(), 0, 255), $id]);

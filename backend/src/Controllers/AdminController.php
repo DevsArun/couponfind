@@ -443,7 +443,7 @@ final class AdminController
     public function addAffiliateNetwork(Request $request): Response
     {
         $data = Validator::make($request->all(), [
-            'provider' => 'required|in:impact,generic',
+            'provider' => 'required|in:impact,awin,cj,shareasale,generic',
             'name'     => 'required|string|min:1|max:120',
         ]);
         $config = is_array($request->input('config')) ? $request->input('config') : [];

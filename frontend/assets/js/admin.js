@@ -631,31 +631,46 @@
       async function del(id) { try { await API.del('/admin/affiliate/networks/' + id); toast('Deleted', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }
 
       function edit(n) {
-        const provider = h('select', { class: 'input' }, [['impact', 'Impact.com'], ['generic', 'Generic JSON feed (any network)']].map(([v, l]) => h('option', { value: v, selected: n && n.provider === v ? 'selected' : null }, l)));
+        const PROV = {
+          impact:     { label: 'Impact.com',                       fields: [['account_sid', 'Account SID', 'IRxxxxxxxxxxxx'], ['auth_token', 'Auth Token', n ? 'leave blank to keep' : ''], ['sub_id', 'Sub ID (optional)', 'couponaut']] },
+          awin:       { label: 'Awin',                             fields: [['publisher_id', 'Publisher ID', ''], ['api_token', 'API Token (OAuth2)', n ? 'leave blank to keep' : '']] },
+          cj:         { label: 'CJ (Commission Junction)',         fields: [['dev_key', 'Personal Access Token', n ? 'leave blank to keep' : ''], ['website_id', 'Website / Property ID', '']] },
+          shareasale: { label: 'ShareASale',                       fields: [['affiliate_id', 'Affiliate ID', ''], ['api_token', 'API Token', n ? 'leave blank to keep' : ''], ['api_secret', 'API Secret', n ? 'leave blank to keep' : '']] },
+          generic:    { label: 'Generic JSON feed (any network)',  fields: [['feed_url', 'Feed URL (JSON)', 'https://network.com/coupons.json'], ['bearer_token', 'Bearer token (optional)', ''], ['root', 'JSON path to array (optional)', 'data.coupons'], ['map', 'Field map JSON (optional)', '{"merchant":"store","code":"coupon_code","landing_url":"url"}']] },
+        };
+        const provider = h('select', { class: 'input' }, Object.keys(PROV).map(k => h('option', { value: k, selected: n && n.provider === k ? 'selected' : null }, PROV[k].label)));
         if (n) provider.disabled = true;
         const name = h('input', { class: 'input', value: n ? n.name : '', placeholder: 'e.g. Impact (Global)' });
-        const f = {};
-        const field = (k, label, ph) => { const i = h('input', { class: 'input', placeholder: ph, autocomplete: 'off' }); f[k] = i; return h('div', {}, [h('label', { class: 'label' }, label), i]); };
-        const impactSec = h('div', { class: 'grid gap-3' }, [field('account_sid', 'Impact Account SID', 'IRxxxxxxxxxxxx'), field('auth_token', 'Impact Auth Token', n ? 'leave blank to keep current' : 'your Impact auth token'), field('sub_id', 'Sub ID (optional, for click attribution)', 'e.g. couponaut')]);
-        const genericSec = h('div', { class: 'grid gap-3' }, [field('feed_url', 'Coupon feed URL (JSON)', 'https://network.com/coupons.json'), field('bearer_token', 'Bearer token (optional)', n ? 'leave blank to keep' : ''), field('root', 'JSON path to array (optional)', 'e.g. data.coupons'), field('map', 'Field map JSON (optional)', '{"merchant":"store","code":"coupon_code","landing_url":"url"}')]);
-        const vis = () => { impactSec.style.display = provider.value === 'impact' ? '' : 'none'; genericSec.style.display = provider.value === 'generic' ? '' : 'none'; };
-        provider.addEventListener('change', vis);
+        const fieldsWrap = h('div', { class: 'grid gap-3' });
+        let f = {};
+        function renderFields() {
+          fieldsWrap.innerHTML = ''; f = {};
+          PROV[provider.value].fields.forEach(([k, label, ph]) => {
+            const inp = k === 'map' ? h('textarea', { class: 'input', rows: '3', placeholder: ph }) : h('input', { class: 'input', placeholder: ph, autocomplete: 'off' });
+            f[k] = inp;
+            fieldsWrap.appendChild(h('div', {}, [h('label', { class: 'label' }, label), inp]));
+          });
+        }
+        provider.addEventListener('change', renderFields);
         const body = h('div', { class: 'grid gap-3' }, [
           h('div', {}, [h('label', { class: 'label' }, 'Provider'), provider]),
           h('div', {}, [h('label', { class: 'label' }, 'Name'), name]),
-          impactSec, genericSec,
+          fieldsWrap,
           h('button', { class: 'btn btn-primary', onclick: save }, n ? 'Save network' : 'Add network'),
         ]);
-        const m = modal(n ? 'Edit ' + n.name : 'Add affiliate network', body); vis();
+        const m = modal(n ? 'Edit ' + n.name : 'Add affiliate network', body);
+        renderFields();
 
         async function save() {
           const config = {};
-          if (provider.value === 'impact') {
-            ['account_sid', 'auth_token', 'sub_id'].forEach(k => { if (f[k].value.trim()) config[k] = f[k].value.trim(); });
-          } else {
-            ['feed_url', 'bearer_token', 'root'].forEach(k => { if (f[k].value.trim()) config[k] = f[k].value.trim(); });
-            if (f.map.value.trim()) { try { config.map = JSON.parse(f.map.value); } catch (e) { toast('Field map must be valid JSON', 'err'); return; } }
-          }
+          let mapErr = false;
+          Object.keys(f).forEach(k => {
+            const val = f[k].value.trim();
+            if (!val) return;
+            if (k === 'map') { try { config.map = JSON.parse(val); } catch (e) { mapErr = true; } }
+            else config[k] = val;
+          });
+          if (mapErr) { toast('Field map must be valid JSON', 'err'); return; }
           try {
             if (n) await API.put('/admin/affiliate/networks/' + n.id, { name: name.value, is_active: true, config });
             else await API.post('/admin/affiliate/networks', { provider: provider.value, name: name.value, config });
