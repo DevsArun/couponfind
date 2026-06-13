@@ -411,7 +411,7 @@
       const q = sub.quota || {};
       const cur = sub.subscription;
       const wrap = h('div', {}, [
-        pageTitle('Billing & Plans', 'Manage your subscription.'),
+        pageTitle('Billing & Plans', 'Manage your subscription. Paid plans are 100% ad-free.'),
         h('div', { class: 'card p-5 mb-6 flex items-center justify-between' }, [
           h('div', {}, [
             h('div', { class: 'text-muted text-xs uppercase' }, 'Current plan'),

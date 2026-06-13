@@ -47,7 +47,7 @@ return function (Router $router, Container $container): void {
         // ---- Catalog (public) ----
         $r->get('/plans', $c('PlanController@index'));
         $r->post('/contact', $c('ContactController@submit'));
-        $r->get('/ads', $c('AdsController@config'));
+        $r->get('/ads', $c('AdsController@config'), [$optional]);
         $r->get('/merchants', $c('MerchantController@index'));
         $r->get('/merchants/{slug}', $c('MerchantController@show'));
         $r->get('/coupons/featured', $c('CouponController@featured'));

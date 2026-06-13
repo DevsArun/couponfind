@@ -584,7 +584,7 @@
             h('button', { class: 'btn btn-primary', onclick: save }, 'Save ad settings'),
             h('span', { class: 'badge ' + (d.enabled ? 'badge-green' : 'badge-muted') }, d.enabled ? 'Ads ON' : 'Ads OFF'),
           ]),
-          h('p', { class: 'text-muted text-xs' }, 'Note: networks like AdSense/Ezoic must approve your live domain before real ads render. Custom code works with any network (Media.net, PropellerAds, etc.).'),
+          h('p', { class: 'text-muted text-xs' }, 'Note: networks like AdSense/Ezoic must approve your live domain before real ads render. Custom code works with any network (Media.net, PropellerAds, etc.). Paid subscribers never see ads — they get an ad-free experience automatically.'),
         ]),
       ]);
       setView(wrap); syncVis();
