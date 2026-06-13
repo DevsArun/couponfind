@@ -399,12 +399,32 @@ final class AdminController
             throw HttpException::notFound('User not found');
         }
         $html = Mailer::render($data['subject'], nl2br(htmlspecialchars((string) $data['body'])));
-        $sent = Mailer::send($user['email'], (string) $data['subject'], $html, $user['name']);
+        $outreachFrom = [
+            'address' => \CouponFind\Core\Settings::get('mail_user_from_address', null, ''),
+            'name'    => \CouponFind\Core\Settings::get('mail_user_from_name', null, ''),
+        ];
+        $sent = Mailer::send($user['email'], (string) $data['subject'], $html, $user['name'], $outreachFrom['address'] !== '' ? $outreachFrom : null);
         Audit::log((int) $request->userId(), 'admin.user.email', 'user', (string) $params['id'], ['subject' => $data['subject'], 'sent' => $sent], $request->ip());
         if (!$sent) {
             throw new HttpException('Email could not be sent — configure SMTP under Email settings first.', 422);
         }
         return Response::ok(['sent' => true], 'Email sent to ' . $user['email']);
+    }
+
+    // ---- Live activity feed (for the real-time backend log view) ----
+    public function activity(Request $request): Response
+    {
+        return Response::ok([
+            'enabled'        => \CouponFind\Core\Settings::get('engine_enabled', null, '1') !== '0',
+            'server_time'    => date('H:i:s'),
+            'found_today'    => (int) $this->db->scalar('SELECT COUNT(*) FROM coupons WHERE created_at >= CURDATE()'),
+            'removed_today'  => (int) $this->db->scalar("SELECT COUNT(*) FROM coupons WHERE status IN ('expired','rejected') AND updated_at >= CURDATE()"),
+            'active'         => (int) $this->db->scalar("SELECT COUNT(*) FROM coupons WHERE status = 'active'"),
+            'queued_jobs'    => (int) $this->db->scalar("SELECT COUNT(*) FROM engine_jobs WHERE status = 'queued'"),
+            'running_jobs'   => (int) $this->db->scalar("SELECT COUNT(*) FROM engine_jobs WHERE status = 'running'"),
+            'jobs'           => $this->db->all('SELECT id, type, status, error, attempts, created_at, started_at, finished_at FROM engine_jobs ORDER BY id DESC LIMIT 25'),
+            'recent_coupons' => $this->db->all('SELECT c.id, c.title, c.code, c.status, c.created_at, m.name AS merchant FROM coupons c JOIN merchants m ON m.id = c.merchant_id ORDER BY c.id DESC LIMIT 12'),
+        ]);
     }
 
     // ---- Feature flags ----

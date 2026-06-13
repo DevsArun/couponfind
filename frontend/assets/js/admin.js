@@ -6,6 +6,8 @@
 
   if (!UI.requireAuthRedirect()) return;
 
+  let livePoll = null; // active interval for the Live Logs view
+
   const NAV = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'users', label: 'Users', icon: 'users' },
@@ -20,6 +22,7 @@
     { id: 'search', label: 'Search Analytics', icon: 'search' },
     { id: 'ai', label: 'AI Control Center', icon: 'cpu' },
     { id: 'engine', label: 'Engine Control', icon: 'spider' },
+    { id: 'live', label: 'Live Logs', icon: 'activity' },
     { id: 'flags', label: 'Feature Flags', icon: 'flag' },
     { id: 'logs', label: 'Logs & Audit', icon: 'activity' },
     { id: 'health', label: 'System Health', icon: 'shield' },
@@ -502,6 +505,57 @@
       }
     },
 
+    async live() {
+      const wrap = h('div', {}, [
+        title('Live Logs', 'Realtime view of what the backend engine is doing', h('div', { class: 'flex items-center gap-2' }, [
+          h('span', { id: 'live-status', class: 'badge badge-muted' }, 'connecting…'),
+          h('button', { id: 'live-toggle', class: 'btn btn-ghost btn-sm', onclick: () => toggle() }, 'Pause'),
+        ])),
+        h('div', { class: 'grid grid-cols-2 md:grid-cols-5 gap-3 mb-4', id: 'live-stats' }),
+        h('div', { class: 'card', style: 'overflow:hidden;' }, [
+          h('div', { class: 'flex items-center justify-between px-4 py-2 border-b hairline', style: 'border-bottom-width:1px;' }, [
+            h('span', { class: 'font-bold text-sm' }, 'Console'),
+            h('span', { id: 'live-clock', class: 'text-muted text-xs mono' }, ''),
+          ]),
+          h('div', { id: 'live-console', class: 'live-console' }, h('div', { class: 'live-line text-muted' }, 'connecting…')),
+        ]),
+      ]);
+      setView(wrap);
+
+      let running = true;
+      const tm = (s) => { if (!s) return '--:--:--'; const d = new Date(String(s).replace(' ', 'T') + (String(s).includes('T') ? '' : 'Z')); return isNaN(d) ? '--:--:--' : d.toLocaleTimeString('en-GB'); };
+      const statusCls = (st) => ({ done: 'ls-ok', failed: 'ls-bad', running: 'ls-run', queued: 'ls-queue' }[st] || '');
+
+      async function tick() {
+        try {
+          const d = await API.get('/admin/activity');
+          const sEl = el('#live-status'); if (sEl) { sEl.className = 'badge ' + (d.enabled ? 'badge-green' : 'badge-red'); sEl.textContent = d.enabled ? '● live' : '● paused'; }
+          const ck = el('#live-clock'); if (ck) ck.textContent = 'server ' + d.server_time;
+          const st = el('#live-stats'); if (st) {
+            st.innerHTML = '';
+            [['Found today', d.found_today], ['Removed today', d.removed_today], ['Active', d.active], ['Queued', d.queued_jobs], ['Running', d.running_jobs]]
+              .forEach(([l, v]) => st.appendChild(h('div', { class: 'card p-3 text-center' }, [h('div', { class: 'h-display', style: 'font-size:1.3rem;' }, fmt.num(v)), h('div', { class: 'text-muted text-xs mt-1' }, l)])));
+          }
+          const lines = [];
+          (d.jobs || []).forEach(j => lines.push({ t: j.finished_at || j.started_at || j.created_at, html: `<span class="lt">[${tm(j.finished_at || j.started_at || j.created_at)}]</span> <span class="lj">JOB#${j.id}</span> ${esc(j.type)} → <span class="${statusCls(j.status)}">${esc(j.status)}</span>` + (j.error ? ` <span class="le">${esc(j.error)}</span>` : '') }));
+          (d.recent_coupons || []).forEach(c => lines.push({ t: c.created_at, html: `<span class="lt">[${tm(c.created_at)}]</span> <span class="lc">FOUND</span> "${esc(c.title)}" <span class="text-muted">(${esc(c.merchant)})</span>` + (c.code ? ` <span class="lcode">${esc(c.code)}</span>` : '') }));
+          lines.sort((a, b) => new Date(b.t) - new Date(a.t));
+          const con = el('#live-console');
+          if (con) con.innerHTML = lines.length ? lines.map(l => `<div class="live-line">${l.html}</div>`).join('') : '<div class="live-line text-muted">No activity yet — add a coupon source and run discovery from Engine Control.</div>';
+        } catch (e) {
+          const sEl = el('#live-status'); if (sEl) { sEl.className = 'badge badge-red'; sEl.textContent = 'disconnected'; }
+        }
+      }
+      function toggle() {
+        running = !running;
+        const b = el('#live-toggle'); if (b) b.textContent = running ? 'Pause' : 'Resume';
+        if (running) { tick(); livePoll = setInterval(tick, 3000); }
+        else if (livePoll) { clearInterval(livePoll); livePoll = null; }
+      }
+      tick();
+      livePoll = setInterval(tick, 3000);
+    },
+
     async email() {
       loading();
       const d = await API.get('/admin/settings');
@@ -511,8 +565,10 @@
       const wrap = h('div', {}, [
         title('Email & SMTP', 'Sender + SMTP server used for verification, welcome and all outbound email'),
         h('div', { class: 'card p-6 grid gap-5', style: 'max-width:680px;' }, [
-          h('div', {}, [h('h3', { class: 'font-bold' }, 'Sender identity'), h('p', { class: 'text-muted text-sm mt-1' }, 'This "from" address is used for account verification & all emails.')]),
+          h('div', {}, [h('h3', { class: 'font-bold' }, 'System sender (verification & welcome)'), h('p', { class: 'text-muted text-sm mt-1' }, 'Used for account verification, welcome and system emails.')]),
           h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_from_address', 'From address', 'no-reply@yourdomain.com'), field('mail_from_name', 'From name', 'CouponFind')]),
+          h('div', { class: 'border-t hairline', style: 'border-top-width:1px;padding-top:1rem;' }, [h('h3', { class: 'font-bold' }, 'Outreach sender (admin → user emails)'), h('p', { class: 'text-muted text-sm mt-1' }, 'Used when you email a user from the panel. Leave blank to reuse the system sender.')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_user_from_address', 'From address', 'team@yourdomain.com'), field('mail_user_from_name', 'From name', 'CouponFind Team')]),
           h('div', { class: 'border-t hairline', style: 'border-top-width:1px;padding-top:1rem;' }, [h('h3', { class: 'font-bold' }, 'SMTP server')]),
           h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_host', 'Host', 'smtp.gmail.com'), field('mail_port', 'Port', '587')]),
           h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_username', 'Username', 'you@gmail.com'), field('mail_password', 'Password / app password', 'leave blank to keep current', 'password')]),
@@ -557,6 +613,7 @@
   function parseHash() { const raw = (location.hash || '#dashboard').slice(1); const [r, qs] = raw.split('?'); return { route: r || 'dashboard', params: new URLSearchParams(qs || '') }; }
   async function route() {
     const { route: r, params } = parseHash();
+    if (livePoll) { clearInterval(livePoll); livePoll = null; }
     setActive(r);
     try { await (Views[r] || Views.dashboard)(params); }
     catch (e) {

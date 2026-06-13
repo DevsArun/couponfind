@@ -19,11 +19,11 @@ final class Mailer
     /**
      * @return bool whether the message was actually handed off to an SMTP server
      */
-    public static function send(string $toEmail, string $subject, string $htmlBody, ?string $toName = null): bool
+    public static function send(string $toEmail, string $subject, string $htmlBody, ?string $toName = null, ?array $from = null): bool
     {
         $host = Settings::get('mail_host', 'MAIL_HOST');
-        $fromAddr = Settings::get('mail_from_address', 'MAIL_FROM_ADDRESS', 'no-reply@couponfind.example');
-        $fromName = Settings::get('mail_from_name', 'MAIL_FROM_NAME', 'CouponFind');
+        $fromAddr = !empty($from['address']) ? $from['address'] : Settings::get('mail_from_address', 'MAIL_FROM_ADDRESS', 'no-reply@couponfind.example');
+        $fromName = !empty($from['name']) ? $from['name'] : Settings::get('mail_from_name', 'MAIL_FROM_NAME', 'CouponFind');
 
         if ($host === '') {
             // No SMTP configured — log so it's observable in dev.

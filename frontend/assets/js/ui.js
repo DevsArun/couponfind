@@ -15,8 +15,8 @@
       else if (v !== null && v !== undefined) node.setAttribute(k, v);
     }
     (Array.isArray(children) ? children : [children]).forEach(c => {
-      if (c == null) return;
-      node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      if (c == null || c === false) return;
+      node.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
     });
     return node;
   }
