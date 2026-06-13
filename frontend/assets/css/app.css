@@ -390,3 +390,53 @@ body {
 .prose li { margin: 0.3rem 0; }
 .prose a { color: var(--accent); text-decoration: underline; }
 .prose strong { color: var(--text); }
+
+
+/* =====================================================================
+   Premium ChatGPT-style chat (final pass)
+   - Assistant replies render as clean text (no gray box), avatar at left
+   - Dashboard chat is seamless/full-bleed (no surrounding card)
+   - User messages keep a subtle solid bubble on the right
+   ===================================================================== */
+.chat-row.bot .chat-bubble,
+.chat-row.bot .chat-bubble.full {
+  background: transparent;
+  border: none;
+  padding: 0;
+  max-width: 100%;
+  color: var(--text);
+}
+.chat-row.bot .chat-bubble p { margin: 0 0 0.5rem; }
+.chat-row.bot .chat-bubble > :last-child { margin-bottom: 0; }
+
+/* Bot/typing rows align cleanly to the top */
+.chat-row.bot { align-items: flex-start; }
+.chat-avatar.bot { background: var(--accent); color: var(--on-accent); box-shadow: 0 2px 8px -3px rgba(0,0,0,0.4); }
+
+/* User bubble: calmer, rounded, premium */
+.chat-row.user .chat-bubble {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-radius: 16px;
+  border-bottom-right-radius: 5px;
+  max-width: 80%;
+}
+
+/* Typing indicator without a box */
+.chat-row.bot .typing { padding: 0.15rem 0; }
+
+/* Dashboard chat: seamless, no card frame */
+.chat-shell.chat-fill {
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  background: transparent;
+}
+.chat-shell.chat-fill .chat-thread { padding-top: 1.75rem; }
+.chat-shell.chat-fill .chat-composer { background: transparent; }
+
+/* Roomier, readable assistant copy + result grid spacing */
+.chat-thread { gap: 1.6rem; }
+.chat-row .chat-bubble { font-size: 0.95rem; line-height: 1.6; }
+.chat-row.bot .chat-bubble .grid { margin-top: 0.7rem; }
+.chat-meta { margin-top: 0.7rem; opacity: 0.9; }
