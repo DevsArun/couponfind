@@ -127,32 +127,12 @@ INSERT INTO coupon_sources (merchant_id, type, url, is_active, crawl_frequency_m
 SELECT m.id, 'offer_page', CONCAT(m.website_url, '/deals'), 1, 180 FROM merchants m
 ON DUPLICATE KEY UPDATE is_active = VALUES(is_active);
 
--- ---- Demo coupons (so search works out of the box before the engine runs) ----
-INSERT INTO coupons (merchant_id, content_hash, title, description, code, type, discount_type, discount_value, currency, landing_url, status, is_featured, valid_until, last_seen_at, success_count, fail_count, times_used)
-SELECT m.id, SHA2(CONCAT(m.slug, c.code, c.title), 256), c.title, c.descr, c.code, c.ctype, c.dtype, c.dval, 'USD', m.website_url, 'active', c.feat, DATE_ADD(NOW(), INTERVAL 30 DAY), NOW(), c.succ, c.fail, c.used
-FROM merchants m
-JOIN (
-    SELECT 'amazon' s, 'Amazon 20% off electronics' title, 'Save 20% on select electronics today' descr, 'AMZ20' code, 'code' ctype, 'percent' dtype, 20.00 dval, 1 feat, 320 succ, 12 fail, 540 used UNION ALL
-    SELECT 'amazon', 'Free shipping on orders $25+', 'Free shipping with no code needed', 'FREESHIP' , 'free_shipping', 'free_shipping', NULL, 0, 210, 8, 410 UNION ALL
-    SELECT 'nike', 'Nike 25% off sitewide', 'Limited time 25% off everything', 'NIKE25', 'code', 'percent', 25.00, 1, 180, 9, 260 UNION ALL
-    SELECT 'nike', 'Extra 15% off sale items', 'Stack an extra 15% on sale', 'EXTRA15', 'code', 'percent', 15.00, 0, 95, 4, 120 UNION ALL
-    SELECT 'hostinger', 'Hostinger 75% off hosting', 'Up to 75% off web hosting plans', 'HOST75', 'code', 'percent', 75.00, 1, 410, 6, 720 UNION ALL
-    SELECT 'nordvpn', 'NordVPN 68% off 2-year plan', 'Best VPN deal: 68% off + 3 months free', 'NORD68', 'code', 'percent', 68.00, 1, 290, 5, 500 UNION ALL
-    SELECT 'adidas', 'Adidas 30% off running shoes', '30% off select running shoes', 'RUN30', 'code', 'percent', 30.00, 0, 130, 7, 150
-) c ON c.s = m.slug
-ON DUPLICATE KEY UPDATE last_seen_at = NOW();
+-- ---- Default platform settings ----
+INSERT INTO settings (`key`, value) VALUES
+    ('engine_enabled', '1'),
+    ('active_payment_gateway', 'stripe')
+ON DUPLICATE KEY UPDATE value = value;
 
--- ---- Coupon scores for the demo coupons (so ranking has data) ----
-INSERT INTO coupon_scores (coupon_id, score, freshness, reliability, popularity, value_score)
-SELECT c.id,
-       LEAST(0.99, 0.4 + (c.success_count / NULLIF(c.success_count + c.fail_count,0)) * 0.4 + (c.is_featured * 0.1)),
-       0.9,
-       (c.success_count / NULLIF(c.success_count + c.fail_count,0)),
-       LEAST(0.99, c.times_used / 1000),
-       LEAST(0.99, COALESCE(c.discount_value,0) / 100)
-FROM coupons c
-ON DUPLICATE KEY UPDATE score = VALUES(score), computed_at = NOW();
-
--- ---- Mark coupons validated ----
-INSERT INTO coupon_validations (coupon_id, method, result, confidence, detail)
-SELECT id, 'heuristic', 'valid', 0.9, 'Seed data' FROM coupons;
+-- NOTE: No demo coupons are seeded. Coupons are produced in real time by the
+-- Python engine from the `coupon_sources` above (and any sources you add in the
+-- admin panel). Run a discovery pass from Admin → Engine Control to populate.

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace CouponFind\Support;
 
 use CouponFind\Core\Env;
+use CouponFind\Core\Settings;
 
 /**
  * Dependency-free SMTP mailer (raw socket). Supports STARTTLS, implicit SSL,
- * or plaintext, with AUTH LOGIN. If MAIL_HOST is not configured the mailer
- * degrades to a no-op (writes the message to the error log) and reports
+ * or plaintext, with AUTH LOGIN. Credentials/sender are resolved from the
+ * admin-editable settings store first, then environment variables. If no host
+ * is configured the mailer degrades to a no-op (logs the message) and reports
  * success=false so callers can decide on fallbacks — it never throws.
  */
 final class Mailer
@@ -19,9 +21,9 @@ final class Mailer
      */
     public static function send(string $toEmail, string $subject, string $htmlBody, ?string $toName = null): bool
     {
-        $host = Env::string('MAIL_HOST', '');
-        $fromAddr = Env::string('MAIL_FROM_ADDRESS', 'no-reply@couponfind.example');
-        $fromName = Env::string('MAIL_FROM_NAME', 'CouponFind');
+        $host = Settings::get('mail_host', 'MAIL_HOST');
+        $fromAddr = Settings::get('mail_from_address', 'MAIL_FROM_ADDRESS', 'no-reply@couponfind.example');
+        $fromName = Settings::get('mail_from_name', 'MAIL_FROM_NAME', 'CouponFind');
 
         if ($host === '') {
             // No SMTP configured — log so it's observable in dev.
@@ -29,10 +31,10 @@ final class Mailer
             return false;
         }
 
-        $port = Env::int('MAIL_PORT', 587);
-        $enc = strtolower(Env::string('MAIL_ENCRYPTION', 'tls'));
-        $user = Env::string('MAIL_USERNAME', '');
-        $pass = Env::string('MAIL_PASSWORD', '');
+        $port = (int) (Settings::get('mail_port', 'MAIL_PORT', '587'));
+        $enc = strtolower(Settings::get('mail_encryption', 'MAIL_ENCRYPTION', 'tls'));
+        $user = Settings::get('mail_username', 'MAIL_USERNAME');
+        $pass = Settings::get('mail_password', 'MAIL_PASSWORD');
 
         try {
             return self::deliver($host, $port, $enc, $user, $pass, $fromAddr, $fromName, $toEmail, $toName, $subject, $htmlBody);
@@ -156,16 +158,17 @@ final class Mailer
     {
         $button = '';
         if ($cta && !empty($cta['url']) && !empty($cta['label'])) {
-            $button = '<a href="' . htmlspecialchars($cta['url'], ENT_QUOTES) . '" style="display:inline-block;background:#FF7A18;color:#1a0f04;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:10px;margin-top:18px;">'
+            $button = '<a href="' . htmlspecialchars($cta['url'], ENT_QUOTES) . '" style="display:inline-block;background:#0d0d0d;color:#ffffff;font-weight:700;text-decoration:none;padding:12px 24px;border-radius:10px;margin-top:20px;">'
                 . htmlspecialchars($cta['label'], ENT_QUOTES) . '</a>';
         }
-        return '<!DOCTYPE html><html><body style="margin:0;background:#0B0F19;font-family:Inter,Arial,sans-serif;color:#fff;padding:32px;">'
-            . '<div style="max-width:520px;margin:0 auto;background:#121826;border:1px solid rgba(148,163,184,0.15);border-radius:16px;padding:32px;">'
-            . '<div style="font-weight:800;font-size:20px;margin-bottom:6px;">CouponFind</div>'
-            . '<h1 style="font-size:22px;margin:16px 0 8px;">' . htmlspecialchars($heading) . '</h1>'
-            . '<div style="color:#94A3B8;font-size:15px;line-height:1.6;">' . $bodyHtml . '</div>'
+        return '<!DOCTYPE html><html><body style="margin:0;background:#f4f4f5;font-family:Inter,Arial,sans-serif;color:#0d0d0d;padding:32px;">'
+            . '<div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid rgba(13,13,13,0.1);border-radius:16px;padding:32px;">'
+            . '<div style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:#0d0d0d;color:#fff;font-weight:900;margin-bottom:8px;">C</div>'
+            . '<div style="font-weight:800;font-size:18px;margin-bottom:2px;">CouponFind</div>'
+            . '<h1 style="font-size:22px;margin:16px 0 8px;color:#0d0d0d;">' . htmlspecialchars($heading) . '</h1>'
+            . '<div style="color:#555;font-size:15px;line-height:1.6;">' . $bodyHtml . '</div>'
             . $button
-            . '<div style="color:#64748b;font-size:12px;margin-top:28px;">You received this email from CouponFind.</div>'
+            . '<div style="color:#9b9b9b;font-size:12px;margin-top:28px;border-top:1px solid rgba(13,13,13,0.08);padding-top:16px;">You received this email from CouponFind.</div>'
             . '</div></body></html>';
     }
 }

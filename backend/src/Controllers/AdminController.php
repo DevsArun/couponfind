@@ -17,6 +17,7 @@ use CouponFind\Repositories\UserRepository;
 use CouponFind\Services\Meilisearch;
 use CouponFind\Support\Audit;
 use CouponFind\Support\HttpException;
+use CouponFind\Support\Mailer;
 use CouponFind\Support\Validator;
 
 /**
@@ -339,6 +340,71 @@ final class AdminController
         RedisClient::instance()->rpush('engine:jobs', json_encode(['id' => $id, 'type' => 'sync']));
         Audit::log((int) $request->userId(), 'admin.indexer.reindex', 'index', null, [], $request->ip());
         return Response::ok(['job_id' => $id], 'Reindex queued');
+    }
+
+    // ---- Engine control (24/7 by default; emergency start/stop + live stats) ----
+    public function engineControl(Request $request): Response
+    {
+        $enabled = \CouponFind\Core\Settings::get('engine_enabled', null, '1') !== '0';
+        $lastJob = $this->db->first('SELECT type, status, created_at, finished_at FROM engine_jobs ORDER BY id DESC LIMIT 1');
+        return Response::ok([
+            'enabled' => $enabled,
+            'stats'   => [
+                'found_today'    => (int) $this->db->scalar('SELECT COUNT(*) FROM coupons WHERE created_at >= CURDATE()'),
+                'removed_today'  => (int) $this->db->scalar("SELECT COUNT(*) FROM coupons WHERE status IN ('expired','rejected') AND updated_at >= CURDATE()"),
+                'active'         => (int) $this->db->scalar("SELECT COUNT(*) FROM coupons WHERE status = 'active'"),
+                'total'          => (int) $this->db->scalar('SELECT COUNT(*) FROM coupons'),
+                'active_sources' => (int) $this->db->scalar('SELECT COUNT(*) FROM coupon_sources WHERE is_active = 1'),
+                'queued_jobs'    => (int) $this->db->scalar("SELECT COUNT(*) FROM engine_jobs WHERE status = 'queued'"),
+                'running_jobs'   => (int) $this->db->scalar("SELECT COUNT(*) FROM engine_jobs WHERE status = 'running'"),
+                'last_job'       => $lastJob,
+            ],
+        ]);
+    }
+
+    public function setEngineControl(Request $request): Response
+    {
+        $enabled = filter_var($request->input('enabled', true), FILTER_VALIDATE_BOOLEAN);
+        \CouponFind\Core\Settings::set('engine_enabled', $enabled ? '1' : '0');
+        Audit::log((int) $request->userId(), 'admin.engine.toggle', 'engine', null, ['enabled' => $enabled], $request->ip());
+        return Response::ok(['enabled' => $enabled], $enabled ? 'Engine resumed' : 'Engine paused (emergency stop)');
+    }
+
+    public function purgeCoupons(Request $request): Response
+    {
+        $scope = (string) $request->input('scope', 'all');
+        if ($scope === 'demo') {
+            $deleted = $this->db->execute("DELETE FROM coupons WHERE code IN ('AMZ20','FREESHIP','NIKE25','EXTRA15','HOST75','NORD68','RUN30')");
+        } else {
+            $deleted = $this->db->execute('DELETE FROM coupons');
+        }
+        try {
+            (new Meilisearch())->ensureIndex();
+        } catch (\Throwable $e) {
+        }
+        $id = $this->db->insert('INSERT INTO engine_jobs (type, status, scheduled_at) VALUES ("sync","queued",NOW())', []);
+        RedisClient::instance()->rpush('engine:jobs', json_encode(['id' => $id, 'type' => 'sync']));
+        Audit::log((int) $request->userId(), 'admin.coupons.purge', 'coupon', null, ['scope' => $scope, 'deleted' => $deleted], $request->ip());
+        return Response::ok(['deleted' => $deleted], 'Removed ' . $deleted . ' coupon(s)');
+    }
+
+    public function emailUser(Request $request, array $params): Response
+    {
+        $data = Validator::make($request->all(), [
+            'subject' => 'required|string|min:2|max:200',
+            'body'    => 'required|string|min:2|max:5000',
+        ]);
+        $user = $this->users->findById((int) $params['id']);
+        if ($user === null) {
+            throw HttpException::notFound('User not found');
+        }
+        $html = Mailer::render($data['subject'], nl2br(htmlspecialchars((string) $data['body'])));
+        $sent = Mailer::send($user['email'], (string) $data['subject'], $html, $user['name']);
+        Audit::log((int) $request->userId(), 'admin.user.email', 'user', (string) $params['id'], ['subject' => $data['subject'], 'sent' => $sent], $request->ip());
+        if (!$sent) {
+            throw new HttpException('Email could not be sent — configure SMTP under Email settings first.', 422);
+        }
+        return Response::ok(['sent' => true], 'Email sent to ' . $user['email']);
     }
 
     // ---- Feature flags ----

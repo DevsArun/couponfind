@@ -24,6 +24,7 @@
     { id: 'logs', label: 'Logs & Audit', icon: 'activity' },
     { id: 'health', label: 'System Health', icon: 'shield' },
     { id: 'settings', label: 'Settings', icon: 'settings' },
+    { id: 'email', label: 'Email & SMTP', icon: 'message' },
   ];
   const nav = el('#nav');
   NAV.forEach(n => nav.appendChild(h('a', { class: 'nav-item', 'data-route': n.id, href: '#' + n.id }, [h('span', { html: icon(n.icon) }), h('span', {}, n.label)])));
@@ -99,6 +100,7 @@
           h('td', {}, h('div', { class: 'flex gap-2' }, [
             h('button', { class: 'btn btn-ghost btn-sm', onclick: () => setStatus(u) }, u.status === 'active' ? 'Suspend' : 'Activate'),
             h('button', { class: 'btn btn-soft btn-sm', onclick: () => assignPlan(u) }, 'Assign plan'),
+            h('button', { class: 'btn btn-soft btn-sm', onclick: () => emailUser(u) }, 'Email'),
           ])),
         ]))),
       ]);
@@ -122,6 +124,18 @@
           h('button', { class: 'btn btn-primary', onclick: async () => { try { await API.post('/admin/subscriptions/assign', { user_id: u.id, plan_id: sel.value, lifetime: life.checked, override_search_limit: lim.value || null, override_search_window: win.value }); toast('Plan assigned', 'ok'); m.close(); } catch (e) { toast(e.message, 'err'); } } }, 'Assign'),
         ]);
         const m = modal('Assign plan to ' + u.name, body);
+      }
+
+      function emailUser(u) {
+        const subject = h('input', { class: 'input', placeholder: 'Subject' });
+        const msg = h('textarea', { class: 'input', rows: '6', placeholder: 'Write your message…' });
+        const body = h('div', { class: 'grid gap-3' }, [
+          h('div', { class: 'text-muted text-sm' }, 'To: ' + u.name + ' <' + u.email + '>'),
+          h('div', {}, [h('label', { class: 'label' }, 'Subject'), subject]),
+          h('div', {}, [h('label', { class: 'label' }, 'Message'), msg]),
+          h('button', { class: 'btn btn-primary', onclick: async () => { try { await API.post('/admin/users/' + u.id + '/email', { subject: subject.value, body: msg.value }); toast('Email sent', 'ok'); m.close(); } catch (e) { toast(e.message, 'err'); } } }, 'Send email'),
+        ]);
+        const m = modal('Email ' + u.name, body);
       }
     },
 
@@ -351,13 +365,30 @@
 
     async engine() {
       loading();
-      const d = await API.get('/admin/engine/jobs');
+      const [ctrl, d] = await Promise.all([API.get('/admin/engine/control'), API.get('/admin/engine/jobs')]);
+      const s = ctrl.stats || {};
+      const statusBadge = h('span', { class: 'badge ' + (ctrl.enabled ? 'badge-green' : 'badge-red') }, ctrl.enabled ? 'Running 24/7' : 'Paused');
+      const toggle = h('button', { class: 'btn ' + (ctrl.enabled ? 'btn-danger' : 'btn-primary') + ' btn-sm', onclick: () => setEngine(!ctrl.enabled) }, ctrl.enabled ? 'Emergency stop' : 'Start engine');
       const actions = h('div', { class: 'flex flex-wrap gap-2' }, [
-        ['discover', 'Discover'], ['crawl', 'Crawl'], ['validate', 'Validate'], ['score', 'Score'], ['sync', 'Sync index'],
+        ['discover', 'Discover now'], ['crawl', 'Crawl'], ['validate', 'Validate'], ['score', 'Score'], ['sync', 'Sync index'],
       ].map(([t, label]) => h('button', { class: 'btn btn-soft btn-sm', onclick: () => API.post('/admin/engine/dispatch', { type: t }).then(() => { toast(label + ' queued', 'ok'); route(); }).catch(e => toast(e.message, 'err')) }, label)));
       const wrap = h('div', {}, [
-        title('Engine Control', 'Crawler · Validation · Indexer', h('button', { class: 'btn btn-primary btn-sm', onclick: () => API.post('/admin/engine/reindex', {}).then(() => toast('Reindex queued', 'ok')).catch(e => toast(e.message, 'err')) }, 'Reindex Meilisearch')),
-        h('div', { class: 'card p-5 mb-5' }, [h('h3', { class: 'font-bold mb-3' }, 'Dispatch jobs'), actions]),
+        title('Engine Control', 'Crawler · Validation · Indexer — runs 24/7 automatically', h('div', { class: 'flex items-center gap-2' }, [statusBadge, toggle])),
+        h('div', { class: 'grid md:grid-cols-4 gap-4 stagger mb-6' }, [
+          stat('Found today', fmt.num(s.found_today), 'new coupons discovered', 'tag'),
+          stat('Removed today', fmt.num(s.removed_today), 'expired / rejected', 'flag'),
+          stat('Active coupons', fmt.num(s.active), 'of ' + fmt.num(s.total) + ' total', 'bolt'),
+          stat('Active sources', fmt.num(s.active_sources), (s.queued_jobs || 0) + ' queued · ' + (s.running_jobs || 0) + ' running', 'spider'),
+        ]),
+        !ctrl.enabled ? h('div', { class: 'card p-4 mb-5', style: 'border-color:var(--red);' }, [h('div', { class: 'flex items-center gap-2' }, [h('span', { class: 'dot bad' }), h('span', { class: 'font-semibold' }, 'Engine is paused'), h('span', { class: 'text-muted text-sm' }, '— no new coupons will be discovered until you start it again.')])]) : null,
+        h('div', { class: 'card p-5 mb-5' }, [
+          h('h3', { class: 'font-bold mb-3' }, 'Run jobs now'),
+          actions,
+          h('div', { class: 'flex flex-wrap gap-2 mt-4 pt-4 border-t hairline', style: 'border-top-width:1px;' }, [
+            h('button', { class: 'btn btn-ghost btn-sm', onclick: () => purge('demo') }, 'Delete demo coupons'),
+            h('button', { class: 'btn btn-danger btn-sm', onclick: () => confirmDialog('Delete ALL coupons? This permanently clears the catalog (re-discovery will repopulate it).', () => purge('all')) }, 'Purge all coupons'),
+          ]),
+        ]),
         h('h3', { class: 'font-bold mb-3' }, 'Recent jobs'),
         h('div', { class: 'card', style: 'overflow:auto;' }, h('table', { class: 'table' }, [
           h('thead', {}, h('tr', {}, ['#', 'Type', 'Status', 'Attempts', 'Created'].map(x => h('th', {}, x)))),
@@ -369,6 +400,13 @@
         ])),
       ]);
       setView(wrap);
+
+      async function setEngine(on) {
+        try { await API.post('/admin/engine/control', { enabled: on }); toast(on ? 'Engine resumed' : 'Engine paused (emergency stop)', 'ok'); route(); } catch (e) { toast(e.message, 'err'); }
+      }
+      async function purge(scope) {
+        try { const r = await API.post('/admin/coupons/purge', { scope }); toast('Removed ' + r.deleted + ' coupon(s)', 'ok'); route(); } catch (e) { toast(e.message, 'err'); }
+      }
     },
 
     async flags() {
@@ -461,6 +499,41 @@
         const payload = { active: d.active };
         Object.keys(f).forEach(k => { if (f[k].value.trim()) payload[k] = f[k].value.trim(); });
         try { await API.put('/admin/payment-gateway', payload); toast('Credentials saved', 'ok'); route(); } catch (e) { toast(e.message, 'err'); }
+      }
+    },
+
+    async email() {
+      loading();
+      const d = await API.get('/admin/settings');
+      const map = {}; (d.settings || []).forEach(s => { map[s.key] = s.value; });
+      const f = {};
+      const field = (k, label, ph, type = 'text') => { const i = h('input', { class: 'input', type, value: map[k] || '', placeholder: ph, autocomplete: 'off' }); f[k] = i; return h('div', {}, [h('label', { class: 'label' }, label), i]); };
+      const wrap = h('div', {}, [
+        title('Email & SMTP', 'Sender + SMTP server used for verification, welcome and all outbound email'),
+        h('div', { class: 'card p-6 grid gap-5', style: 'max-width:680px;' }, [
+          h('div', {}, [h('h3', { class: 'font-bold' }, 'Sender identity'), h('p', { class: 'text-muted text-sm mt-1' }, 'This "from" address is used for account verification & all emails.')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_from_address', 'From address', 'no-reply@yourdomain.com'), field('mail_from_name', 'From name', 'CouponFind')]),
+          h('div', { class: 'border-t hairline', style: 'border-top-width:1px;padding-top:1rem;' }, [h('h3', { class: 'font-bold' }, 'SMTP server')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_host', 'Host', 'smtp.gmail.com'), field('mail_port', 'Port', '587')]),
+          h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [field('mail_username', 'Username', 'you@gmail.com'), field('mail_password', 'Password / app password', 'leave blank to keep current', 'password')]),
+          field('mail_encryption', 'Encryption', 'tls / ssl / none'),
+          h('div', { class: 'flex items-center gap-3 mt-1' }, [
+            h('button', { class: 'btn btn-primary', onclick: save }, 'Save email settings'),
+            h('span', { class: 'text-muted text-sm' }, map['mail_host'] ? 'SMTP configured ✓' : 'Not configured yet'),
+          ]),
+        ]),
+      ]);
+      setView(wrap);
+
+      async function save() {
+        try {
+          for (const k of Object.keys(f)) {
+            const v = f[k].value;
+            if (k === 'mail_password' && v.trim() === '') continue; // keep existing secret
+            await API.put('/admin/settings/' + encodeURIComponent(k), { value: v });
+          }
+          toast('Email settings saved', 'ok');
+        } catch (e) { toast(e.message, 'err'); }
       }
     },
 

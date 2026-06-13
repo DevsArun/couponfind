@@ -59,6 +59,20 @@ final class AuthController
 
         Audit::log($userId, 'auth.register', 'user', (string) $userId, [], $request->ip());
 
+        // Welcome / account email (uses the admin-configured sender + SMTP).
+        try {
+            $appUrl = rtrim(Env::string('APP_URL', 'http://localhost:8080'), '/');
+            $html = Mailer::render(
+                'Welcome to CouponFind 🎉',
+                'Hi ' . htmlspecialchars($data['name']) . ',<br><br>Your CouponFind account is ready. '
+                . 'Just ask for any brand or deal in plain language — we will find the best working coupon for you.',
+                ['label' => 'Start saving', 'url' => $appUrl . '/app']
+            );
+            Mailer::send($data['email'], 'Welcome to CouponFind', $html, $data['name']);
+        } catch (\Throwable $e) {
+            error_log('[register:mail] ' . $e->getMessage());
+        }
+
         $user = $this->users->findById($userId);
         return $this->issueTokens($user, 'Account created', 201);
     }

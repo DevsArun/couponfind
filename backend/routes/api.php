@@ -141,6 +141,10 @@ return function (Router $router, Container $container): void {
             $r->get('/engine/jobs', $c('AdminController@jobs'));
             $r->post('/engine/dispatch', $c('AdminController@dispatchJob'));
             $r->post('/engine/reindex', $c('AdminController@reindex'));
+            $r->get('/engine/control', $c('AdminController@engineControl'));
+            $r->post('/engine/control', $c('AdminController@setEngineControl'));
+            $r->post('/coupons/purge', $c('AdminController@purgeCoupons'));
+            $r->post('/users/{id}/email', $c('AdminController@emailUser'));
 
             $r->get('/flags', $c('AdminController@flags'));
             $r->put('/flags/{key}', $c('AdminController@updateFlag'));

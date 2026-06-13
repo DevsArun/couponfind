@@ -11,8 +11,19 @@ import time
 
 from . import meili_sync, pipeline, ranking, validator, worker
 from .config import config
+from .db import db
 
 log = logging.getLogger("couponengine.scheduler")
+
+
+def _engine_enabled() -> bool:
+    """Admin kill-switch. The engine runs 24/7 by default; an admin can pause
+    it from the panel (settings.engine_enabled = '0') for emergencies."""
+    try:
+        v = db().scalar("SELECT value FROM settings WHERE `key`='engine_enabled' LIMIT 1")
+        return str(v) != "0"
+    except Exception:
+        return True
 
 
 def run() -> None:
@@ -25,6 +36,7 @@ def run() -> None:
     last_discovery = 0.0
     last_validate = 0.0
     last_sync = 0.0
+    paused = False
 
     # Ensure the index exists immediately on boot.
     try:
@@ -36,6 +48,17 @@ def run() -> None:
     while True:
         now = time.time()
         try:
+            # Emergency kill-switch: pause all crawling/validation work.
+            if not _engine_enabled():
+                if not paused:
+                    log.warning("engine PAUSED by admin (settings.engine_enabled=0)")
+                    paused = True
+                time.sleep(15)
+                continue
+            if paused:
+                log.info("engine RESUMED by admin")
+                paused = False
+
             # Always drain admin-dispatched jobs first (low latency).
             handled = worker.drain(max_jobs=20)
             if handled:
