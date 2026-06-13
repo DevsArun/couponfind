@@ -10,12 +10,11 @@
   if (me && me.is_admin) { /* admins can still use the user app */ }
 
   // ---- Static UI bits ----
-  el('#cmd-ico').innerHTML = icon('bolt');
   el('#hdr-search-ico').innerHTML = icon('search');
   el('#bell-ico').innerHTML = icon('bell');
-  el('#logout-ico').innerHTML = icon('logout');
+  el('#newchat-ico').innerHTML = icon('plus');
 
-  // ---- Running "coupons found" counter (ChatGPT-style, lives in the header) ----
+  // ---- Running "coupons found" counter (lives in the header) ----
   let sessionFound = 0;
   function bumpFound(n) {
     sessionFound += (n || 0);
@@ -24,8 +23,8 @@
     const inView = el('#view-found'); if (inView) inView.textContent = sessionFound + ' found';
   }
 
-  const NAV = [
-    { id: 'search', label: 'AI Search', icon: 'sparkles' },
+  // ---- Secondary menu (lives in the bottom account popover, ChatGPT-style) ----
+  const MENU = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'saved', label: 'Saved Coupons', icon: 'bookmark' },
     { id: 'watchlist', label: 'Watchlist', icon: 'eye' },
@@ -38,13 +37,49 @@
     { id: 'profile', label: 'Profile & Settings', icon: 'settings' },
   ];
 
+  // ---- Chat history store (persisted per-user in localStorage) ----
+  const ChatStore = {
+    key: 'cf_chats_' + (me.id || me.email || 'me'),
+    all() { try { return JSON.parse(localStorage.getItem(this.key) || '[]'); } catch (e) { return []; } },
+    persist(list) { try { localStorage.setItem(this.key, JSON.stringify(list.slice(0, 60))); } catch (e) {} },
+    get(id) { return this.all().find(c => c.id === id) || null; },
+    upsert(conv) { const list = this.all(); const i = list.findIndex(c => c.id === conv.id); if (i >= 0) list.splice(i, 1); list.unshift(conv); this.persist(list); },
+    remove(id) { this.persist(this.all().filter(c => c.id !== id)); },
+  };
+  const newConvId = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  let activeConvId = null;
+
+  // ---- Sidebar: chat-history list ----
   const nav = el('#nav');
-  NAV.forEach(n => nav.appendChild(h('a', { class: 'nav-item', 'data-route': n.id, href: '#' + n.id }, [
-    h('span', { html: icon(n.icon) }), h('span', {}, n.label),
-  ])));
+  function renderHistory() {
+    const list = ChatStore.all();
+    nav.innerHTML = '';
+    if (!list.length) { nav.appendChild(h('div', { class: 'text-muted', style: 'padding:0.5rem 0.75rem;font-size:0.82rem;' }, 'No chats yet — start a search.')); return; }
+    list.forEach(conv => nav.appendChild(h('a', {
+      class: 'nav-item chat-hist' + (conv.id === activeConvId ? ' active' : ''),
+      href: '#search?c=' + conv.id, title: conv.title,
+    }, [
+      h('span', { style: 'width:15px;height:15px;display:inline-flex;flex:none;', html: icon('message') }),
+      h('span', { class: 'chat-hist-title' }, conv.title || 'New chat'),
+      h('span', { class: 'chat-hist-del', title: 'Delete chat', html: icon('trash'), onclick: (e) => { e.preventDefault(); e.stopPropagation(); ChatStore.remove(conv.id); if (activeConvId === conv.id) location.hash = 'search?new=1'; renderHistory(); } }),
+    ])));
+  }
+
+  el('#new-chat').addEventListener('click', () => { activeConvId = null; location.hash = 'search?new=1'; });
+
+  // ---- Account popover (bottom-left, ChatGPT-style) ----
+  const acctMenu = el('#acct-menu');
+  MENU.forEach(m => acctMenu.appendChild(h('a', { class: 'acct-item', href: '#' + m.id }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon(m.icon) }), h('span', {}, m.label)])));
+  if (me.is_admin) acctMenu.appendChild(h('a', { class: 'acct-item', href: '/admin/' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('shield') }), h('span', {}, 'Admin console')]));
+  acctMenu.appendChild(h('div', { class: 'acct-sep' }));
+  acctMenu.appendChild(h('button', { id: 'logout', class: 'acct-item', style: 'width:100%;color:var(--red);' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('logout') }), h('span', {}, 'Log out')]));
+  el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/login'; });
+  el('#account-btn').addEventListener('click', (e) => { e.stopPropagation(); acctMenu.classList.toggle('hide'); });
+  document.addEventListener('click', (e) => { if (!acctMenu.classList.contains('hide') && !e.target.closest('.sidebar-foot')) acctMenu.classList.add('hide'); });
+  acctMenu.addEventListener('click', () => acctMenu.classList.add('hide'));
 
   function setActive(route) {
-    els('.nav-item', nav).forEach(a => a.classList.toggle('active', a.getAttribute('data-route') === route));
+    els('.acct-item', acctMenu).forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + route));
   }
 
   // ---- Header user ----
@@ -54,7 +89,6 @@
   }
   paintUser();
 
-  el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/login'; });
   el('#global-search').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.value.trim()) { location.hash = 'search?q=' + encodeURIComponent(e.target.value.trim()); }
   });
@@ -62,7 +96,8 @@
 
   // ---- Command palette ----
   UI.setupCommandPalette([
-    ...NAV.map(n => ({ label: 'Go to ' + n.label, icon: n.icon, action: () => location.hash = n.id })),
+    { label: 'New chat', icon: 'plus', action: () => { activeConvId = null; location.hash = 'search?new=1'; } },
+    ...MENU.map(n => ({ label: 'Go to ' + n.label, icon: n.icon, action: () => location.hash = n.id })),
     { label: 'Log out', icon: 'logout', action: async () => { await API.logout(); location.href = '/login'; } },
   ]);
 
@@ -167,59 +202,70 @@
     },
 
     async search(params) {
-      // Full-height ChatGPT-style chat: details live in the left sidebar,
-      // the conversation runs here on the right, and the header keeps a running count.
       const thread = h('div', { class: 'chat-thread', id: 'chat-thread', style: 'flex:1;' });
       const ta = h('textarea', { id: 'sq', rows: '1', placeholder: 'Ask for a coupon… e.g. best amazon coupon today' });
       const sendBtn = h('button', { class: 'chat-send', html: icon('send'), onclick: () => send() });
       const shell = h('div', { class: 'chat-shell chat-fill' }, [
         thread,
-        h('div', { class: 'chat-composer' }, [
-          h('div', { class: 'input-wrap' }, [ta]),
-          sendBtn,
-        ]),
+        h('div', { class: 'chat-composer' }, [h('div', { class: 'input-wrap' }, [ta]), sendBtn]),
       ]);
-      const wrap = h('div', {}, [
-        h('div', { class: 'flex items-center justify-between mb-4 fade-up' }, [
-          h('div', {}, [
-            h('h1', { class: 'h-display', style: 'font-size:1.5rem;' }, 'AI Search'),
-            h('p', { class: 'text-muted text-sm mt-1' }, 'Ask naturally — typos welcome.'),
-          ]),
-          h('span', { id: 'view-found', class: 'badge badge-muted' }, sessionFound + ' found'),
-        ]),
-        shell,
-      ]);
-      setView(wrap);
+      setView(h('div', { class: 'chat-page' }, [shell]));
 
-      // greeting / empty state
-      thread.appendChild(h('div', { class: 'chat-empty', id: 'empty-state' }, [
-        h('div', { class: 'brand-mark mx-auto', style: 'width:46px;height:46px;font-size:1.1rem;margin-bottom:0.9rem;' }, 'C'),
-        h('div', { class: 'font-bold', style: 'font-size:1.05rem;color:var(--text);' }, 'Hi ' + (me.name ? me.name.split(' ')[0] : 'there') + ' 👋 what are we saving on?'),
-        h('p', { class: 'text-sm mt-1', style: 'max-width:360px;margin:0.4rem auto 0;' }, 'Ask for any brand, deal or category. I understand typos, slang and intent.'),
-        h('div', { class: 'chat-suggest justify-center mt-4' },
-          ['best amazon coupon today', 'nike offer', 'best vpn deal', 'bst niek coupn'].map(x =>
-            h('button', { class: 'chip', onclick: () => { ta.value = x; send(); } }, x))),
-      ]));
+      // Resolve which conversation we're in.
+      let conv = null;
+      if (params.get('new')) activeConvId = null;
+      else if (params.get('c')) { conv = ChatStore.get(params.get('c')); activeConvId = conv ? conv.id : null; }
+      renderHistory();
 
-      let busy = false;
-      function scrollDown() { thread.scrollTop = thread.scrollHeight; }
-      function autogrow() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; }
-      ta.addEventListener('input', autogrow);
-      ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+      const scrollDown = () => { thread.scrollTop = thread.scrollHeight; };
+      const autogrow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 160) + 'px'; };
 
+      function greeting() {
+        thread.appendChild(h('div', { class: 'chat-empty', id: 'empty-state' }, [
+          h('div', { class: 'brand-mark mx-auto', style: 'width:44px;height:44px;font-size:1.05rem;margin-bottom:0.8rem;' }, 'C'),
+          h('div', { class: 'font-bold', style: 'font-size:1.05rem;color:var(--text);' }, 'Hi ' + (me.name ? me.name.split(' ')[0] : 'there') + ' 👋 what are we saving on?'),
+          h('p', { class: 'text-sm mt-1', style: 'max-width:380px;margin:0.4rem auto 0;' }, 'Ask for any brand, deal or category. I understand typos, slang and intent.'),
+          h('div', { class: 'chat-suggest justify-center mt-4' },
+            ['best amazon coupon today', 'nike offer', 'best vpn deal', 'bst niek coupn'].map(x => h('button', { class: 'chip', onclick: () => { ta.value = x; send(); } }, x))),
+        ]));
+      }
       function userRow(text) {
         return h('div', { class: 'chat-row user' }, [h('div', { class: 'chat-avatar user' }, (me.name || 'U').trim()[0].toUpperCase()), h('div', { class: 'chat-bubble' }, text)]);
       }
       function botRow(node, full) {
         return h('div', { class: 'chat-row bot' }, [h('div', { class: 'chat-avatar bot', html: icon('sparkles') }), h('div', { class: 'chat-bubble' + (full ? ' full' : '') }, node)]);
       }
+      function botFromData(d) {
+        const block = h('div', {}, [h('p', { style: 'margin:0 0 0.4rem;' }, d.line)]);
+        if (d.results && d.results.length) {
+          const grid = h('div', { class: 'grid sm:grid-cols-2 gap-3 mt-2 stagger' });
+          d.results.forEach(c => grid.appendChild(couponCard(c)));
+          block.appendChild(grid);
+        }
+        if (d.meta) block.appendChild(h('div', { class: 'chat-meta' }, d.meta));
+        return botRow(block, true);
+      }
+
+      // Render an existing conversation, or the greeting for a fresh one.
+      if (conv && conv.messages && conv.messages.length) {
+        conv.messages.forEach(m => thread.appendChild(m.role === 'user' ? userRow(m.text) : botFromData(m)));
+        scrollDown();
+      } else {
+        greeting();
+      }
+
+      let busy = false;
+      ta.addEventListener('input', autogrow);
+      ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
 
       async function send() {
         const query = ta.value.trim();
         if (!query || busy) return;
         busy = true;
         const es = el('#empty-state'); if (es) es.remove();
+        if (!conv) { conv = { id: newConvId(), title: query.slice(0, 42), createdAt: Date.now(), messages: [] }; activeConvId = conv.id; }
         thread.appendChild(userRow(query));
+        conv.messages.push({ role: 'user', text: query });
         ta.value = ''; autogrow();
         const typing = h('div', { class: 'chat-row bot' }, [h('div', { class: 'chat-avatar bot', html: icon('sparkles') }), h('div', { class: 'chat-bubble' }, h('div', { class: 'typing' }, [h('span'), h('span'), h('span')]))]);
         thread.appendChild(typing); scrollDown();
@@ -232,14 +278,11 @@
           const line = !n
             ? `I couldn't find live coupons for "${query}" right now. Try a brand name or broader term.`
             : `Found ${n} working coupon${n === 1 ? '' : 's'} ${brand ? 'for ' + brand : 'matching "' + query + '"'} in ${data.took_ms}ms. ${n === 1 ? "Here's the best one" : 'Here are the best ones'} 👇`;
-          const block = h('div', {}, [h('p', { style: 'margin:0 0 0.4rem;' }, line)]);
-          if (data.results && data.results.length) {
-            const grid = h('div', { class: 'grid sm:grid-cols-2 gap-3 mt-2 stagger' });
-            data.results.forEach(c => grid.appendChild(couponCard(c)));
-            block.appendChild(grid);
-          }
-          block.appendChild(h('div', { class: 'chat-meta' }, `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '')));
-          thread.appendChild(botRow(block, true));
+          const meta = `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '');
+          const msg = { role: 'bot', line, results: (data.results || []).slice(0, 8), meta };
+          thread.appendChild(botFromData(msg));
+          conv.messages.push(msg);
+          ChatStore.upsert(conv); renderHistory();
         } catch (e) {
           typing.remove();
           thread.appendChild(botRow(h('div', {}, [
@@ -457,17 +500,14 @@
       h('p', { class: 'text-muted text-sm mt-2', style: 'flex:1;' }, p.description || ''),
       isCurrent
         ? h('button', { class: 'btn btn-ghost mt-4', disabled: true }, 'Current plan')
-        : h('div', { class: 'grid grid-cols-2 gap-2 mt-4' }, [
-            h('button', { class: 'btn btn-primary btn-sm', onclick: () => checkout(p.id, 'stripe') }, 'Stripe'),
-            h('button', { class: 'btn btn-ghost btn-sm', onclick: () => checkout(p.id, 'razorpay') }, 'Razorpay'),
-          ]),
+        : h('button', { class: 'btn btn-primary mt-4', onclick: () => checkout(p.id) }, p.price_cents === 0 ? 'Switch to Free' : 'Upgrade'),
     ]);
   }
 
-  async function checkout(planId, gateway) {
+  async function checkout(planId) {
     try {
-      const r = await API.post('/subscription/checkout', { plan_id: planId, gateway });
-      if (r.redirect_url && r.redirect_url !== location.href) { toast('Redirecting to ' + gateway + '…', 'info'); location.href = r.redirect_url; }
+      const r = await API.post('/subscription/checkout', { plan_id: planId });
+      if (r.redirect_url && r.redirect_url !== location.href) { toast('Redirecting to secure checkout…', 'info'); location.href = r.redirect_url; }
       else { toast('Plan updated', 'ok'); route(); }
     } catch (e) { toast(e.message, 'err'); }
   }
@@ -514,6 +554,7 @@
     try { me = await API.me(); API.store.user = me; paintUser(); el('#user-plan').textContent = (me.role_name || 'Member'); }
     catch (e) { await API.logout(); location.href = '/login'; return; }
     if (!location.hash) location.hash = 'search';
+    renderHistory();
     route();
     refreshBell();
   })();

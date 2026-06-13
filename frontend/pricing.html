@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing — CouponFind</title>
+  <meta name="description" content="Simple, transparent pricing. Start free and upgrade when you save more." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <section class="page-hero">
+    <p class="eyebrow" style="font-size:0.78rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);">Pricing</p>
+    <h1 class="h-display mt-3" style="font-size:clamp(2.2rem,5vw,3.4rem);">Start free. Scale when you save more.</h1>
+    <p class="text-muted mt-4" style="font-size:1.05rem;">No credit card to start. Cancel anytime. Plans are managed live by our team.</p>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-5">
+    <div class="grid md:grid-cols-3 lg:grid-cols-5 gap-4" id="pricing-grid">
+      <div class="skeleton" style="height:360px;"></div><div class="skeleton" style="height:360px;"></div>
+      <div class="skeleton" style="height:360px;"></div><div class="skeleton" style="height:360px;"></div>
+      <div class="skeleton" style="height:360px;"></div>
+    </div>
+    <p class="text-center text-muted text-sm mt-5" id="pay-note"></p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="max-w-3xl mx-auto px-5 py-14">
+    <h2 class="h-display text-center" style="font-size:1.8rem;">Frequently asked questions</h2>
+    <div class="grid gap-3 mt-7" id="faq"></div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/site.js"></script>
+  <script>
+    (function () {
+      const { h, el, fmt, icon } = UI;
+      const grid = el('#pricing-grid');
+      API.get('/plans', { noAuth: true }).then(data => {
+        grid.innerHTML = '';
+        (data.plans || []).forEach(p => {
+          const featured = p.slug === 'pro';
+          grid.appendChild(h('div', { class: 'card p-6 flex flex-col', style: featured ? 'border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent),var(--shadow);' : '' }, [
+            featured ? h('div', { class: 'badge badge-accent mb-2', style: 'align-self:flex-start;' }, 'Most popular') : null,
+            h('h3', { class: 'font-bold', style: 'font-size:1.1rem;' }, p.name),
+            h('div', { class: 'mt-2 flex items-end gap-1' }, [
+              h('span', { class: 'h-display', style: 'font-size:2rem;' }, p.price_cents === 0 ? 'Free' : fmt.money(p.price_cents, p.currency)),
+              p.price_cents ? h('span', { class: 'text-muted text-sm', style: 'margin-bottom:6px;' }, '/' + p.interval) : null,
+            ]),
+            h('p', { class: 'text-muted text-sm mt-1' }, p.description || ''),
+            h('ul', { class: 'mt-4 grid gap-2 text-sm', style: 'list-style:none;padding:0;flex:1;' },
+              (p.features || []).map(f => h('li', { class: 'flex items-center gap-2 text-muted' }, [h('span', { style: 'width:15px;height:15px;display:inline-flex;color:var(--accent);', html: icon('check') }), f]))),
+            h('a', { href: '/register', class: 'btn ' + (featured ? 'btn-primary' : 'btn-ghost') + ' mt-5' }, p.price_cents === 0 ? 'Start free' : 'Choose ' + p.name),
+          ]));
+        });
+        if (data.payment_gateway) {
+          el('#pay-note').textContent = 'Payments processed securely via ' + (data.payment_gateway === 'razorpay' ? 'Razorpay' : 'Stripe') + '.';
+        }
+      }).catch(() => {
+        grid.innerHTML = '<div class="card p-6 text-muted">Pricing is temporarily unavailable. Please try again shortly.</div>';
+      });
+
+      const faqs = [
+        ['Is there a free plan?', 'Yes — you can search for working coupons every day for free, no credit card required.'],
+        ['Can I cancel anytime?', 'Absolutely. Cancel in one click; your plan stays active until the end of the billing period.'],
+        ['How do payments work?', 'Checkout is handled securely by our payment provider. We never store your full card details.'],
+        ['Do coupons really work?', 'Codes are auto-validated and scored for reliability, but offers can expire — we always show the freshest, best-ranked deals.'],
+      ];
+      const faq = el('#faq');
+      faqs.forEach(([q, a]) => faq.appendChild(h('div', { class: 'card p-5' }, [
+        h('div', { class: 'font-bold' }, q),
+        h('p', { class: 'text-muted text-sm mt-2', style: 'margin:0.5rem 0 0;' }, a),
+      ])));
+    })();
+  </script>
+</body>
+</html>

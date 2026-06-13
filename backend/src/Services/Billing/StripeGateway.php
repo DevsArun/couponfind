@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace CouponFind\Services\Billing;
 
-use CouponFind\Core\Env;
+use CouponFind\Core\Settings;
 use CouponFind\Support\Http;
 
 /**
  * Stripe gateway via the REST API (no SDK dependency). Handles Checkout
  * Session creation for subscriptions and webhook signature verification.
+ * Credentials are resolved from the admin-editable settings store first,
+ * falling back to environment variables.
  */
 final class StripeGateway
 {
@@ -17,7 +19,7 @@ final class StripeGateway
 
     public function __construct()
     {
-        $this->secret = Env::string('STRIPE_SECRET_KEY', '');
+        $this->secret = Settings::get('stripe_secret_key', 'STRIPE_SECRET_KEY');
     }
 
     public function isConfigured(): bool
@@ -91,7 +93,7 @@ final class StripeGateway
      */
     public function verifyWebhook(string $payload, ?string $signatureHeader): bool
     {
-        $secret = Env::string('STRIPE_WEBHOOK_SECRET', '');
+        $secret = Settings::get('stripe_webhook_secret', 'STRIPE_WEBHOOK_SECRET');
         if ($secret === '' || $signatureHeader === null) {
             return false;
         }

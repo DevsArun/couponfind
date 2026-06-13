@@ -19,6 +19,9 @@ final class PlanController
 
     public function index(Request $request): Response
     {
-        return Response::ok(['plans' => $this->plans->publicPlans()]);
+        return Response::ok([
+            'plans'           => $this->plans->publicPlans(),
+            'payment_gateway' => (new \CouponFind\Services\Billing\BillingService())->activeGateway(),
+        ]);
     }
 }

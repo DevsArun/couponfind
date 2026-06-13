@@ -45,20 +45,26 @@ final class SubscriptionController
     {
         $data = Validator::make($request->all(), [
             'plan_id' => 'required|int',
-            'gateway' => 'required|in:stripe,razorpay',
         ]);
         $user = $request->user();
         $appUrl = rtrim(Env::string('APP_URL', 'http://localhost:8080'), '/');
 
+        // The payment gateway is controlled by the admin, not the client.
+        // (A client-sent gateway is honored only if it's a valid override.)
+        $requested = (string) $request->input('gateway', '');
+        $gateway = in_array($requested, ['stripe', 'razorpay'], true)
+            ? $requested
+            : $this->billing->activeGateway();
+
         $result = $this->billing->startCheckout(
             $user,
             (int) $data['plan_id'],
-            (string) $data['gateway'],
+            $gateway,
             $appUrl . '/app/billing?status=success',
             $appUrl . '/app/billing?status=cancelled'
         );
 
-        Audit::log((int) $user['id'], 'billing.checkout_started', 'plan', (string) $data['plan_id'], ['gateway' => $data['gateway']], $request->ip());
+        Audit::log((int) $user['id'], 'billing.checkout_started', 'plan', (string) $data['plan_id'], ['gateway' => $gateway], $request->ip());
         return Response::ok($result, 'Checkout created');
     }
 

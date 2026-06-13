@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace CouponFind\Services\Billing;
 
-use CouponFind\Core\Env;
+use CouponFind\Core\Settings;
 use CouponFind\Support\Http;
 
 /**
  * Razorpay gateway via the REST API. Creates subscriptions (recurring) and
- * verifies webhook signatures (HMAC-SHA256 of the raw body).
+ * verifies webhook signatures (HMAC-SHA256 of the raw body). Credentials are
+ * resolved from the admin-editable settings store first, falling back to env.
  */
 final class RazorpayGateway
 {
@@ -18,8 +19,8 @@ final class RazorpayGateway
 
     public function __construct()
     {
-        $this->keyId = Env::string('RAZORPAY_KEY_ID', '');
-        $this->keySecret = Env::string('RAZORPAY_KEY_SECRET', '');
+        $this->keyId = Settings::get('razorpay_key_id', 'RAZORPAY_KEY_ID');
+        $this->keySecret = Settings::get('razorpay_key_secret', 'RAZORPAY_KEY_SECRET');
     }
 
     public function isConfigured(): bool
@@ -87,7 +88,7 @@ final class RazorpayGateway
     /** Verify X-Razorpay-Signature = HMAC-SHA256(body, webhook_secret). */
     public function verifyWebhook(string $payload, ?string $signature): bool
     {
-        $secret = Env::string('RAZORPAY_WEBHOOK_SECRET', '');
+        $secret = Settings::get('razorpay_webhook_secret', 'RAZORPAY_WEBHOOK_SECRET');
         if ($secret === '' || $signature === null) {
             return false;
         }

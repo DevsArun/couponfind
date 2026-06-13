@@ -148,6 +148,9 @@ return function (Router $router, Container $container): void {
             $r->get('/settings', $c('AdminController@settings'));
             $r->put('/settings/{key}', $c('AdminController@updateSetting'));
 
+            $r->get('/payment-gateway', $c('AdminController@paymentGateway'));
+            $r->put('/payment-gateway', $c('AdminController@updatePaymentGateway'));
+
             $r->get('/logs/audit', $c('AdminController@auditLogs'));
             $r->get('/logs/api', $c('AdminController@apiLogs'));
             $r->get('/health', $c('AdminController@health'));

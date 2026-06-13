@@ -3,27 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — CouponFind</title>
+  <title>CouponFind</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
 <body>
   <div class="app-shell">
-    <!-- Mobile drawer overlay -->
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <!-- Sidebar -->
+    <!-- ChatGPT-style sidebar: New chat + history on top, account menu at the bottom -->
     <aside id="sidebar" class="app-sidebar glass">
-      <div class="px-5 h-16 flex items-center gap-2 border-b hairline">
-        <span class="brand-mark" style="width:28px;height:28px;">C</span>
-        <span class="font-extrabold">CouponFind</span>
+      <div class="p-3">
+        <div class="flex items-center gap-2 px-2 mb-3">
+          <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);">
+            <span class="brand-mark" style="width:26px;height:26px;font-size:0.78rem;">C</span>
+            <span class="font-extrabold">CouponFind</span>
+          </a>
+        </div>
+        <button id="new-chat" class="btn btn-soft w-full" style="justify-content:flex-start;gap:0.55rem;">
+          <span style="width:16px;height:16px;display:inline-flex;" id="newchat-ico"></span> New chat
+        </button>
       </div>
-      <nav id="nav" class="p-3 grid gap-1" style="flex:1;overflow-y:auto;"></nav>
-      <div class="p-3 border-t hairline">
-        <button onclick="UI.openCmdk()" class="nav-item w-full" style="justify-content:space-between;">
-          <span class="flex items-center gap-2"><span style="width:18px;height:18px;display:inline-flex;" id="cmd-ico"></span> Quick actions</span>
-          <span class="badge badge-muted">⌘K</span>
+
+      <div class="px-4 pb-1 text-muted" style="font-size:0.68rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;">Chats</div>
+      <nav id="nav" class="px-2 pb-2 grid gap-0.5" style="flex:1;overflow-y:auto;"></nav>
+
+      <!-- Account / settings menu (ChatGPT-style, bottom-left) -->
+      <div class="sidebar-foot">
+        <div id="acct-menu" class="acct-menu hide"></div>
+        <button id="account-btn" class="acct-btn">
+          <span id="avatar" class="acct-avatar"></span>
+          <span style="flex:1;text-align:left;min-width:0;">
+            <span id="user-name" class="block font-semibold text-sm" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+            <span id="user-plan" class="block text-muted" style="font-size:0.72rem;">Account &amp; settings</span>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--muted);flex:none;"><path d="m6 9 6 6 6-6"/></svg>
         </button>
       </div>
     </aside>
@@ -43,14 +58,6 @@
         <div class="flex items-center gap-2 sm:gap-3">
           <span id="found-counter" class="badge badge-muted hidden md:inline-flex" title="Coupons found this session">0 coupons found</span>
           <button id="bell" class="btn btn-ghost btn-sm" style="position:relative;"><span style="width:18px;height:18px;display:inline-flex;" id="bell-ico"></span><span id="bell-dot" class="hide" style="position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--accent);"></span></button>
-          <div class="flex items-center gap-2">
-            <span id="avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;"></span>
-            <div class="hidden md:block" style="line-height:1.1;">
-              <div id="user-name" class="text-sm font-semibold"></div>
-              <div id="user-plan" class="text-xs text-muted"></div>
-            </div>
-          </div>
-          <button id="logout" class="btn btn-ghost btn-sm"><span style="width:16px;height:16px;display:inline-flex;" id="logout-ico"></span></button>
         </div>
       </header>
 
@@ -67,11 +74,10 @@
       var sb = document.getElementById('sidebar');
       var ov = document.getElementById('sidebar-overlay');
       var mb = document.getElementById('menu-btn');
-      function open() { sb.classList.add('open'); ov.classList.add('open'); }
       function close() { sb.classList.remove('open'); ov.classList.remove('open'); }
-      if (mb) mb.addEventListener('click', open);
+      if (mb) mb.addEventListener('click', function () { sb.classList.add('open'); ov.classList.add('open'); });
       if (ov) ov.addEventListener('click', close);
-      if (sb) sb.addEventListener('click', function (e) { if (e.target.closest('.nav-item')) close(); });
+      if (sb) sb.addEventListener('click', function (e) { if (e.target.closest('.nav-item') || e.target.closest('.acct-item')) close(); });
       window.addEventListener('hashchange', close);
     })();
   </script>

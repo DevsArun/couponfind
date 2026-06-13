@@ -375,6 +375,51 @@ final class AdminController
         return Response::ok(null, 'Setting saved');
     }
 
+    // ---- Payment gateway (admin-controlled, switchable at any time) ----
+    public function paymentGateway(Request $request): Response
+    {
+        $billing = new \CouponFind\Services\Billing\BillingService();
+        $s = static fn (string $k, string $env): bool => \CouponFind\Core\Settings::get($k, $env) !== '';
+        return Response::ok([
+            'active'   => $billing->activeGateway(),
+            'gateways' => [
+                'stripe' => [
+                    'label'       => 'Stripe',
+                    'configured'  => $billing->stripe()->isConfigured(),
+                    'has_secret'  => $s('stripe_secret_key', 'STRIPE_SECRET_KEY'),
+                    'has_webhook' => $s('stripe_webhook_secret', 'STRIPE_WEBHOOK_SECRET'),
+                ],
+                'razorpay' => [
+                    'label'          => 'Razorpay',
+                    'configured'     => $billing->razorpay()->isConfigured(),
+                    'has_key_id'     => $s('razorpay_key_id', 'RAZORPAY_KEY_ID'),
+                    'has_key_secret' => $s('razorpay_key_secret', 'RAZORPAY_KEY_SECRET'),
+                    'has_webhook'    => $s('razorpay_webhook_secret', 'RAZORPAY_WEBHOOK_SECRET'),
+                ],
+            ],
+        ]);
+    }
+
+    public function updatePaymentGateway(Request $request): Response
+    {
+        $data = Validator::make($request->all(), [
+            'active' => 'required|in:stripe,razorpay',
+        ]);
+        \CouponFind\Core\Settings::set('active_payment_gateway', (string) $data['active']);
+
+        // Persist credentials only when a non-empty value is supplied, so a
+        // blank field never wipes an existing key.
+        foreach (['stripe_secret_key', 'stripe_webhook_secret', 'razorpay_key_id', 'razorpay_key_secret', 'razorpay_webhook_secret'] as $k) {
+            $v = $request->input($k);
+            if ($v !== null && $v !== '') {
+                \CouponFind\Core\Settings::set($k, (string) $v);
+            }
+        }
+        \CouponFind\Core\Settings::clearCache();
+        Audit::log((int) $request->userId(), 'admin.payment_gateway.update', 'setting', 'active_payment_gateway', ['active' => $data['active']], $request->ip());
+        return Response::ok(['active' => $data['active']], 'Payment gateway updated');
+    }
+
     // ---- Logs / audit ----
     public function auditLogs(Request $request): Response
     {

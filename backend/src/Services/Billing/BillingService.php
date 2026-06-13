@@ -43,6 +43,13 @@ final class BillingService
         return $this->razorpay;
     }
 
+    /** The admin-selected active payment gateway (settings > env > 'stripe'). */
+    public function activeGateway(): string
+    {
+        $g = \CouponFind\Core\Settings::get('active_payment_gateway', 'BILLING_DEFAULT_GATEWAY', 'stripe');
+        return in_array($g, ['stripe', 'razorpay'], true) ? $g : 'stripe';
+    }
+
     /**
      * Begin a checkout for a plan via the chosen gateway.
      * @return array{gateway:string,redirect_url:string,reference:string}

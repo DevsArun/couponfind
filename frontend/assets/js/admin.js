@@ -13,6 +13,7 @@
     { id: 'subscriptions', label: 'Subscriptions', icon: 'list' },
     { id: 'revenue', label: 'Revenue', icon: 'chart' },
     { id: 'payments', label: 'Payments', icon: 'card' },
+    { id: 'gateway', label: 'Payment Gateway', icon: 'lock' },
     { id: 'coupons', label: 'Coupons', icon: 'tag' },
     { id: 'merchants', label: 'Merchants', icon: 'store' },
     { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
@@ -414,6 +415,53 @@
           stat('PHP', d.php_version, 'runtime', 'cpu'),
         ]),
       ]));
+    },
+
+    async gateway() {
+      loading();
+      const d = await API.get('/admin/payment-gateway');
+      const wrap = h('div', {}, [title('Payment Gateway', 'Pick the gateway that processes payments. Switch anytime — users always check out through the active one.')]);
+
+      const grid = h('div', { class: 'grid md:grid-cols-2 gap-4' });
+      [['stripe', 'Stripe'], ['razorpay', 'Razorpay']].forEach(([key, label]) => {
+        const g = d.gateways[key] || {};
+        const active = d.active === key;
+        grid.appendChild(h('div', { class: 'card p-5', style: active ? 'border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);' : '' }, [
+          h('div', { class: 'flex items-center justify-between' }, [
+            h('div', { class: 'flex items-center gap-2' }, [h('span', { class: 'feature-ico', style: 'width:34px;height:34px;', html: icon('card') }), h('h3', { class: 'font-bold', style: 'font-size:1.15rem;' }, label)]),
+            active ? h('span', { class: 'badge badge-accent' }, 'Active') : h('button', { class: 'btn btn-soft btn-sm', onclick: () => setActive(key) }, 'Make active'),
+          ]),
+          h('div', { class: 'flex items-center gap-2 mt-3' }, [
+            h('span', { class: 'dot ' + (g.configured ? 'ok' : 'bad') }),
+            h('span', { class: 'text-sm text-muted' }, g.configured ? 'Configured & ready' : 'Missing API keys'),
+          ]),
+        ]));
+      });
+      wrap.appendChild(grid);
+
+      // ---- Credentials (saved into settings; blank = keep existing) ----
+      const f = {};
+      const keyField = (k, label, ph) => { const i = h('input', { class: 'input', type: 'password', autocomplete: 'off', placeholder: ph || 'leave blank to keep current' }); f[k] = i; return h('div', {}, [h('label', { class: 'label' }, label), i]); };
+      const form = h('div', { class: 'card p-5 mt-5' }, [
+        h('h3', { class: 'font-bold mb-1' }, 'API credentials'),
+        h('p', { class: 'text-muted text-sm mb-4' }, 'Stored securely server-side. Leave a field blank to keep the current value.'),
+        h('div', { class: 'grid md:grid-cols-2 gap-5' }, [
+          h('div', { class: 'grid gap-3' }, [h('div', { class: 'font-semibold text-sm' }, 'Stripe'), keyField('stripe_secret_key', 'Secret key (sk_…)'), keyField('stripe_webhook_secret', 'Webhook signing secret (whsec_…)')]),
+          h('div', { class: 'grid gap-3' }, [h('div', { class: 'font-semibold text-sm' }, 'Razorpay'), keyField('razorpay_key_id', 'Key ID (rzp_…)'), keyField('razorpay_key_secret', 'Key secret'), keyField('razorpay_webhook_secret', 'Webhook secret')]),
+        ]),
+        h('button', { class: 'btn btn-primary mt-5', onclick: saveKeys }, 'Save credentials'),
+      ]);
+      wrap.appendChild(form);
+      setView(wrap);
+
+      async function setActive(key) {
+        try { await API.put('/admin/payment-gateway', { active: key }); toast('Now using ' + key, 'ok'); route(); } catch (e) { toast(e.message, 'err'); }
+      }
+      async function saveKeys() {
+        const payload = { active: d.active };
+        Object.keys(f).forEach(k => { if (f[k].value.trim()) payload[k] = f[k].value.trim(); });
+        try { await API.put('/admin/payment-gateway', payload); toast('Credentials saved', 'ok'); route(); } catch (e) { toast(e.message, 'err'); }
+      }
     },
 
     async settings() {
