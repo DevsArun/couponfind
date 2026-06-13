@@ -11,7 +11,7 @@
   "portsAttributes": {
     "8080": {
       "label": "CouponFind App",
-      "onAutoForward": "notify"
+      "onAutoForward": "openBrowser"
     },
     "7700": {
       "label": "Meilisearch",
@@ -19,6 +19,8 @@
     }
   },
   "onCreateCommand": "bash .devcontainer/setup-env.sh",
+  "postCreateCommand": "bash .devcontainer/start.sh",
+  "postStartCommand": "bash .devcontainer/resume.sh",
   "postAttachCommand": "bash .devcontainer/welcome.sh",
   "remoteUser": "vscode"
 }
