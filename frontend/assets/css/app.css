@@ -17,8 +17,9 @@
   --accent-soft: rgba(13, 13, 13, 0.06);
   --on-accent: #ffffff;
   --text: #0d0d0d;
-  --muted: #6b6b6b;
-  --muted-2: #9b9b9b;
+  /* darker mutes for clearly readable secondary text (WCAG AA on white) */
+  --muted: #555555;
+  --muted-2: #717171;
   /* status colors kept neutral-leaning but still legible */
   --green: #1a7f4b;
   --red: #c0392b;
@@ -221,7 +222,7 @@ body {
 .chat-row.bot .chat-bubble { background: var(--bg-2); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 .chat-bubble.full { max-width: 100%; width: 100%; background: transparent; border: none; padding: 0; }
 
-.chat-meta { font-size: 0.72rem; color: var(--muted-2); margin-top: 0.5rem; }
+.chat-meta { font-size: 0.74rem; color: var(--muted); margin-top: 0.5rem; }
 
 /* typing indicator */
 .typing { display: inline-flex; align-items: center; gap: 5px; padding: 0.35rem 0; }
@@ -257,3 +258,66 @@ body {
 .chat-send svg { width: 18px; height: 18px; }
 
 .chat-suggest { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+
+/* =====================================================================
+   App shell layout + mobile responsiveness
+   ===================================================================== */
+.app-shell { display: flex; min-height: 100vh; }
+
+.app-sidebar {
+  width: 248px; flex: none;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  border-top: none; border-bottom: none; border-left: none;
+  z-index: 60;
+}
+.app-main { flex: 1; min-width: 0; }
+
+/* hamburger + overlay are hidden on desktop */
+.menu-btn { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; flex: none; }
+.menu-btn svg { width: 20px; height: 20px; }
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(13, 13, 13, 0.4);
+  z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  backdrop-filter: blur(2px);
+}
+
+/* ---- Tablet / mobile: turn the sidebar into an off-canvas drawer ---- */
+@media (max-width: 900px) {
+  .app-sidebar {
+    position: fixed; top: 0; left: 0; height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.45);
+    /* solid (not glass) so text stays readable over page content */
+    background: var(--card);
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .app-sidebar.open { transform: translateX(0); }
+  .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+  .menu-btn { display: inline-flex; }
+}
+
+/* ---- Phone: tighten spacing ---- */
+@media (max-width: 640px) {
+  #view { padding: 1rem !important; }
+  .app-header { padding-left: 0.75rem !important; padding-right: 0.75rem !important; gap: 0.5rem; }
+  .chat-thread { padding: 1rem; gap: 1.1rem; }
+  .chat-bubble { max-width: 88%; font-size: 0.92rem; }
+  .chat-composer { padding: 0.6rem; }
+  .chat-row { gap: 0.6rem; }
+}
+
+/* let the global header search shrink gracefully instead of overflowing */
+.header-search { min-width: 0; }
+@media (max-width: 480px) {
+  .header-search .input { font-size: 0.9rem; }
+}
+
+
+/* Dashboard chat fills the viewport height (dvh handles mobile browser chrome) */
+.chat-fill { height: calc(100vh - 8.5rem); height: calc(100dvh - 8.5rem); }
+@media (max-width: 640px) {
+  .chat-fill { height: calc(100dvh - 11rem); }
+}

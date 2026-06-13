@@ -172,7 +172,7 @@
       const thread = h('div', { class: 'chat-thread', id: 'chat-thread', style: 'flex:1;' });
       const ta = h('textarea', { id: 'sq', rows: '1', placeholder: 'Ask for a coupon… e.g. best amazon coupon today' });
       const sendBtn = h('button', { class: 'chat-send', html: icon('send'), onclick: () => send() });
-      const shell = h('div', { class: 'chat-shell', style: 'height:calc(100vh - 8.5rem);' }, [
+      const shell = h('div', { class: 'chat-shell chat-fill' }, [
         thread,
         h('div', { class: 'chat-composer' }, [
           h('div', { class: 'input-wrap' }, [ta]),

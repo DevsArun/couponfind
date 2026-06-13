@@ -9,8 +9,10 @@
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
 <body>
-  <div class="flex min-h-screen">
-    <aside class="glass" style="width:256px;flex:none;border-top:none;border-bottom:none;border-left:none;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;">
+  <div class="app-shell">
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <aside id="sidebar" class="app-sidebar glass" style="width:256px;">
       <div class="px-5 h-16 flex items-center gap-2 border-b hairline">
         <span class="brand-mark" style="width:28px;height:28px;">C</span>
         <div style="line-height:1.05;"><div class="font-extrabold text-sm">CouponFind</div><div class="text-muted" style="font-size:0.68rem;">Mission Control</div></div>
@@ -20,12 +22,17 @@
         <a href="/app" class="nav-item">← Back to app</a>
       </div>
     </aside>
-    <main style="flex:1;min-width:0;">
-      <header class="glass flex items-center justify-between px-6 h-16" style="position:sticky;top:0;z-index:30;border-left:none;border-right:none;border-top:none;">
-        <div class="flex items-center gap-2"><span class="dot ok" id="health-dot"></span><span id="health-text" class="text-sm text-muted">checking…</span></div>
-        <div class="flex items-center gap-3">
-          <button onclick="UI.openCmdk()" class="btn btn-ghost btn-sm">⌘K</button>
-          <div class="flex items-center gap-2"><span id="avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;"></span><span id="user-name" class="text-sm font-semibold hidden md:block"></span></div>
+    <main class="app-main">
+      <header class="app-header glass flex items-center justify-between px-6 h-16" style="position:sticky;top:0;z-index:30;border-left:none;border-right:none;border-top:none;">
+        <div class="flex items-center gap-2" style="min-width:0;">
+          <button id="menu-btn" class="menu-btn btn btn-ghost" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          </button>
+          <div class="flex items-center gap-2" style="min-width:0;"><span class="dot ok" id="health-dot" style="flex:none;"></span><span id="health-text" class="text-sm text-muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">checking…</span></div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button onclick="UI.openCmdk()" class="btn btn-ghost btn-sm hidden sm:inline-flex">⌘K</button>
+          <div class="flex items-center gap-2"><span id="avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;"></span><span id="user-name" class="text-sm font-semibold hidden md:block"></span></div>
           <button id="logout" class="btn btn-ghost btn-sm">Logout</button>
         </div>
       </header>
@@ -35,5 +42,18 @@
   <script src="/assets/js/api.js"></script>
   <script src="/assets/js/ui.js"></script>
   <script src="/assets/js/admin.js"></script>
+  <script>
+    (function () {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebar-overlay');
+      var mb = document.getElementById('menu-btn');
+      function open() { sb.classList.add('open'); ov.classList.add('open'); }
+      function close() { sb.classList.remove('open'); ov.classList.remove('open'); }
+      if (mb) mb.addEventListener('click', open);
+      if (ov) ov.addEventListener('click', close);
+      if (sb) sb.addEventListener('click', function (e) { if (e.target.closest('.nav-item')) close(); });
+      window.addEventListener('hashchange', close);
+    })();
+  </script>
 </body>
 </html>
