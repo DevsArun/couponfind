@@ -279,7 +279,7 @@
           const line = !n
             ? `I couldn't find live coupons for "${query}" right now. Try a brand name or broader term.`
             : `Found ${n} working coupon${n === 1 ? '' : 's'} ${brand ? 'for ' + brand : 'matching "' + query + '"'} in ${data.took_ms}ms. ${n === 1 ? "Here's the best one" : 'Here are the best ones'} 👇`;
-          const meta = `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '') + ((data.results || []).some(r => r && r.is_affiliate) ? ' · some links are affiliate links (we may earn a commission)' : '');
+          const meta = `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left this ' + (data.quota.window || 'day')) : '') + ((data.results || []).some(r => r && r.is_affiliate) ? ' · some links are affiliate links (we may earn a commission)' : '');
           const msg = { role: 'bot', line, results: (data.results || []).slice(0, 8), meta };
           thread.appendChild(botFromData(msg));
           conv.messages.push(msg);

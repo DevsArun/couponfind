@@ -114,10 +114,9 @@ python cli.py run-once     # full pipeline once (discover→validate→score→s
 | Plan | Price | Quota |
 |---|---|---|
 | Free | $0 | 10 searches / day |
-| Starter | $5 / mo | 100 / month |
-| Pro | $10 / mo | 200 / month |
-| Yearly Pro | $49 / yr | 100 / day |
-| Yearly Elite | $99 / yr | 200 / day |
+| Starter | $5 / mo | 100 searches / month |
+| Pro | $10 / mo | 200 searches / day |
+| Annual Pro | $99 / yr | 200 searches / day |
 
 Super Admin can create/edit/delete plans, assign custom or lifetime plans, and
 override per-subscription limits.

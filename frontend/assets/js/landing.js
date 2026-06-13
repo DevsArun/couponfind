@@ -186,17 +186,21 @@
       const highlight = 'pro';
       data.plans.forEach(p => {
         const featured = p.slug === highlight;
-        const card = h('div', { class: 'card p-6 flex flex-col', style: featured ? 'border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent),var(--shadow);' : '' }, [
+        const isAnnual = p.interval === 'year';
+        const card = h('div', { class: 'card price-card p-6 flex flex-col relative' + (featured ? ' featured' : '') }, [
           featured ? h('div', { class: 'badge badge-accent mb-2', style: 'align-self:flex-start;' }, 'Most popular') : null,
-          h('h3', { class: 'font-bold', style: 'font-size:1.1rem;' }, p.name),
+          h('div', { class: 'flex items-center gap-2' }, [
+            h('h3', { class: 'font-bold', style: 'font-size:1.1rem;' }, p.name),
+            isAnnual ? h('span', { class: 'save-badge' }, '2 months free') : null,
+          ]),
           h('div', { class: 'mt-2 flex items-end gap-1' }, [
-            h('span', { class: 'h-display', style: 'font-size:2rem;' }, p.price_cents === 0 ? 'Free' : fmt.money(p.price_cents, p.currency)),
-            p.price_cents ? h('span', { class: 'text-muted text-sm', style: 'margin-bottom:6px;' }, '/' + p.interval) : null,
+            h('span', { class: 'h-display', style: 'font-size:2.2rem;' }, p.price_cents === 0 ? 'Free' : fmt.money(p.price_cents, p.currency)),
+            p.price_cents ? h('span', { class: 'text-muted text-sm', style: 'margin-bottom:7px;' }, '/' + p.interval) : null,
           ]),
           h('p', { class: 'text-muted text-sm mt-1' }, p.description || ''),
-          h('ul', { class: 'mt-4 grid gap-2 text-sm', style: 'list-style:none;padding:0;flex:1;' },
-            (p.features || []).map(f => h('li', { class: 'flex items-center gap-2 text-muted' }, [h('span', { style: 'width:15px;height:15px;display:inline-flex;color:var(--accent);', html: icon('check') }), f]))),
-          h('a', { href: '/register', class: 'btn ' + (featured ? 'btn-primary' : 'btn-ghost') + ' mt-5' }, p.price_cents === 0 ? 'Start free' : 'Choose ' + p.name),
+          h('ul', { class: 'mt-5 grid gap-2.5 text-sm', style: 'list-style:none;padding:0;flex:1;' },
+            (p.features || []).map(f => h('li', { class: 'flex items-center gap-2 text-muted' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;color:var(--accent);flex:none;', html: icon('check') }), f]))),
+          h('a', { href: '/register', class: 'btn ' + (featured ? 'btn-primary' : 'btn-ghost') + ' mt-6' }, p.price_cents === 0 ? 'Start free' : 'Choose ' + p.name),
         ]);
         grid.appendChild(card);
       });

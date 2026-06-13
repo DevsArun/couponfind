@@ -49,10 +49,10 @@ ON DUPLICATE KEY UPDATE role_id = role_id;
 
 -- ---- Plans (per product spec) ----
 INSERT INTO plans (slug, name, description, price_cents, currency, `interval`, search_limit, search_window, is_active, is_public, sort_order, features_json) VALUES
-    ('free',       'Free',       '10 searches per day',                 0,    'USD', 'month', 10,  'day', 1, 1, 1, JSON_ARRAY('AI coupon search','Best working codes','Save coupons','Ad-supported')),
-    ('starter',    'Starter',    '100 searches per day',                500,  'USD', 'month', 100, 'day', 1, 1, 2, JSON_ARRAY('Everything in Free','Ad-free experience','100 searches / day','Watchlists & deal alerts')),
-    ('pro',        'Pro',        '200 searches per day',                1000, 'USD', 'month', 200, 'day', 1, 1, 3, JSON_ARRAY('Everything in Starter','Ad-free experience','200 searches / day','Priority ranking & email alerts')),
-    ('annual_pro', 'Annual Pro', '200 searches per day, billed yearly', 9900, 'USD', 'year',  200, 'day', 1, 1, 4, JSON_ARRAY('Ad-free experience','200 searches / day','Best value — 1 full year','Priority support'))
+    ('free',       'Free',       '10 searches per day',                 0,    'USD', 'month', 10,  'day',   1, 1, 1, JSON_ARRAY('AI coupon search','Best working codes','Save coupons','Ad-supported')),
+    ('starter',    'Starter',    '100 searches per month',              500,  'USD', 'month', 100, 'month', 1, 1, 2, JSON_ARRAY('Everything in Free','Ad-free experience','100 searches / month','Watchlists & deal alerts')),
+    ('pro',        'Pro',        '200 searches per day',                1000, 'USD', 'month', 200, 'day',   1, 1, 3, JSON_ARRAY('Everything in Starter','Ad-free experience','200 searches / day','Priority ranking & email alerts')),
+    ('annual_pro', 'Annual Pro', '200 searches per day, billed yearly', 9900, 'USD', 'year',  200, 'day',   1, 1, 4, JSON_ARRAY('Everything in Pro','Ad-free experience','200 searches / day','Best value — 2 months free','Priority support'))
 ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description), price_cents = VALUES(price_cents), search_limit = VALUES(search_limit), search_window = VALUES(search_window), `interval` = VALUES(`interval`), features_json = VALUES(features_json);
 
 -- Retire older tiers from earlier seeds (kept out of the public pricing page).
