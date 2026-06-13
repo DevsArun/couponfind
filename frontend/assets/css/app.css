@@ -326,7 +326,7 @@ body {
 /* =====================================================================
    ChatGPT-style sidebar: chat history + bottom account menu
    ===================================================================== */
-.app-sidebar #nav { scrollbar-width: thin; }
+.app-sidebar #nav { scrollbar-width: thin; align-content: start; }
 .chat-hist { position: relative; padding-right: 2rem; }
 .chat-hist-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 .chat-hist-del {
