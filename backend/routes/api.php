@@ -48,6 +48,7 @@ return function (Router $router, Container $container): void {
         $r->get('/plans', $c('PlanController@index'));
         $r->post('/contact', $c('ContactController@submit'));
         $r->get('/ads', $c('AdsController@config'), [$optional]);
+        $r->get('/go/{id}', $c('RedirectController@go'), [$optional]);
         $r->get('/merchants', $c('MerchantController@index'));
         $r->get('/merchants/{slug}', $c('MerchantController@show'));
         $r->get('/coupons/featured', $c('CouponController@featured'));
@@ -151,6 +152,12 @@ return function (Router $router, Container $container): void {
             $r->delete('/contact-messages/{id}', $c('AdminController@deleteContactMessage'));
             $r->get('/ads', $c('AdminController@ads'));
             $r->put('/ads', $c('AdminController@updateAds'));
+
+            $r->get('/affiliate/networks', $c('AdminController@affiliateNetworks'));
+            $r->post('/affiliate/networks', $c('AdminController@addAffiliateNetwork'));
+            $r->put('/affiliate/networks/{id}', $c('AdminController@updateAffiliateNetwork'));
+            $r->delete('/affiliate/networks/{id}', $c('AdminController@deleteAffiliateNetwork'));
+            $r->post('/affiliate/networks/{id}/sync', $c('AdminController@syncAffiliate'));
             $r->post('/coupons/purge', $c('AdminController@purgeCoupons'));
             $r->post('/users/{id}/email', $c('AdminController@emailUser'));
 

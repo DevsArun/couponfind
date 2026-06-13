@@ -21,6 +21,7 @@
     { id: 'coupons', label: 'Coupons', icon: 'tag' },
     { id: 'merchants', label: 'Merchants', icon: 'store' },
     { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
+    { id: 'affiliate', label: 'Affiliate Networks', icon: 'globe' },
     { id: 'search', label: 'Search Analytics', icon: 'search' },
     { id: 'ai', label: 'AI Control Center', icon: 'cpu' },
     { id: 'engine', label: 'Engine Control', icon: 'spider' },
@@ -598,6 +599,69 @@
           });
           toast('Ad settings saved', 'ok'); route();
         } catch (e) { toast(e.message, 'err'); }
+      }
+    },
+
+    async affiliate() {
+      loading();
+      const d = await API.get('/admin/affiliate/networks');
+      const wrap = h('div', {}, [title('Affiliate Networks', 'Connect Impact or any JSON-feed network. Synced coupons are marked affiliate and rank on top in chat.', h('button', { class: 'btn btn-primary btn-sm', onclick: () => edit() }, '+ Add network'))]);
+      if (!d.networks.length) {
+        wrap.appendChild(h('div', { class: 'card p-10 text-center text-muted' }, 'No networks yet. Add Impact (you are connected) or any JSON coupon feed.'));
+      } else {
+        const grid = h('div', { class: 'grid md:grid-cols-2 gap-4' });
+        d.networks.forEach(n => grid.appendChild(h('div', { class: 'card p-5' }, [
+          h('div', { class: 'flex items-center justify-between' }, [
+            h('div', {}, [h('h3', { class: 'font-bold' }, n.name), h('div', { class: 'text-muted text-xs mt-1' }, 'provider: ' + n.provider + (n.has_credentials ? ' · keys set ✓' : ' · no keys'))]),
+            h('span', { class: 'badge ' + (n.is_active ? 'badge-green' : 'badge-muted') }, n.is_active ? 'active' : 'off'),
+          ]),
+          h('div', { class: 'text-muted text-xs mt-2' }, (n.last_status || 'never synced') + (n.last_synced_at ? ' · ' + fmt.ago(n.last_synced_at) : '')),
+          h('div', { class: 'text-muted text-xs mt-1' }, fmt.num(n.imported_count || 0) + ' coupons imported'),
+          h('div', { class: 'flex flex-wrap gap-2 mt-4' }, [
+            h('button', { class: 'btn btn-primary btn-sm', onclick: () => sync(n.id) }, 'Sync now'),
+            h('button', { class: 'btn btn-ghost btn-sm', onclick: () => edit(n) }, 'Edit'),
+            h('button', { class: 'btn btn-danger btn-sm', onclick: () => confirmDialog('Delete ' + n.name + '?', () => del(n.id)) }, 'Delete'),
+          ]),
+        ])));
+        wrap.appendChild(grid);
+      }
+      setView(wrap);
+
+      async function sync(id) { toast('Syncing… this can take a few seconds', 'info'); try { const r = await API.post('/admin/affiliate/networks/' + id + '/sync', {}); toast('Imported ' + r.imported + ' coupons', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }
+      async function del(id) { try { await API.del('/admin/affiliate/networks/' + id); toast('Deleted', 'ok'); route(); } catch (e) { toast(e.message, 'err'); } }
+
+      function edit(n) {
+        const provider = h('select', { class: 'input' }, [['impact', 'Impact.com'], ['generic', 'Generic JSON feed (any network)']].map(([v, l]) => h('option', { value: v, selected: n && n.provider === v ? 'selected' : null }, l)));
+        if (n) provider.disabled = true;
+        const name = h('input', { class: 'input', value: n ? n.name : '', placeholder: 'e.g. Impact (Global)' });
+        const f = {};
+        const field = (k, label, ph) => { const i = h('input', { class: 'input', placeholder: ph, autocomplete: 'off' }); f[k] = i; return h('div', {}, [h('label', { class: 'label' }, label), i]); };
+        const impactSec = h('div', { class: 'grid gap-3' }, [field('account_sid', 'Impact Account SID', 'IRxxxxxxxxxxxx'), field('auth_token', 'Impact Auth Token', n ? 'leave blank to keep current' : 'your Impact auth token'), field('sub_id', 'Sub ID (optional, for click attribution)', 'e.g. couponaut')]);
+        const genericSec = h('div', { class: 'grid gap-3' }, [field('feed_url', 'Coupon feed URL (JSON)', 'https://network.com/coupons.json'), field('bearer_token', 'Bearer token (optional)', n ? 'leave blank to keep' : ''), field('root', 'JSON path to array (optional)', 'e.g. data.coupons'), field('map', 'Field map JSON (optional)', '{"merchant":"store","code":"coupon_code","landing_url":"url"}')]);
+        const vis = () => { impactSec.style.display = provider.value === 'impact' ? '' : 'none'; genericSec.style.display = provider.value === 'generic' ? '' : 'none'; };
+        provider.addEventListener('change', vis);
+        const body = h('div', { class: 'grid gap-3' }, [
+          h('div', {}, [h('label', { class: 'label' }, 'Provider'), provider]),
+          h('div', {}, [h('label', { class: 'label' }, 'Name'), name]),
+          impactSec, genericSec,
+          h('button', { class: 'btn btn-primary', onclick: save }, n ? 'Save network' : 'Add network'),
+        ]);
+        const m = modal(n ? 'Edit ' + n.name : 'Add affiliate network', body); vis();
+
+        async function save() {
+          const config = {};
+          if (provider.value === 'impact') {
+            ['account_sid', 'auth_token', 'sub_id'].forEach(k => { if (f[k].value.trim()) config[k] = f[k].value.trim(); });
+          } else {
+            ['feed_url', 'bearer_token', 'root'].forEach(k => { if (f[k].value.trim()) config[k] = f[k].value.trim(); });
+            if (f.map.value.trim()) { try { config.map = JSON.parse(f.map.value); } catch (e) { toast('Field map must be valid JSON', 'err'); return; } }
+          }
+          try {
+            if (n) await API.put('/admin/affiliate/networks/' + n.id, { name: name.value, is_active: true, config });
+            else await API.post('/admin/affiliate/networks', { provider: provider.value, name: name.value, config });
+            toast('Saved', 'ok'); m.close(); route();
+          } catch (e) { toast(e.message, 'err'); }
+        }
       }
     },
 

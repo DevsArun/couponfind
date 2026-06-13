@@ -434,6 +434,48 @@ final class AdminController
         return Response::ok(\CouponFind\Controllers\AdsController::publicConfig(), 'Ad settings saved');
     }
 
+    // ---- Affiliate networks (Impact + any JSON-feed network) ----
+    public function affiliateNetworks(Request $request): Response
+    {
+        return Response::ok(['networks' => (new \CouponFind\Services\Affiliate\AffiliateService())->networks()]);
+    }
+
+    public function addAffiliateNetwork(Request $request): Response
+    {
+        $data = Validator::make($request->all(), [
+            'provider' => 'required|in:impact,generic',
+            'name'     => 'required|string|min:1|max:120',
+        ]);
+        $config = is_array($request->input('config')) ? $request->input('config') : [];
+        $id = (new \CouponFind\Services\Affiliate\AffiliateService())->addNetwork((string) $data['provider'], (string) $data['name'], $config);
+        Audit::log((int) $request->userId(), 'admin.affiliate.add', 'affiliate_network', (string) $id, ['provider' => $data['provider']], $request->ip());
+        return Response::created(['id' => $id], 'Affiliate network added');
+    }
+
+    public function updateAffiliateNetwork(Request $request, array $params): Response
+    {
+        (new \CouponFind\Services\Affiliate\AffiliateService())->updateNetwork((int) $params['id'], [
+            'name'      => $request->input('name'),
+            'is_active' => filter_var($request->input('is_active', true), FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+            'config'    => is_array($request->input('config')) ? $request->input('config') : [],
+        ]);
+        return Response::ok(null, 'Network updated');
+    }
+
+    public function deleteAffiliateNetwork(Request $request, array $params): Response
+    {
+        (new \CouponFind\Services\Affiliate\AffiliateService())->deleteNetwork((int) $params['id']);
+        Audit::log((int) $request->userId(), 'admin.affiliate.delete', 'affiliate_network', (string) $params['id'], [], $request->ip());
+        return Response::ok(null, 'Network deleted');
+    }
+
+    public function syncAffiliate(Request $request, array $params): Response
+    {
+        $count = (new \CouponFind\Services\Affiliate\AffiliateService())->sync((int) $params['id']);
+        Audit::log((int) $request->userId(), 'admin.affiliate.sync', 'affiliate_network', (string) $params['id'], ['imported' => $count], $request->ip());
+        return Response::ok(['imported' => $count], 'Synced — imported ' . $count . ' affiliate coupons');
+    }
+
     // ---- Contact messages (from the public contact form) ----
     public function contactMessages(Request $request): Response
     {

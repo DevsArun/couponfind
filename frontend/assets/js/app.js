@@ -130,7 +130,7 @@
       actions.push(h('button', { class: 'code-pill btn-soft', style: 'cursor:pointer;', onclick: () => { copyToClipboard(c.code); API.post('/coupons/' + (c.id || c.coupon_id) + '/use', {}).catch(() => {}); } },
         [c.code + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })]));
     } else {
-      actions.push(h('a', { class: 'btn btn-soft btn-sm', href: c.landing_url || '#', target: '_blank' }, 'View deal'));
+      actions.push(h('a', { class: 'btn btn-soft btn-sm', href: '/api/go/' + (c.id || c.coupon_id), target: '_blank', rel: 'sponsored nofollow noopener' }, 'Get deal →'));
     }
     const right = opts.saved
       ? h('button', { class: 'btn btn-ghost btn-sm', onclick: () => opts.onRemove() }, 'Remove')
@@ -140,6 +140,7 @@
       h('div', { class: 'flex items-center gap-2' }, [
         h('span', { class: 'badge badge-accent' }, fmt.discount(c)),
         h('span', { class: 'text-muted text-xs' }, c.merchant_name),
+        c.is_affiliate ? h('span', { class: 'badge badge-muted', title: 'Affiliate partner deal' }, 'affiliate') : null,
       ]),
       h('h4', { class: 'font-bold', style: 'font-size:1rem;line-height:1.3;' }, c.title),
       c.description ? h('p', { class: 'text-muted text-sm', style: 'margin:0;' }, c.description) : null,
@@ -278,7 +279,7 @@
           const line = !n
             ? `I couldn't find live coupons for "${query}" right now. Try a brand name or broader term.`
             : `Found ${n} working coupon${n === 1 ? '' : 's'} ${brand ? 'for ' + brand : 'matching "' + query + '"'} in ${data.took_ms}ms. ${n === 1 ? "Here's the best one" : 'Here are the best ones'} 👇`;
-          const meta = `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '');
+          const meta = `via ${data.source}${data.cache_hit ? ' · cached' : ''}` + (data.quota ? (data.quota.unlimited ? ' · ∞ searches' : ' · ' + data.quota.remaining + ' left today') : '') + ((data.results || []).some(r => r && r.is_affiliate) ? ' · some links are affiliate links (we may earn a commission)' : '');
           const msg = { role: 'bot', line, results: (data.results || []).slice(0, 8), meta };
           thread.appendChild(botFromData(msg));
           conv.messages.push(msg);

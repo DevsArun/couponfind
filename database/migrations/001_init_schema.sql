@@ -290,6 +290,8 @@ CREATE TABLE IF NOT EXISTS coupons (
     success_count   INT UNSIGNED    NOT NULL DEFAULT 0,
     fail_count      INT UNSIGNED    NOT NULL DEFAULT 0,
     times_used      INT UNSIGNED    NOT NULL DEFAULT 0,
+    is_affiliate    TINYINT(1)      NOT NULL DEFAULT 0,
+    affiliate_network VARCHAR(60)   NULL,
     created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -534,6 +536,32 @@ CREATE TABLE IF NOT EXISTS contact_messages (
     created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_cm_status (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Affiliate networks configured from the admin panel (Impact, Awin, CJ, generic…)
+CREATE TABLE IF NOT EXISTS affiliate_networks (
+    id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    provider      VARCHAR(40)     NOT NULL,           -- impact | generic | awin | cj ...
+    name          VARCHAR(120)    NOT NULL,
+    config_json   JSON            NULL,               -- credentials + mapping (client-secret kept server-side)
+    is_active     TINYINT(1)      NOT NULL DEFAULT 1,
+    last_synced_at TIMESTAMP      NULL,
+    last_status   VARCHAR(255)    NULL,
+    imported_count INT UNSIGNED   NOT NULL DEFAULT 0,
+    created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_aff_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Affiliate link clicks (our own tracking for the /go redirect)
+CREATE TABLE IF NOT EXISTS affiliate_clicks (
+    id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    coupon_id   BIGINT UNSIGNED NULL,
+    user_id     BIGINT UNSIGNED NULL,
+    ip          VARCHAR(45)     NULL,
+    created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_click_coupon (coupon_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

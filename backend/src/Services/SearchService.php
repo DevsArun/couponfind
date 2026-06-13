@@ -101,6 +101,9 @@ final class SearchService
             usort($results, fn ($a, $b) => strcmp((string) ($b['valid_until'] ?? ''), (string) ($a['valid_until'] ?? '')));
         }
 
+        // 5b. Affiliate coupons always rank on top (general coupons below).
+        $results = $this->applyAffiliateBoost($results);
+
         $payload = [
             'query'     => $raw,
             'intent'    => $intent,
@@ -175,6 +178,37 @@ final class SearchService
         $r['score'] = (float) $r['score'];
         unset($r['success_count'], $r['fail_count'], $r['times_used'], $r['terms'], $r['status'], $r['is_featured'], $r['currency']);
         return $r;
+    }
+
+    /**
+     * Annotate each result with is_affiliate (looked up by id) and stable-sort
+     * so affiliate coupons appear first. Safe if the column doesn't exist yet.
+     */
+    private function applyAffiliateBoost(array $results): array
+    {
+        if ($results === []) {
+            return $results;
+        }
+        $ids = array_values(array_filter(array_map(static fn ($r) => (int) ($r['id'] ?? 0), $results)));
+        if ($ids === []) {
+            return $results;
+        }
+        $map = [];
+        try {
+            $in = implode(',', array_map('intval', $ids));
+            $rows = \CouponFind\Core\Database::instance()->all("SELECT id, is_affiliate FROM coupons WHERE id IN ($in)");
+            foreach ($rows as $row) {
+                $map[(int) $row['id']] = (int) ($row['is_affiliate'] ?? 0);
+            }
+        } catch (\Throwable) {
+            return $results; // column may not exist yet — no boost, no break
+        }
+        foreach ($results as &$r) {
+            $r['is_affiliate'] = $map[(int) ($r['id'] ?? 0)] ?? 0;
+        }
+        unset($r);
+        usort($results, static fn ($a, $b) => ($b['is_affiliate'] ?? 0) <=> ($a['is_affiliate'] ?? 0));
+        return $results;
     }
 
     private function logSearch(string $raw, array $payload, ?int $userId, ?string $ip, bool $cacheHit): void

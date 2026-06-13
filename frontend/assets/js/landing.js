@@ -117,7 +117,7 @@
       block.appendChild(grid);
     }
     block.appendChild(h('div', { class: 'chat-meta' },
-      `via ${data.source}${data.cache_hit ? ' · cached' : ''}${data.intent && data.intent.confidence ? ' · intent ' + Math.round(data.intent.confidence * 100) + '%' : ''}`));
+      `via ${data.source}${data.cache_hit ? ' · cached' : ''}${data.intent && data.intent.confidence ? ' · intent ' + Math.round(data.intent.confidence * 100) + '%' : ''}` + ((data.results || []).some(r => r && r.is_affiliate) ? ' · some links are affiliate links (we may earn a commission)' : '')));
     thread.appendChild(botRow(block, true));
     UI.Ads.afterResponse(thread);
     scrollDown();
@@ -127,12 +127,13 @@
     const codeBtn = c.code
       ? h('button', { class: 'code-pill btn-soft', style: 'cursor:pointer;', onclick: () => { copyToClipboard(c.code); API.post('/coupons/' + c.id + '/use', {}).catch(() => {}); } },
           [c.code + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })])
-      : h('a', { class: 'btn btn-soft btn-sm', href: c.landing_url || '#', target: '_blank' }, 'View deal');
+      : h('a', { class: 'btn btn-soft btn-sm', href: '/api/go/' + c.id, target: '_blank', rel: 'sponsored nofollow noopener' }, 'Get deal →');
 
     return h('div', { class: 'card coupon-card p-4 flex flex-col gap-2' }, [
       h('div', { class: 'flex items-center gap-2' }, [
         h('span', { class: 'badge badge-accent' }, fmt.discount(c)),
         h('span', { class: 'text-muted text-xs' }, c.merchant_name),
+        c.is_affiliate ? h('span', { class: 'badge badge-muted', title: 'Affiliate partner deal' }, 'affiliate') : null,
       ]),
       h('h4', { class: 'font-bold', style: 'font-size:0.95rem;line-height:1.3;margin:0;' }, c.title),
       c.description ? h('p', { class: 'text-muted text-sm', style: 'margin:0;' }, c.description) : null,
