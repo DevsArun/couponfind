@@ -4,20 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Couponaut — Ask for any coupon. Get the one that works.</title>
-  <meta name="description" content="The AI coupon search that works like a chat. Type it however you want — typos welcome. Couponaut finds the brand, validates the codes, and hands you the best live deal in milliseconds." />
+  <meta name="description" content="Couponaut is the AI coupon search that works like a chat. Type it however you want — typos welcome. We find the brand, validate the codes, and hand you the best live deal in milliseconds. Free to start." />
+  <meta property="og:title" content="Couponaut — AI coupon search that actually works" />
+  <meta property="og:description" content="Ask in plain language. Get the best working coupon in milliseconds. Validated, ranked, ad-free on paid plans." />
+  <meta property="og:type" content="website" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/app.css" />
   <style>
-    .feature-ico { width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:var(--accent);color:var(--on-accent); }
+    .feature-ico { width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:var(--accent);color:var(--on-accent); }
     .feature-ico svg{width:22px;height:22px;}
     .eyebrow { font-size:0.78rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted-2); }
     .logo-row span { color:var(--muted-2); font-weight:800; font-size:1.15rem; letter-spacing:-0.02em; opacity:.55; }
     .dotgrid { background-image:radial-gradient(rgba(13,13,13,0.13) 1px, transparent 1px); background-size:24px 24px; -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 35%, transparent 72%); mask-image:radial-gradient(ellipse at 50% 0%, #000 35%, transparent 72%); }
     .pill { display:inline-flex;align-items:center;gap:.5rem;padding:.42rem .9rem;font-size:.82rem; }
-    .step-card { position:relative; }
-    .step-card .step-n { font-variant-numeric:tabular-nums; }
+    /* equal-height premium bento cards */
+    .bento { display:flex; flex-direction:column; height:100%; }
+    .bento h3 { margin-top:1.1rem; }
+    /* numbered step cards with connecting rail */
+    .step { position:relative; }
+    .step-num { font-family:ui-monospace,monospace; font-weight:800; font-size:.85rem; color:var(--muted-2); border:1px solid var(--border-strong); border-radius:999px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; flex:none; }
+    /* showcase coupon card */
+    .demo-card { border:1px solid var(--border); border-radius:16px; background:var(--card); padding:1rem; box-shadow:var(--shadow-soft); }
+    .demo-code { font-family:ui-monospace,monospace; letter-spacing:.08em; border:1px dashed var(--border-strong); border-radius:8px; padding:.4rem .7rem; font-size:.85rem; font-weight:700; }
+    /* compare table */
+    .vs-col { border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.6rem; background:var(--card); box-shadow:var(--shadow-soft); height:100%; }
+    .vs-col.win { border-color:var(--text); box-shadow:0 0 0 1.5px var(--text), var(--shadow-md); }
+    .vs-li { display:flex; gap:.6rem; align-items:flex-start; padding:.5rem 0; color:var(--muted); font-size:.94rem; }
+    .vs-ico { width:20px;height:20px;flex:none;margin-top:1px; }
+    /* partner logos */
+    .net-chip { display:inline-flex; align-items:center; gap:.5rem; border:1px solid var(--border-strong); background:var(--card); border-radius:12px; padding:.6rem .9rem; font-weight:700; font-size:.9rem; box-shadow:var(--shadow-soft); }
+    /* testimonial */
+    .quote-card { display:flex; flex-direction:column; height:100%; }
+    .stars { display:inline-flex; gap:2px; color:var(--accent); }
+    .stars svg { width:15px;height:15px; }
+    .avatar-ini { width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex:none; }
+    /* faq */
+    details.faq { border:1px solid var(--border); border-radius:14px; background:var(--card); padding:0; overflow:hidden; box-shadow:var(--shadow-soft); }
+    details.faq summary { list-style:none; cursor:pointer; padding:1.05rem 1.2rem; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+    details.faq summary::-webkit-details-marker { display:none; }
+    details.faq summary .chev { transition:transform .2s; flex:none; width:18px;height:18px;color:var(--muted-2); }
+    details.faq[open] summary .chev { transform:rotate(180deg); }
+    details.faq .faq-body { padding:0 1.2rem 1.15rem; color:var(--muted); line-height:1.6; font-size:.94rem; }
   </style>
 </head>
 <body>
@@ -31,9 +60,9 @@
       <nav class="hidden md:flex items-center gap-7 text-sm">
         <a href="#features" style="color:var(--muted);text-decoration:none;">Features</a>
         <a href="#how" style="color:var(--muted);text-decoration:none;">How it works</a>
+        <a href="#partners" style="color:var(--muted);text-decoration:none;">For brands</a>
         <a href="/pricing" style="color:var(--muted);text-decoration:none;">Pricing</a>
         <a href="/about" style="color:var(--muted);text-decoration:none;">About</a>
-        <a href="/contact" style="color:var(--muted);text-decoration:none;">Contact</a>
       </nav>
       <div class="hidden md:flex items-center gap-2">
         <a href="/login" class="btn btn-ghost btn-sm">Sign in</a>
@@ -48,9 +77,9 @@
       <div class="px-5 py-3 grid gap-1">
         <a href="#features" class="nav-item">Features</a>
         <a href="#how" class="nav-item">How it works</a>
+        <a href="#partners" class="nav-item">For brands</a>
         <a href="/pricing" class="nav-item">Pricing</a>
         <a href="/about" class="nav-item">About</a>
-        <a href="/contact" class="nav-item">Contact</a>
         <div class="grid grid-cols-2 gap-2 mt-2">
           <a href="/login" class="btn btn-ghost">Sign in</a>
           <a href="/register" class="btn btn-primary">Get started</a>
@@ -69,19 +98,24 @@
   <!-- Hero -->
   <section class="relative" style="overflow:hidden;">
     <div class="hero-aurora" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="dotgrid" style="position:absolute;inset:0;height:680px;pointer-events:none;z-index:0;"></div>
+    <div class="dotgrid" style="position:absolute;inset:0;height:720px;pointer-events:none;z-index:0;"></div>
     <div class="max-w-5xl mx-auto px-5 pt-16 md:pt-24 pb-8 text-center relative fade-up" style="z-index:1;">
       <div class="pill mx-auto mb-6" style="width:fit-content;">
         <span class="pulse-dot"></span>
         <span style="width:15px;height:15px;display:inline-flex;color:var(--accent);" id="pill-ico"></span>
-        AI coupon search · sub-200ms
+        AI coupon search · sub-200ms · validated codes
       </div>
       <h1 class="h-display" style="font-size:clamp(2.7rem,7.2vw,4.8rem);max-width:920px;margin:0 auto;">
         Ask for any coupon.<br/>Get the one that <span style="text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:9px;text-decoration-color:var(--accent);">actually works</span>.
       </h1>
-      <p class="text-muted mx-auto mt-6" style="max-width:620px;font-size:1.14rem;line-height:1.65;">
-        Type it like you'd text a friend — even <span class="mono" style="color:var(--text);">"bst niek coupn"</span>. Couponaut fixes the typo, finds the brand, validates the codes, and ranks the best live deals. Conversational AI search — but for savings.
+      <p class="text-muted mx-auto mt-6" style="max-width:640px;font-size:1.15rem;line-height:1.65;">
+        Couponaut is an AI search engine for discounts. Type it like you'd text a friend — even <span class="mono" style="color:var(--text);">"bst niek coupn"</span> — and we fix the typo, find the brand, validate the codes, and rank the best live deals. Conversational search, built for savings.
       </p>
+
+      <div class="flex items-center justify-center gap-3 mt-8 flex-wrap">
+        <a href="/register" class="btn btn-primary btn-lg">Start saving free →</a>
+        <a href="#how" class="btn btn-ghost btn-lg">See how it works</a>
+      </div>
 
       <!-- chat-style search -->
       <div class="chat-shell chat-float mt-11 text-left" style="max-width:700px;margin-left:auto;margin-right:auto;min-height:340px;">
@@ -136,18 +170,214 @@
     <div class="text-center mb-12">
       <span class="eyebrow-chip">Built like a search engine</span>
       <h2 class="h-display mt-4" style="font-size:clamp(1.9rem,4vw,2.7rem);">Not just a list of dead codes</h2>
-      <p class="text-muted mt-3" style="max-width:560px;margin:0.75rem auto 0;">Pre-indexed, validated and ranked. We never scrape while you wait — that's how it stays instant.</p>
+      <p class="text-muted mt-3" style="max-width:580px;margin:0.75rem auto 0;">Every result is pre-indexed, validated and ranked. We never scrape while you wait — that's how it stays instant and reliable.</p>
     </div>
-    <div class="grid md:grid-cols-3 gap-4 stagger" id="features-grid"></div>
+    <div class="grid md:grid-cols-3 gap-4 stagger">
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Typo-proof</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">Misspell anything — "niek", "hostingr", "amazn". We resolve the real brand with fuzzy matching plus AI intent.</p>
+      </div>
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Intent-aware</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">Detects the merchant, discount type and time intent ("today", "20% off") to rank results precisely.</p>
+      </div>
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Blazing fast</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">Meilisearch + Redis cache deliver ranked, typo-tolerant results in well under 200ms.</p>
+      </div>
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Validated</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">Codes are auto-validated, deduped and scored for reliability before you ever see them.</p>
+      </div>
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Best-first ranking</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">A composite score blends freshness, success rate, popularity and real cash value.</p>
+      </div>
+      <div class="bento">
+        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+        <h3 class="font-bold" style="font-size:1.05rem;">Always fresh</h3>
+        <p class="text-muted text-sm mt-2" style="line-height:1.55;">A background intelligence engine continuously discovers new deals from official sources.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product showcase: see it in action -->
+  <section class="max-w-6xl mx-auto px-5 py-16">
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <span class="eyebrow-chip">See it in action</span>
+        <h2 class="h-display mt-4" style="font-size:clamp(1.8rem,4vw,2.5rem);">One message. The best working deal.</h2>
+        <p class="text-muted mt-4" style="line-height:1.65;">No more 20 open tabs, expired codes and pop-up roulette. Just ask in plain language and Couponaut hands back ranked, validated coupons — with one-tap copy and a live "ends" date on every card.</p>
+        <ul class="grid gap-3 mt-6" style="list-style:none;padding:0;">
+          <li class="flex items-center gap-3 text-muted"><span style="width:18px;height:18px;color:var(--accent);flex:none;" class="ico-check"></span> Understands typos, slang and intent</li>
+          <li class="flex items-center gap-3 text-muted"><span style="width:18px;height:18px;color:var(--accent);flex:none;" class="ico-check"></span> Only shows codes that pass validation</li>
+          <li class="flex items-center gap-3 text-muted"><span style="width:18px;height:18px;color:var(--accent);flex:none;" class="ico-check"></span> Copy a code or open the deal in one tap</li>
+        </ul>
+        <a href="/register" class="btn btn-primary mt-7">Try it free</a>
+      </div>
+
+      <!-- static demo conversation -->
+      <div class="card" style="padding:1.1rem;">
+        <div class="flex items-center gap-2 pb-3 mb-1" style="border-bottom:1px solid var(--border);">
+          <span class="brand-mark" style="width:22px;height:22px;font-size:0.65rem;">C</span>
+          <span class="font-bold text-sm">Couponaut Assistant</span>
+          <span class="badge badge-green" style="margin-left:auto;">live</span>
+        </div>
+        <div class="grid gap-4" style="padding:.6rem .2rem;">
+          <div class="flex justify-end">
+            <div style="background:var(--accent);color:var(--on-accent);border-radius:14px;border-bottom-right-radius:5px;padding:.6rem .85rem;font-size:.92rem;max-width:80%;">bst niek coupn for running shoes</div>
+          </div>
+          <div class="flex gap-2 items-start">
+            <span class="brand-mark" style="width:24px;height:24px;font-size:0.65rem;flex:none;">C</span>
+            <div style="font-size:.92rem;line-height:1.55;">
+              <p style="margin:0 0 .7rem;">Found <strong>3 working Nike coupons</strong> in 142ms — here are the best ones 👇</p>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div class="demo-card">
+                  <div class="flex items-center gap-2 mb-1"><span class="badge badge-accent">25% OFF</span><span class="text-muted text-xs">Nike</span></div>
+                  <div class="font-bold" style="font-size:.9rem;line-height:1.3;">25% off running shoes</div>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="demo-code">RUN25</span>
+                    <span class="text-xs text-muted">Ends Jun 30</span>
+                  </div>
+                </div>
+                <div class="demo-card">
+                  <div class="flex items-center gap-2 mb-1"><span class="badge badge-accent">FREE SHIP</span><span class="text-muted text-xs">Nike</span></div>
+                  <div class="font-bold" style="font-size:.9rem;line-height:1.3;">Free shipping, no minimum</div>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="demo-code">SHIPFREE</span>
+                    <span class="text-xs text-muted">Ends Jul 12</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-muted" style="margin:.7rem 0 0;">via index · cached · intent 96%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- How it works -->
-  <section id="how" class="max-w-5xl mx-auto px-5 py-12">
-    <div class="text-center mb-10">
+  <section id="how" class="max-w-6xl mx-auto px-5 py-16">
+    <div class="text-center mb-12">
       <span class="eyebrow-chip">How it works</span>
       <h2 class="h-display mt-4" style="font-size:clamp(1.8rem,4vw,2.5rem);">From query to coupon in four steps</h2>
+      <p class="text-muted mt-3" style="max-width:560px;margin:0.75rem auto 0;">A Python intelligence engine does the heavy lifting in the background, so your search is always instant.</p>
     </div>
-    <div class="grid md:grid-cols-4 gap-4" id="steps-grid"></div>
+    <div class="grid md:grid-cols-4 gap-4">
+      <div class="bento step">
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span class="step-num">01</span></div>
+        <h3 class="font-bold mt-4">Discover</h3>
+        <p class="text-muted text-sm mt-1" style="line-height:1.55;">The engine crawls offer pages, RSS feeds and sitemaps around the clock.</p>
+      </div>
+      <div class="bento step">
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span><span class="step-num">02</span></div>
+        <h3 class="font-bold mt-4">Structure</h3>
+        <p class="text-muted text-sm mt-1" style="line-height:1.55;">AI extracts codes, validates them, and removes duplicates automatically.</p>
+      </div>
+      <div class="bento step">
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></span><span class="step-num">03</span></div>
+        <h3 class="font-bold mt-4">Rank</h3>
+        <p class="text-muted text-sm mt-1" style="line-height:1.55;">Each deal is scored by freshness, reliability and real value.</p>
+      </div>
+      <div class="bento step">
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="step-num">04</span></div>
+        <h3 class="font-bold mt-4">Ask</h3>
+        <p class="text-muted text-sm mt-1" style="line-height:1.55;">You ask in plain language — we hand back the best deal instantly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Old way vs Couponaut -->
+  <section class="max-w-5xl mx-auto px-5 py-16">
+    <div class="text-center mb-12">
+      <span class="eyebrow-chip">Why Couponaut</span>
+      <h2 class="h-display mt-4" style="font-size:clamp(1.8rem,4vw,2.5rem);">The end of the coupon hunt</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="vs-col">
+        <div class="text-muted font-bold mb-3" style="letter-spacing:.02em;">The old way</div>
+        <div class="vs-li"><span class="vs-ico ico-x"></span> 20 browser tabs and sketchy coupon sites</div>
+        <div class="vs-li"><span class="vs-ico ico-x"></span> Pasting expired codes one by one at checkout</div>
+        <div class="vs-li"><span class="vs-ico ico-x"></span> Pop-ups, redirects and fake "verified" badges</div>
+        <div class="vs-li"><span class="vs-ico ico-x"></span> No idea which discount is actually the best</div>
+      </div>
+      <div class="vs-col win">
+        <div class="flex items-center gap-2 mb-3"><span class="brand-mark" style="width:22px;height:22px;font-size:.6rem;">C</span><span class="font-bold">With Couponaut</span></div>
+        <div class="vs-li" style="color:var(--text);"><span class="vs-ico ico-check"></span> One message — get the best working code instantly</div>
+        <div class="vs-li" style="color:var(--text);"><span class="vs-ico ico-check"></span> Codes auto-validated and scored before you see them</div>
+        <div class="vs-li" style="color:var(--text);"><span class="vs-ico ico-check"></span> Clean, ad-free experience on every paid plan</div>
+        <div class="vs-li" style="color:var(--text);"><span class="vs-ico ico-check"></span> Ranked best-first, with live expiry on each deal</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For brands & partners -->
+  <section id="partners" class="max-w-6xl mx-auto px-5 py-16">
+    <div class="card" style="padding:clamp(1.75rem,4vw,3rem);">
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="eyebrow-chip">For brands &amp; partners</span>
+          <h2 class="h-display mt-4" style="font-size:clamp(1.8rem,4vw,2.5rem);">Put your best offers in front of high-intent shoppers</h2>
+          <p class="text-muted mt-4" style="line-height:1.65;">Couponaut surfaces validated, ranked deals to people who are actively searching to buy. We plug directly into the major affiliate networks and direct merchant feeds, so your live promotions reach ready-to-convert customers — with transparent affiliate disclosure on every link.</p>
+          <ul class="grid sm:grid-cols-2 gap-3 mt-6" style="list-style:none;padding:0;">
+            <li class="flex items-center gap-2 text-muted text-sm"><span style="width:16px;color:var(--accent);flex:none;" class="ico-check"></span> High purchase-intent traffic</li>
+            <li class="flex items-center gap-2 text-muted text-sm"><span style="width:16px;color:var(--accent);flex:none;" class="ico-check"></span> Validated, ranked placement</li>
+            <li class="flex items-center gap-2 text-muted text-sm"><span style="width:16px;color:var(--accent);flex:none;" class="ico-check"></span> Affiliate-network integrated</li>
+            <li class="flex items-center gap-2 text-muted text-sm"><span style="width:16px;color:var(--accent);flex:none;" class="ico-check"></span> Transparent disclosure</li>
+          </ul>
+          <div class="flex items-center gap-3 mt-7 flex-wrap">
+            <a href="/contact" class="btn btn-primary">Become a partner</a>
+            <a href="/contact" class="btn btn-ghost">Talk to us</a>
+          </div>
+        </div>
+        <div>
+          <div class="text-muted text-sm font-bold mb-3" style="letter-spacing:.04em;text-transform:uppercase;">Integrated affiliate networks</div>
+          <div class="flex flex-wrap gap-2.5">
+            <span class="net-chip">Awin</span>
+            <span class="net-chip">CJ Affiliate</span>
+            <span class="net-chip">Impact</span>
+            <span class="net-chip">ShareASale</span>
+            <span class="net-chip">Direct feeds</span>
+          </div>
+          <div class="grid grid-cols-3 gap-px mt-6" style="background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;">
+            <div class="p-5 text-center" style="background:var(--card);"><div class="h-display" style="font-size:1.6rem;">5+</div><div class="text-muted text-xs mt-1">networks</div></div>
+            <div class="p-5 text-center" style="background:var(--card);"><div class="h-display" style="font-size:1.6rem;">1M+</div><div class="text-muted text-xs mt-1">deals indexed</div></div>
+            <div class="p-5 text-center" style="background:var(--card);"><div class="h-display" style="font-size:1.6rem;">24/7</div><div class="text-muted text-xs mt-1">freshness</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="max-w-6xl mx-auto px-5 py-16">
+    <div class="text-center mb-12">
+      <span class="eyebrow-chip">Loved by savers</span>
+      <h2 class="h-display mt-4" style="font-size:clamp(1.8rem,4vw,2.5rem);">Real savings, zero hassle</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="card p-6 quote-card">
+        <div class="stars" id="stars1"></div>
+        <p class="mt-3" style="line-height:1.6;flex:1;">"It found a working code in seconds after three other sites failed me. This is how coupon search should feel."</p>
+        <div class="flex items-center gap-3 mt-5"><span class="avatar-ini">AR</span><div><div class="font-bold text-sm">Aditi R.</div><div class="text-muted text-xs">Online shopper</div></div></div>
+      </div>
+      <div class="card p-6 quote-card">
+        <div class="stars" id="stars2"></div>
+        <p class="mt-3" style="line-height:1.6;flex:1;">"I typed the brand wrong and it still understood me. The ad-free plan is absolutely worth the five bucks."</p>
+        <div class="flex items-center gap-3 mt-5"><span class="avatar-ini">MK</span><div><div class="font-bold text-sm">Marcus K.</div><div class="text-muted text-xs">Pro subscriber</div></div></div>
+      </div>
+      <div class="card p-6 quote-card">
+        <div class="stars" id="stars3"></div>
+        <p class="mt-3" style="line-height:1.6;flex:1;">"Validated codes ranked best-first — no more dead coupons. It's basically a search engine for discounts."</p>
+        <div class="flex items-center gap-3 mt-5"><span class="avatar-ini">SP</span><div><div class="font-bold text-sm">Sara P.</div><div class="text-muted text-xs">Deal hunter</div></div></div>
+      </div>
+    </div>
   </section>
 
   <!-- Pricing -->
@@ -160,6 +390,36 @@
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4" id="pricing-grid">
       <div class="skeleton" style="height:360px;border-radius:24px;"></div><div class="skeleton" style="height:360px;border-radius:24px;"></div>
       <div class="skeleton" style="height:360px;border-radius:24px;"></div><div class="skeleton" style="height:360px;border-radius:24px;"></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="max-w-3xl mx-auto px-5 py-12">
+    <div class="text-center mb-10">
+      <span class="eyebrow-chip">FAQ</span>
+      <h2 class="h-display mt-4" style="font-size:clamp(1.7rem,4vw,2.2rem);">Questions, answered</h2>
+    </div>
+    <div class="grid gap-3" id="faq-list">
+      <details class="faq" open>
+        <summary>What exactly is Couponaut? <span class="chev ico-chev"></span></summary>
+        <div class="faq-body">Couponaut is an AI-powered search engine for coupons and discounts. You ask in plain language and we return the best <em>working</em> codes, validated and ranked — instead of a wall of expired ones.</div>
+      </details>
+      <details class="faq">
+        <summary>Is there a free plan? <span class="chev ico-chev"></span></summary>
+        <div class="faq-body">Yes — you get 10 searches every day for free, no credit card required. Upgrade any time for more searches and an ad-free experience.</div>
+      </details>
+      <details class="faq">
+        <summary>Do the coupons actually work? <span class="chev ico-chev"></span></summary>
+        <div class="faq-body">Codes are auto-validated and scored for reliability before you ever see them. Offers can still expire, so we always show the freshest, best-ranked deals first.</div>
+      </details>
+      <details class="faq">
+        <summary>How is it so fast? <span class="chev ico-chev"></span></summary>
+        <div class="faq-body">A background engine continuously discovers, validates and indexes deals into Meilisearch with a Redis cache. Search reads pre-indexed data and never scrapes while you wait — so results return in under 200ms.</div>
+      </details>
+      <details class="faq">
+        <summary>I'm a brand — can I partner with you? <span class="chev ico-chev"></span></summary>
+        <div class="faq-body">Absolutely. We integrate with major affiliate networks (Awin, CJ, Impact, ShareASale) and direct merchant feeds. <a href="/contact" style="color:var(--accent);text-decoration:underline;">Get in touch</a> and we'll get your offers in front of high-intent shoppers.</div>
+      </details>
     </div>
   </section>
 
@@ -192,7 +452,7 @@
       </div>
       <div>
         <div class="footer-col-title">Company</div>
-        <div class="grid gap-2.5"><a class="footer-link" href="/about">About us</a><a class="footer-link" href="/contact">Contact</a></div>
+        <div class="grid gap-2.5"><a class="footer-link" href="/about">About us</a><a class="footer-link" href="#partners">For brands</a><a class="footer-link" href="/contact">Contact</a></div>
       </div>
       <div>
         <div class="footer-col-title">Get started</div>
@@ -210,5 +470,19 @@
   <script src="/assets/js/api.js"></script>
   <script src="/assets/js/ui.js"></script>
   <script src="/assets/js/landing.js"></script>
+  <script>
+    /* Inline icon hydration for static sections (uses UI.icon) */
+    (function () {
+      if (!window.UI) return;
+      var ic = UI.icon;
+      document.querySelectorAll('.ico-check').forEach(function (n) { n.innerHTML = ic('check'); });
+      document.querySelectorAll('.ico-chev').forEach(function (n) { n.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'; });
+      document.querySelectorAll('.ico-x').forEach(function (n) { n.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'; n.style.color = 'var(--muted-2)'; });
+      ['stars1', 'stars2', 'stars3'].forEach(function (id) {
+        var n = document.getElementById(id); if (!n) return;
+        n.innerHTML = Array(5).fill(ic('star')).join('');
+      });
+    })();
+  </script>
 </body>
 </html>

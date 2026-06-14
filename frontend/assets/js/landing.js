@@ -144,38 +144,7 @@
     ]);
   }
 
-  // ---------- Features (bento) ----------
-  const features = [
-    { icon: 'sparkles', title: 'Typo-proof', desc: 'Misspell anything — "niek", "hostingr", "amazn". We resolve the real brand with fuzzy matching + AI.' },
-    { icon: 'target', title: 'Intent-aware', desc: 'Detects the merchant, discount type and time intent ("today", "20% off") to rank precisely.' },
-    { icon: 'bolt', title: 'Blazing fast', desc: 'Meilisearch + Redis cache deliver ranked results in well under 200ms.' },
-    { icon: 'shield', title: 'Validated', desc: 'Codes are auto-validated, deduped and scored by reliability before you ever see them.' },
-    { icon: 'layers', title: 'Best-first ranking', desc: 'A composite score blends freshness, success rate, popularity and real value.' },
-    { icon: 'refresh', title: 'Always fresh', desc: 'A background engine continuously discovers new deals from official sources.' },
-  ];
-  const fg = el('#features-grid');
-  features.forEach(f => fg.appendChild(h('div', { class: 'bento' }, [
-    h('div', { class: 'feature-ico', html: icon(f.icon) }),
-    h('h3', { class: 'font-bold mt-4', style: 'font-size:1.05rem;' }, f.title),
-    h('p', { class: 'text-muted text-sm mt-2', style: 'line-height:1.55;' }, f.desc),
-  ])));
-
-  // ---------- Steps ----------
-  const steps = [
-    { n: '01', icon: 'globe', title: 'Discover', desc: 'Our engine crawls offer pages, RSS feeds & sitemaps around the clock.' },
-    { n: '02', icon: 'sparkles', title: 'Structure', desc: 'AI extracts codes, validates them and removes duplicates.' },
-    { n: '03', icon: 'layers', title: 'Rank', desc: 'Each deal is scored by freshness, reliability and value.' },
-    { n: '04', icon: 'message', title: 'Ask', desc: 'You ask in plain language — we hand back the best deal instantly.' },
-  ];
-  const sg = el('#steps-grid');
-  steps.forEach(s => sg.appendChild(h('div', { class: 'bento' }, [
-    h('div', { class: 'flex items-center justify-between' }, [
-      h('span', { class: 'feature-ico', style: 'width:38px;height:38px;', html: icon(s.icon) }),
-      h('span', { class: 'mono text-muted', style: 'font-size:0.9rem;' }, s.n),
-    ]),
-    h('h3', { class: 'font-bold mt-4' }, s.title),
-    h('p', { class: 'text-muted text-sm mt-1' }, s.desc),
-  ])));
+  // ---------- Features & steps are now static in index.html ----------
 
   // ---------- Pricing ----------
   (async function loadPlans() {
@@ -214,7 +183,7 @@
 /* ---- Premium scroll-reveal motion ---- */
 (function () {
   function setupReveal() {
-    const sel = '#features .text-center, #how .text-center, #pricing .text-center, .bento, #pricing .card, .stats-band, .cta-card';
+    const sel = '.eyebrow-chip, .bento, .vs-col, .net-chip, .quote-card, #pricing .card, .price-card, .stats-band, .cta-card, .demo-card, details.faq';
     document.querySelectorAll(sel).forEach(el => el.classList.add('reveal'));
     if (!('IntersectionObserver' in window)) { document.querySelectorAll('.reveal').forEach(el => el.classList.add('in')); return; }
     const io = new IntersectionObserver((entries) => {
