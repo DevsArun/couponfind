@@ -245,7 +245,34 @@ final class AdminController
             [$request->input('merchant_id') ? (int) $request->input('merchant_id') : null, $data['type'], $data['url'], 1, (int) $request->input('crawl_frequency_minutes', 180)]
         );
         Audit::log((int) $request->userId(), 'admin.source.create', 'coupon_source', (string) $id, $data, $request->ip());
-        return Response::created(['id' => $id], 'Source added');
+
+        // Auto-start ingestion for the new source immediately: crawl it now,
+        // then validate + index — so coupons appear within seconds instead of
+        // waiting for the next scheduled discovery cycle.
+        $this->enqueueEngineJob('discover', ['source_id' => (int) $id]);
+        $this->enqueueEngineJob('validate', []);
+        $this->enqueueEngineJob('sync', []);
+
+        return Response::created(['id' => $id], 'Source added — the engine is crawling it now');
+    }
+
+    /**
+     * Queue an engine job (durable in engine_jobs + Redis wakeup hint). The
+     * engine worker drains the DB queue every ~15s, so jobs run promptly even
+     * if Redis is unavailable.
+     */
+    private function enqueueEngineJob(string $type, array $payload = []): int
+    {
+        $id = (int) $this->db->insert(
+            'INSERT INTO engine_jobs (type, payload, status, scheduled_at) VALUES (?,?,?,NOW())',
+            [$type, $payload ? json_encode($payload) : null, 'queued']
+        );
+        try {
+            RedisClient::instance()->rpush('engine:jobs', json_encode(['id' => $id, 'type' => $type, 'payload' => $payload]));
+        } catch (\Throwable $e) {
+            // Redis is only a low-latency hint; the scheduler drains the DB queue regardless.
+        }
+        return $id;
     }
 
     public function deleteSource(Request $request, array $params): Response
