@@ -15,6 +15,7 @@ services:
       # NOT recurse into subdirectories) — so mount each .sql file individually,
       # named to control execution order (schema before seeds).
       - ./database/migrations/001_init_schema.sql:/docker-entrypoint-initdb.d/10_schema.sql:ro
+      - ./database/migrations/002_add_source_types.sql:/docker-entrypoint-initdb.d/15_source_types.sql:ro
       - ./database/seeds/001_seed.sql:/docker-entrypoint-initdb.d/20_seed.sql:ro
     ports:
       - "3306:3306"

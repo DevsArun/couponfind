@@ -315,11 +315,24 @@
       setView(wrap);
 
       function addSource() {
-        const type = h('select', { class: 'input' }, ['offer_page', 'promo_page', 'rss', 'sitemap', 'newsletter', 'user_submission'].map(x => h('option', { value: x }, x)));
-        const url = h('input', { class: 'input', placeholder: 'https://merchant.com/deals' });
+        const types = ['offer_page', 'promo_page', 'rss', 'sitemap', 'telegram', 'reddit', 'forum', 'webpage', 'newsletter', 'user_submission'];
+        const type = h('select', { class: 'input' }, types.map(x => h('option', { value: x }, x)));
+        const hints = {
+          telegram: 'https://t.me/s/yourdealschannel   (or @channel / channel)',
+          reddit: 'https://www.reddit.com/r/coupons   (or r/deals)',
+          rss: 'https://site.com/feed.xml',
+          sitemap: 'https://site.com/sitemap.xml',
+          forum: 'https://forum.com/deals',
+          webpage: 'https://site.com/coupons',
+          offer_page: 'https://merchant.com/deals',
+        };
+        const url = h('input', { class: 'input', placeholder: hints.offer_page });
+        type.addEventListener('change', () => { url.placeholder = hints[type.value] || 'https://...'; });
+        const help = h('p', { class: 'text-muted text-xs' }, 'Scrape from anywhere — Telegram public channels (t.me/s/…), Reddit subreddits, deal forums, RSS feeds or any web page. No API keys needed.');
         const body = h('div', { class: 'grid gap-3' }, [
           h('div', {}, [h('label', { class: 'label' }, 'Type'), type]),
-          h('div', {}, [h('label', { class: 'label' }, 'URL'), url]),
+          h('div', {}, [h('label', { class: 'label' }, 'URL / handle'), url]),
+          help,
           h('button', { class: 'btn btn-primary', onclick: async () => { try { await API.post('/admin/sources', { type: type.value, url: url.value }); toast('Added', 'ok'); m.close(); route(); } catch (e) { toast(e.message, 'err'); } } }, 'Add source'),
         ]);
         const m = modal('Add coupon source', body);

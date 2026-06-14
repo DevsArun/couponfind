@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 
-from . import ai_structuring, deduplicator, extractor, meili_sync, ranking, rss, sitemap, validator
+from . import ai_structuring, deduplicator, extractor, meili_sync, ranking, reddit, rss, sitemap, telegram, validator
 from .crawler import fetch
 from .db import db
 from .importer import import_coupons
@@ -33,7 +33,11 @@ def _candidates_for_source(source: dict) -> list[dict]:
             return rss.discover(url)
         if stype == "sitemap":
             return sitemap.discover(url)
-        # offer_page / promo_page / newsletter / user_submission -> fetch HTML
+        if stype == "telegram":
+            return telegram.discover(url)
+        if stype == "reddit":
+            return reddit.discover(url)
+        # offer_page / promo_page / forum / webpage / newsletter / user_submission -> fetch HTML
         html = fetch(url)
         if not html:
             return []

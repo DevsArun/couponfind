@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS merchant_aliases (
 CREATE TABLE IF NOT EXISTS coupon_sources (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     merchant_id     BIGINT UNSIGNED NULL,
-    type            ENUM('offer_page','promo_page','rss','sitemap','newsletter','user_submission') NOT NULL,
+    type            ENUM('offer_page','promo_page','rss','sitemap','newsletter','user_submission','telegram','reddit','forum','webpage') NOT NULL,
     url             VARCHAR(500)    NOT NULL,
     is_active       TINYINT(1)      NOT NULL DEFAULT 1,
     crawl_frequency_minutes INT UNSIGNED NOT NULL DEFAULT 180,

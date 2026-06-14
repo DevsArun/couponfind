@@ -237,7 +237,7 @@ final class AdminController
     public function createSource(Request $request): Response
     {
         $data = Validator::make($request->all(), [
-            'type' => 'required|in:offer_page,promo_page,rss,sitemap,newsletter,user_submission',
+            'type' => 'required|in:offer_page,promo_page,rss,sitemap,newsletter,user_submission,telegram,reddit,forum,webpage',
             'url'  => 'required|url',
         ]);
         $id = $this->db->insert(

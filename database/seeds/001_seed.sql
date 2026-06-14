@@ -141,6 +141,19 @@ INSERT INTO coupon_sources (merchant_id, type, url, is_active, crawl_frequency_m
     (NULL, 'rss', 'https://www.dealnews.com/rss/c142/Computers/', 1, 240)
 ON DUPLICATE KEY UPDATE is_active = VALUES(is_active);
 
+-- Multi-source ingestion: the engine also scrapes Reddit deal subreddits (public
+-- JSON, no auth) and Telegram public channels (t.me/s/ web preview, no API key).
+--  * Reddit subs below are public & reliable — enabled by default.
+--  * Telegram channels are examples (disabled): replace the handle with the
+--    public deal channels you want and flip is_active=1 in the admin panel.
+INSERT INTO coupon_sources (merchant_id, type, url, is_active, crawl_frequency_minutes) VALUES
+    (NULL, 'reddit',   'https://www.reddit.com/r/coupons',     1, 180),
+    (NULL, 'reddit',   'https://www.reddit.com/r/deals',       1, 180),
+    (NULL, 'reddit',   'https://www.reddit.com/r/buildapcsales',1, 240),
+    (NULL, 'reddit',   'https://www.reddit.com/r/frugalmalefashion', 1, 360),
+    (NULL, 'telegram', 'https://t.me/s/example_deals_channel', 0, 240)
+ON DUPLICATE KEY UPDATE is_active = VALUES(is_active);
+
 -- ---- Default platform settings ----
 INSERT INTO settings (`key`, value) VALUES
     ('engine_enabled', '1'),

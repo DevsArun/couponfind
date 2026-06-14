@@ -178,12 +178,30 @@ PHP-side periodic tasks complete the loop — add these to crontab on your VPS:
 python cli.py schedule    # scheduler loop + job-queue worker (default in Docker)
 python cli.py run-once    # full pipeline once
 python cli.py discover    # crawl sources → extract → AI structure → import
+python cli.py seed-curated # import curated starter coupons (cold start)
 python cli.py validate    # validate active/unverified coupons (--http for liveness)
 python cli.py score       # recompute coupon scores
 python cli.py sync        # push active coupons into Meilisearch
 python cli.py worker      # drain the engine_jobs queue once
 python cli.py health      # check DB + Meilisearch connectivity
 ```
+
+### Coupon sources (scrape from anywhere)
+
+The engine ingests coupons from many source types — add/manage them in
+**Admin → Coupon Sources** (no API keys required):
+
+| Type | What it scrapes | Example URL / handle |
+|---|---|---|
+| `telegram` | Public Telegram channel messages (via `t.me/s/` web preview) | `https://t.me/s/yourdeals` · `@yourdeals` |
+| `reddit` | Newest posts from a subreddit (public JSON) | `https://www.reddit.com/r/coupons` · `r/deals` |
+| `rss` | RSS/Atom deal feeds | `https://site.com/feed.xml` |
+| `sitemap` | URLs from a sitemap, then crawled | `https://site.com/sitemap.xml` |
+| `forum` / `webpage` / `offer_page` | Any HTML page (deal forums, merchant offer pages) | `https://merchant.com/deals` |
+
+Every candidate flows through the same pipeline: extract → AI-structure →
+dedupe → import → validate → score → index. Reddit deal subs are enabled by
+default; add your favourite Telegram channels and flip them on.
 
 The admin panel's "Engine Control" dispatches jobs into the `engine_jobs` table
 (mirrored onto a Redis list); the engine's worker drains them.
