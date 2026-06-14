@@ -15,6 +15,12 @@
   <style>
     .feature-ico { width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:var(--accent);color:var(--on-accent); }
     .feature-ico svg{width:22px;height:22px;}
+    /* bulletproof inline icon sizing for static sections */
+    .ico-check,.ico-x,.ico-chev,.vs-ico{display:inline-flex;align-items:center;justify-content:center;}
+    .ico-check{width:18px;height:18px;flex:none;color:var(--accent);}
+    .ico-x{width:20px;height:20px;flex:none;}
+    .ico-chev{width:18px;height:18px;flex:none;}
+    .ico-check svg,.ico-x svg,.ico-chev svg,.vs-ico svg{width:100%;height:100%;display:block;}
     .eyebrow { font-size:0.78rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted-2); }
     .logo-row span { color:var(--muted-2); font-weight:800; font-size:1.15rem; letter-spacing:-0.02em; opacity:.55; }
     .dotgrid { background-image:radial-gradient(rgba(13,13,13,0.13) 1px, transparent 1px); background-size:24px 24px; -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 35%, transparent 72%); mask-image:radial-gradient(ellipse at 50% 0%, #000 35%, transparent 72%); }
@@ -174,32 +180,32 @@
     </div>
     <div class="grid md:grid-cols-3 gap-4 stagger">
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></div>
+        <div class="feature-ico" data-ico="sparkles"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Typo-proof</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">Misspell anything — "niek", "hostingr", "amazn". We resolve the real brand with fuzzy matching plus AI intent.</p>
       </div>
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg></div>
+        <div class="feature-ico" data-ico="target"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Intent-aware</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">Detects the merchant, discount type and time intent ("today", "20% off") to rank results precisely.</p>
       </div>
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg></div>
+        <div class="feature-ico" data-ico="zap"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Blazing fast</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">Meilisearch + Redis cache deliver ranked, typo-tolerant results in well under 200ms.</p>
       </div>
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="feature-ico" data-ico="shield"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Validated</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">Codes are auto-validated, deduped and scored for reliability before you ever see them.</p>
       </div>
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></div>
+        <div class="feature-ico" data-ico="layers"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Best-first ranking</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">A composite score blends freshness, success rate, popularity and real cash value.</p>
       </div>
       <div class="bento">
-        <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+        <div class="feature-ico" data-ico="refresh"></div>
         <h3 class="font-bold" style="font-size:1.05rem;">Always fresh</h3>
         <p class="text-muted text-sm mt-2" style="line-height:1.55;">A background intelligence engine continuously discovers new deals from official sources.</p>
       </div>
@@ -271,22 +277,22 @@
     </div>
     <div class="grid md:grid-cols-4 gap-4">
       <div class="bento step">
-        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span class="step-num">01</span></div>
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:40px;height:40px;" data-ico="globe"></span><span class="step-num">01</span></div>
         <h3 class="font-bold mt-4">Discover</h3>
         <p class="text-muted text-sm mt-1" style="line-height:1.55;">The engine crawls offer pages, RSS feeds and sitemaps around the clock.</p>
       </div>
       <div class="bento step">
-        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span><span class="step-num">02</span></div>
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:40px;height:40px;" data-ico="sparkles"></span><span class="step-num">02</span></div>
         <h3 class="font-bold mt-4">Structure</h3>
         <p class="text-muted text-sm mt-1" style="line-height:1.55;">AI extracts codes, validates them, and removes duplicates automatically.</p>
       </div>
       <div class="bento step">
-        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg></span><span class="step-num">03</span></div>
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:40px;height:40px;" data-ico="layers"></span><span class="step-num">03</span></div>
         <h3 class="font-bold mt-4">Rank</h3>
         <p class="text-muted text-sm mt-1" style="line-height:1.55;">Each deal is scored by freshness, reliability and real value.</p>
       </div>
       <div class="bento step">
-        <div class="flex items-center justify-between"><span class="feature-ico" style="width:38px;height:38px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="step-num">04</span></div>
+        <div class="flex items-center justify-between"><span class="feature-ico" style="width:40px;height:40px;" data-ico="message"></span><span class="step-num">04</span></div>
         <h3 class="font-bold mt-4">Ask</h3>
         <p class="text-muted text-sm mt-1" style="line-height:1.55;">You ask in plain language — we hand back the best deal instantly.</p>
       </div>
@@ -471,13 +477,14 @@
   <script src="/assets/js/ui.js"></script>
   <script src="/assets/js/landing.js"></script>
   <script>
-    /* Inline icon hydration for static sections (uses UI.icon) */
+    /* Icon hydration for static sections — uses the shared Lucide-grade UI.icon set */
     (function () {
       if (!window.UI) return;
       var ic = UI.icon;
+      document.querySelectorAll('[data-ico]').forEach(function (n) { n.innerHTML = ic(n.getAttribute('data-ico')); });
       document.querySelectorAll('.ico-check').forEach(function (n) { n.innerHTML = ic('check'); });
-      document.querySelectorAll('.ico-chev').forEach(function (n) { n.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'; });
-      document.querySelectorAll('.ico-x').forEach(function (n) { n.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'; n.style.color = 'var(--muted-2)'; });
+      document.querySelectorAll('.ico-chev').forEach(function (n) { n.innerHTML = ic('chevronDown'); });
+      document.querySelectorAll('.ico-x').forEach(function (n) { n.innerHTML = ic('x'); n.style.color = 'var(--muted-2)'; });
       ['stars1', 'stars2', 'stars3'].forEach(function (id) {
         var n = document.getElementById(id); if (!n) return;
         n.innerHTML = Array(5).fill(ic('star')).join('');

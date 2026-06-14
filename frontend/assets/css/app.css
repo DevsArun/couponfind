@@ -595,7 +595,7 @@ body::before {
    Cards & surfaces — refined elevation
    ===================================================================== */
 .card { border-radius: var(--radius-lg); box-shadow: var(--shadow-md); transition: box-shadow .3s var(--ease-out), border-color .25s, transform .25s var(--ease-out); }
-.bento { border-radius: 20px; box-shadow: var(--shadow-soft); }
+.bento { border-radius: 20px; box-shadow: var(--shadow-soft); padding: 1.6rem; border: 1px solid var(--border); background: var(--card); }
 .bento:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--text); }
 
 /* Glass nav — tighter, premium */
