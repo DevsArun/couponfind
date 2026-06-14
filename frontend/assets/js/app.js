@@ -125,13 +125,20 @@
 
   // ---- Coupon card (reused) ----
   function couponCard(c, opts = {}) {
-    const actions = [];
-    if (c.code) {
-      actions.push(h('button', { class: 'code-pill btn-soft', style: 'cursor:pointer;', onclick: () => { copyToClipboard(c.code); API.post('/coupons/' + (c.id || c.coupon_id) + '/use', {}).catch(() => {}); } },
-        [c.code + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })]));
-    } else {
-      actions.push(h('a', { class: 'btn btn-soft btn-sm', href: '/api/go/' + (c.id || c.coupon_id), target: '_blank', rel: 'sponsored nofollow noopener' }, 'Get deal →'));
-    }
+    const cid = c.id || c.coupon_id;
+    // Always surface a clickable store link routed through our click-tracking
+    // redirect (/api/go/{id}). For affiliate coupons this is the monetized
+    // deeplink — so the affiliate link is shown in chat for every result, even
+    // ones that also have a code to copy.
+    const shopLink = c.landing_url ? h('a', {
+      class: 'btn btn-soft btn-sm', href: '/api/go/' + cid, target: '_blank', rel: 'sponsored nofollow noopener',
+      title: c.is_affiliate ? 'Affiliate link — opens the store (we may earn a commission)' : 'Open the store',
+    }, c.code ? 'Shop now →' : 'Get deal →') : null;
+    const codeBtn = c.code
+      ? h('button', { class: 'code-pill btn-soft', style: 'cursor:pointer;', onclick: () => { copyToClipboard(c.code); API.post('/coupons/' + cid + '/use', {}).catch(() => {}); } },
+          [c.code + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })])
+      : null;
+    const left = h('div', { class: 'flex items-center gap-2 flex-wrap' }, [codeBtn, shopLink]);
     const right = opts.saved
       ? h('button', { class: 'btn btn-ghost btn-sm', onclick: () => opts.onRemove() }, 'Remove')
       : h('button', { class: 'btn btn-ghost btn-sm', title: 'Save', onclick: () => save(c.id) }, [h('span', { style: 'width:15px;height:15px;display:inline-flex;', html: icon('bookmark') })]);
@@ -144,7 +151,7 @@
       ]),
       h('h4', { class: 'font-bold', style: 'font-size:1rem;line-height:1.3;' }, c.title),
       c.description ? h('p', { class: 'text-muted text-sm', style: 'margin:0;' }, c.description) : null,
-      h('div', { class: 'flex items-center justify-between mt-1' }, [actions[0], right]),
+      h('div', { class: 'flex items-center justify-between mt-1' }, [left, right]),
     ]);
   }
 

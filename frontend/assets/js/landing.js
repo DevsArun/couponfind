@@ -124,10 +124,16 @@
   }
 
   function couponCard(c) {
+    // Always surface the store link via our tracking redirect (/api/go/{id});
+    // for affiliate coupons this is the monetized deeplink.
+    const shopLink = c.landing_url ? h('a', {
+      class: 'btn btn-soft btn-sm', href: '/api/go/' + c.id, target: '_blank', rel: 'sponsored nofollow noopener',
+      title: c.is_affiliate ? 'Affiliate link — opens the store (we may earn a commission)' : 'Open the store',
+    }, c.code ? 'Shop now →' : 'Get deal →') : null;
     const codeBtn = c.code
       ? h('button', { class: 'code-pill btn-soft', style: 'cursor:pointer;', onclick: () => { copyToClipboard(c.code); API.post('/coupons/' + c.id + '/use', {}).catch(() => {}); } },
           [c.code + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })])
-      : h('a', { class: 'btn btn-soft btn-sm', href: '/api/go/' + c.id, target: '_blank', rel: 'sponsored nofollow noopener' }, 'Get deal →');
+      : null;
 
     return h('div', { class: 'card coupon-card p-4 flex flex-col gap-2' }, [
       h('div', { class: 'flex items-center gap-2' }, [
@@ -138,7 +144,7 @@
       h('h4', { class: 'font-bold', style: 'font-size:0.95rem;line-height:1.3;margin:0;' }, c.title),
       c.description ? h('p', { class: 'text-muted text-sm', style: 'margin:0;' }, c.description) : null,
       h('div', { class: 'flex items-center justify-between mt-1' }, [
-        codeBtn,
+        h('div', { class: 'flex items-center gap-2 flex-wrap' }, [codeBtn, shopLink]),
         c.valid_until ? h('span', { class: 'text-xs text-muted' }, 'Ends ' + fmt.date(c.valid_until)) : h('span', {}),
       ]),
     ]);
