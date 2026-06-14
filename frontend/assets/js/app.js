@@ -227,7 +227,7 @@
           h('div', { class: 'font-bold', style: 'font-size:1.05rem;color:var(--text);' }, 'Hi ' + (me.name ? me.name.split(' ')[0] : 'there') + ' 👋 what are we saving on?'),
           h('p', { class: 'text-sm mt-1', style: 'max-width:380px;margin:0.4rem auto 0;' }, 'Ask for any brand, deal or category. I understand typos, slang and intent.'),
           h('div', { class: 'chat-suggest justify-center mt-4' },
-            ['best amazon coupon today', 'nike offer', 'best vpn deal', 'bst niek coupn'].map(x => h('button', { class: 'chip', onclick: () => { ta.value = x; send(); } }, x))),
+            ['best amazon coupon today', 'nike running shoes', 'best vpn deal', 'hostinger discount'].map(x => h('button', { class: 'chip', onclick: () => { ta.value = x; send(); } }, x))),
         ]));
       }
       function userRow(text) {

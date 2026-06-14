@@ -54,7 +54,7 @@
   }
 
   // ---------- Examples ----------
-  const examples = ['best amazon coupon today', 'hostinger discount', 'nike offer', 'best vpn deal', 'bst niek coupn'];
+  const examples = ['best amazon coupon today', 'hostinger discount', 'nike offer', 'best vpn deal', 'adidas promo code'];
   const exWrap = el('#examples');
   examples.forEach(e => exWrap.appendChild(h('button', { class: 'chip', onclick: () => { input.value = e; send(); } }, e)));
 
