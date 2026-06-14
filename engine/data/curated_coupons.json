@@ -1,0 +1,102 @@
+{
+  "_note": "Curated starter offers. These populate the catalog with real, honest deals BEFORE affiliate networks are connected. Edit freely and re-run `python cli.py seed-curated` (idempotent). Prefer code-less 'deal' entries (store-wide sales) which are always honest; only add a 'code' when you have verified it works. Once affiliate feeds are live, the engine keeps these alongside auto-discovered coupons.",
+  "merchants": [
+    {
+      "name": "Amazon", "slug": "amazon", "domain": "amazon.com",
+      "website_url": "https://www.amazon.com", "category": "marketplace", "country": "US", "popularity": 1000,
+      "offers": [
+        { "title": "Today's Deals — up to 70% off across categories", "description": "Daily rotating lightning deals and limited-time discounts. No code needed — savings applied automatically.", "type": "deal", "discount_type": "percent", "discount_value": 70, "landing_url": "https://www.amazon.com/deals", "valid_days": 90, "featured": 1 },
+        { "title": "Warehouse Deals — extra savings on open-box & returns", "description": "Quality-inspected pre-owned and open-box items at a discount. No coupon required.", "type": "deal", "discount_type": "other", "landing_url": "https://www.amazon.com/Warehouse-Deals", "valid_days": 90 },
+        { "title": "Free shipping on eligible orders", "description": "Free delivery on millions of items with no minimum for Prime members.", "type": "free_shipping", "discount_type": "free_shipping", "landing_url": "https://www.amazon.com", "valid_days": 120 }
+      ]
+    },
+    {
+      "name": "Nike", "slug": "nike", "domain": "nike.com",
+      "website_url": "https://www.nike.com", "category": "fashion", "country": "US", "popularity": 850,
+      "offers": [
+        { "title": "Nike Sale — up to 50% off shoes & apparel", "description": "Markdowns across running, training and lifestyle. No code needed.", "type": "deal", "discount_type": "percent", "discount_value": 50, "landing_url": "https://www.nike.com/w/sale-3yaep", "valid_days": 60, "featured": 1 },
+        { "title": "Free shipping for Nike Members", "description": "Join Nike Membership (free) for free shipping on orders.", "type": "free_shipping", "discount_type": "free_shipping", "landing_url": "https://www.nike.com/membership", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Adidas", "slug": "adidas", "domain": "adidas.com",
+      "website_url": "https://www.adidas.com", "category": "fashion", "country": "US", "popularity": 700,
+      "offers": [
+        { "title": "adidas Outlet — up to 60% off", "description": "Discounted styles across footwear, clothing and accessories.", "type": "deal", "discount_type": "percent", "discount_value": 60, "landing_url": "https://www.adidas.com/us/outlet", "valid_days": 60, "featured": 1 },
+        { "title": "Extra discount for adiClub members", "description": "Free adiClub membership unlocks members-only pricing and early access.", "type": "deal", "discount_type": "other", "landing_url": "https://www.adidas.com/us/adiclub", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Hostinger", "slug": "hostinger", "domain": "hostinger.com",
+      "website_url": "https://www.hostinger.com", "category": "hosting", "country": "US", "popularity": 720,
+      "offers": [
+        { "title": "Web hosting — up to 75% off + 3 months free", "description": "Discounted shared and cloud hosting plans for new customers.", "type": "deal", "discount_type": "percent", "discount_value": 75, "landing_url": "https://www.hostinger.com/web-hosting", "valid_days": 60, "featured": 1 },
+        { "title": "Free domain & SSL with annual plans", "description": "Annual hosting plans include a free domain for the first year and free SSL.", "type": "deal", "discount_type": "other", "landing_url": "https://www.hostinger.com/web-hosting", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "NordVPN", "slug": "nordvpn", "domain": "nordvpn.com",
+      "website_url": "https://www.nordvpn.com", "category": "vpn", "country": "US", "popularity": 680,
+      "offers": [
+        { "title": "NordVPN — up to 70% off 2-year plans", "description": "Big savings on long-term VPN subscriptions for new users.", "type": "deal", "discount_type": "percent", "discount_value": 70, "landing_url": "https://nordvpn.com/offer/", "valid_days": 60, "featured": 1 },
+        { "title": "30-day money-back guarantee", "description": "Try risk-free — full refund within 30 days, no code needed.", "type": "deal", "discount_type": "other", "landing_url": "https://nordvpn.com/offer/", "valid_days": 120 }
+      ]
+    },
+    {
+      "name": "Booking.com", "slug": "booking-com", "domain": "booking.com",
+      "website_url": "https://www.booking.com", "category": "travel", "country": "US", "popularity": 640,
+      "offers": [
+        { "title": "Last-minute deals — save 15% or more", "description": "Limited-time discounts on stays worldwide. No code needed.", "type": "deal", "discount_type": "percent", "discount_value": 15, "landing_url": "https://www.booking.com/deals.html", "valid_days": 45, "featured": 1 },
+        { "title": "Genius members save 10%+ on select stays", "description": "Free Genius loyalty program unlocks discounted rates and perks.", "type": "deal", "discount_type": "percent", "discount_value": 10, "landing_url": "https://www.booking.com/genius.html", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Samsung", "slug": "samsung", "domain": "samsung.com",
+      "website_url": "https://www.samsung.com", "category": "electronics", "country": "US", "popularity": 620,
+      "offers": [
+        { "title": "Samsung Offers — discounts on phones, TVs & appliances", "description": "Trade-in credit and instant savings across the Samsung store.", "type": "deal", "discount_type": "other", "landing_url": "https://www.samsung.com/us/web/offers/", "valid_days": 60, "featured": 1 },
+        { "title": "Free shipping on Samsung.com orders", "description": "Standard free shipping on eligible orders.", "type": "free_shipping", "discount_type": "free_shipping", "landing_url": "https://www.samsung.com/us/", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Udemy", "slug": "udemy", "domain": "udemy.com",
+      "website_url": "https://www.udemy.com", "category": "education", "country": "US", "popularity": 560,
+      "offers": [
+        { "title": "Top courses from $12.99 during sales", "description": "Frequent sitewide sales bring thousands of courses to a low flat price.", "type": "deal", "discount_type": "amount", "discount_value": 13, "landing_url": "https://www.udemy.com/", "valid_days": 30, "featured": 1 },
+        { "title": "Free courses — learn at no cost", "description": "A large library of free courses across tech, business and design.", "type": "deal", "discount_type": "other", "landing_url": "https://www.udemy.com/courses/free/", "valid_days": 120 }
+      ]
+    },
+    {
+      "name": "Canva", "slug": "canva", "domain": "canva.com",
+      "website_url": "https://www.canva.com", "category": "software", "country": "US", "popularity": 540,
+      "offers": [
+        { "title": "Canva Pro — free 30-day trial", "description": "Try premium templates, brand kit and background remover free for 30 days.", "type": "deal", "discount_type": "other", "landing_url": "https://www.canva.com/pro/", "valid_days": 90, "featured": 1 },
+        { "title": "Canva for Teams — discounted annual billing", "description": "Save when you bill the team plan annually instead of monthly.", "type": "deal", "discount_type": "other", "landing_url": "https://www.canva.com/pricing/", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Myntra", "slug": "myntra", "domain": "myntra.com",
+      "website_url": "https://www.myntra.com", "category": "fashion", "country": "IN", "popularity": 520,
+      "offers": [
+        { "title": "Deals of the Day — up to 80% off fashion", "description": "Daily fashion and beauty discounts. No code needed.", "type": "deal", "discount_type": "percent", "discount_value": 80, "landing_url": "https://www.myntra.com/deals-of-the-day", "valid_days": 30, "featured": 1 },
+        { "title": "Myntra Insider rewards", "description": "Free loyalty program with members-only coupons and early sale access.", "type": "deal", "discount_type": "other", "landing_url": "https://www.myntra.com/myntra-insider", "valid_days": 90 }
+      ]
+    },
+    {
+      "name": "Flipkart", "slug": "flipkart", "domain": "flipkart.com",
+      "website_url": "https://www.flipkart.com", "category": "marketplace", "country": "IN", "popularity": 500,
+      "offers": [
+        { "title": "Offers Store — top deals across categories", "description": "Bank offers, exchange discounts and daily deals. No code needed.", "type": "deal", "discount_type": "other", "landing_url": "https://www.flipkart.com/offers-store", "valid_days": 45, "featured": 1 },
+        { "title": "Big Saving Days — up to 80% off", "description": "Flagship sale event with steep markdowns sitewide.", "type": "deal", "discount_type": "percent", "discount_value": 80, "landing_url": "https://www.flipkart.com/big-saving-days-store", "valid_days": 30 }
+      ]
+    },
+    {
+      "name": "AliExpress", "slug": "aliexpress", "domain": "aliexpress.com",
+      "website_url": "https://www.aliexpress.com", "category": "marketplace", "country": "US", "popularity": 480,
+      "offers": [
+        { "title": "SuperDeals — up to 60% off + free shipping", "description": "Daily SuperDeals with free or low-cost shipping on many items.", "type": "deal", "discount_type": "percent", "discount_value": 60, "landing_url": "https://www.aliexpress.com/ssr/300000512/SuperValue", "valid_days": 45, "featured": 1 },
+        { "title": "New-user coupons on first order", "description": "First-time buyers unlock welcome coupons at checkout — no code needed.", "type": "deal", "discount_type": "other", "landing_url": "https://www.aliexpress.com", "valid_days": 90 }
+      ]
+    }
+  ]
+}

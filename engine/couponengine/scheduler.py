@@ -38,6 +38,18 @@ def run() -> None:
     last_sync = 0.0
     paused = False
 
+    # Cold start: if the catalog is empty (e.g. fresh install, before any
+    # affiliate feeds are connected), seed curated starter coupons so the site
+    # has real, browseable deals immediately.
+    try:
+        total = db().scalar("SELECT COUNT(*) FROM coupons") or 0
+        if int(total) == 0:
+            from . import curated
+            log.info("empty catalog detected — importing curated starter coupons")
+            curated.run()
+    except Exception as exc:  # pragma: no cover
+        log.warning("curated cold-start skipped: %s", exc)
+
     # Ensure the index exists immediately on boot.
     try:
         meili_sync.ensure_index()

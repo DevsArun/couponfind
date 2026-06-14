@@ -147,6 +147,10 @@ INSERT INTO settings (`key`, value) VALUES
     ('active_payment_gateway', 'stripe')
 ON DUPLICATE KEY UPDATE value = value;
 
--- NOTE: No demo coupons are seeded. Coupons are produced in real time by the
--- Python engine from the `coupon_sources` above (and any sources you add in the
--- admin panel). Run a discovery pass from Admin → Engine Control to populate.
+-- NOTE: No demo coupons are seeded here. The catalog is populated two ways:
+--   1) COLD START (recommended, no affiliates needed): curated starter offers
+--      from engine/data/curated_coupons.json. The engine auto-imports these on
+--      first boot when the catalog is empty, or run it manually any time:
+--          docker compose exec engine python cli.py seed-curated
+--   2) REAL-TIME: the Python engine crawls the `coupon_sources` above (and any
+--      sources/affiliate networks you add in the admin panel).

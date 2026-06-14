@@ -80,10 +80,18 @@ php -S 127.0.0.1:8080 backend/public/router.php
 cd engine
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python cli.py sync         # build the Meilisearch index from seeded coupons
+python cli.py seed-curated # cold start: import curated coupons (no affiliates needed)
+python cli.py sync         # build the Meilisearch index from coupons
 python cli.py run-once     # full pipeline once (discover→validate→score→sync)
 # or: python cli.py schedule   # continuous scheduler + job worker
 ```
+
+> **Cold start / no affiliates yet?** The catalog is populated from
+> `engine/data/curated_coupons.json` — real, honest merchant offers that need no
+> affiliate networks. The engine auto-imports them on first boot when the catalog
+> is empty, or run `docker compose exec engine python cli.py seed-curated` (or
+> `python cli.py seed-curated` locally) any time after editing that file. Add
+> more brands/offers by editing the JSON; re-running is idempotent.
 
 ### Seeded demo accounts
 

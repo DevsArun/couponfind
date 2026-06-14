@@ -5,6 +5,7 @@ Usage:
     python cli.py schedule        # run scheduler loop (default in Docker)
     python cli.py run-once        # run the full pipeline once
     python cli.py discover        # crawl sources -> extract -> import
+    python cli.py seed-curated    # import curated starter coupons (pre-affiliate cold start)
     python cli.py validate        # validate active/unverified coupons
     python cli.py score           # recompute coupon scores
     python cli.py sync            # push active coupons into Meilisearch
@@ -45,6 +46,15 @@ def main(argv: list[str]) -> int:
 
     if command == "discover":
         print(json.dumps(pipeline.discover(), indent=2, default=str))
+        return 0
+
+    if command in ("seed-curated", "curated", "import-curated"):
+        from couponengine import curated
+        path = None
+        for a in argv[2:]:
+            if not a.startswith("--"):
+                path = a
+        print(json.dumps(curated.run(path=path), indent=2, default=str))
         return 0
 
     if command == "validate":
