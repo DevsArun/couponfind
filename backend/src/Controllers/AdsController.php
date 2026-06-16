@@ -45,6 +45,17 @@ final class AdsController
                 'qr_url'    => Settings::get('support_qr_url'),
                 'frequency' => max(1, (int) (Settings::get('support_frequency', null, '3') ?: '3')),
             ],
+            // Generic custom promo banner shown after chat responses (any image + text + link).
+            'banner'         => [
+                'enabled'   => Settings::get('banner_enabled', null, '0') === '1',
+                'image'     => Settings::get('banner_image'),
+                'title'     => Settings::get('banner_title'),
+                'text'      => Settings::get('banner_text'),
+                'link'      => Settings::get('banner_link'),
+                'cta'       => Settings::get('banner_cta'),
+                'html'      => Settings::get('banner_html'),
+                'frequency' => max(1, (int) (Settings::get('banner_frequency', null, '2') ?: '2')),
+            ],
         ];
     }
 

@@ -4,7 +4,9 @@
 (function () {
   const { el, els, h, esc, toast, fmt, icon, modal, confirmDialog } = UI;
 
-  if (!UI.requireAuthRedirect()) return;
+  // Admin-only access gate — separate from the public user login.
+  if (!API.isAuthed()) { location.href = '/admin/login'; return; }
+  if (!(API.store.user && API.store.user.is_admin)) { location.href = '/admin/login?err=notadmin'; return; }
 
   let livePoll = null; // active interval for the Live Logs view
 
@@ -36,7 +38,7 @@
   NAV.forEach(n => nav.appendChild(h('a', { class: 'nav-item', 'data-route': n.id, href: '#' + n.id }, [h('span', { html: icon(n.icon) }), h('span', {}, n.label)])));
   const setActive = (r) => els('.nav-item', nav).forEach(a => a.classList.toggle('active', a.getAttribute('data-route') === r));
 
-  el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/login'; });
+  el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/admin/login'; });
 
   UI.setupCommandPalette([
     ...NAV.map(n => ({ label: n.label, icon: n.icon, action: () => location.hash = n.id })),
@@ -614,6 +616,36 @@
         ]),
         h('p', { class: 'text-muted text-xs' }, 'Tip: make a UPI/Razorpay QR, host the image (or use a Razorpay payment-page link), paste the URL above. The QR renders right inside the chat for users to scan & pay.'),
       ]);
+
+      // Custom promo banner (any image + text + link, or raw HTML) after chat responses.
+      const ban = d.banner || {};
+      const banEnabled = h('input', { type: 'checkbox' }); banEnabled.checked = !!ban.enabled;
+      const banImage = h('input', { class: 'input', value: ban.image || '', placeholder: 'https://.../banner-image.png (optional)' });
+      const banTitle = h('input', { class: 'input', value: ban.title || '', placeholder: 'e.g. Get 50% off Pro this week' });
+      const banText = h('textarea', { class: 'input', rows: '2', placeholder: 'Short promo line shown under the title (optional)' }, ban.text || '');
+      const banLink = h('input', { class: 'input', value: ban.link || '', placeholder: 'https://where-to-send-users.com' });
+      const banCta = h('input', { class: 'input', value: ban.cta || '', placeholder: 'Button text (e.g. Claim offer →)' });
+      const banHtml = h('textarea', { class: 'input', rows: '4', placeholder: '<!-- Advanced: paste raw banner HTML. If filled, it overrides the fields above. -->' }, ban.html || '');
+      const banFreq = h('input', { class: 'input', type: 'number', min: '1', value: ban.frequency || 2 });
+      const bannerCard = h('div', { class: 'card p-6 grid gap-4 mt-5', style: 'max-width:700px;' }, [
+        h('div', {}, [h('h3', { class: 'font-bold' }, 'Custom Promo Banner'), h('p', { class: 'text-muted text-sm', style: 'margin-top:2px;' }, 'Show ANY banner after chat responses — your own promo, announcement, or partner ad. Fill the simple fields, or paste raw HTML for full control.')]),
+        h('label', { class: 'flex items-center gap-3', style: 'cursor:pointer;' }, [banEnabled, h('span', { class: 'font-semibold' }, 'Enable custom banner after chat responses')]),
+        h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [
+          h('div', {}, [h('label', { class: 'label' }, 'Title'), banTitle]),
+          h('div', {}, [h('label', { class: 'label' }, 'Image URL'), banImage]),
+        ]),
+        h('div', {}, [h('label', { class: 'label' }, 'Text'), banText]),
+        h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [
+          h('div', {}, [h('label', { class: 'label' }, 'Link URL'), banLink]),
+          h('div', {}, [h('label', { class: 'label' }, 'Button text (CTA)'), banCta]),
+        ]),
+        h('div', {}, [h('label', { class: 'label' }, 'Raw HTML (advanced — overrides the fields above)'), banHtml]),
+        h('div', { style: 'max-width:220px;' }, [h('label', { class: 'label' }, 'Show every N responses'), banFreq]),
+        h('div', { class: 'flex items-center gap-3 mt-1' }, [
+          h('button', { class: 'btn btn-primary', onclick: save }, 'Save banner settings'),
+          h('span', { class: 'badge ' + (ban.enabled ? 'badge-green' : 'badge-muted') }, ban.enabled ? 'Banner ON' : 'Banner OFF'),
+        ]),
+      ]);
       const wrap = h('div', {}, [
         title('Ads & Monetization', 'Show an ad after each chat response (like premium AI chat apps). Off by default — enable when ready.'),
         h('div', { class: 'card p-6 grid gap-5', style: 'max-width:700px;' }, [
@@ -628,6 +660,7 @@
           h('p', { class: 'text-muted text-xs' }, 'Note: networks like AdSense/Ezoic must approve your live domain before real ads render. Custom code works with any network (Media.net, PropellerAds, etc.). Paid subscribers never see ads — they get an ad-free experience automatically.'),
         ]),
         supportCard,
+        bannerCard,
       ]);
       setView(wrap); syncVis();
 
@@ -640,6 +673,9 @@
             support_enabled: supEnabled.checked, support_title: supTitle.value, support_message: supMsg.value,
             support_upi: supUpi.value, support_pay_url: supPay.value, support_qr_url: supQr.value,
             support_frequency: Number(supFreq.value) || 3,
+            banner_enabled: banEnabled.checked, banner_image: banImage.value, banner_title: banTitle.value,
+            banner_text: banText.value, banner_link: banLink.value, banner_cta: banCta.value,
+            banner_html: banHtml.value, banner_frequency: Number(banFreq.value) || 2,
           });
           toast('Settings saved', 'ok'); route();
         } catch (e) { toast(e.message, 'err'); }

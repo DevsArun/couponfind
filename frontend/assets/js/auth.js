@@ -77,7 +77,39 @@
     });
   }
 
-  global.CFAuth = { initLogin, initRegister, initForgot, initReset };
+  global.CFAuth = { initLogin, initAdminLogin, initRegister, initForgot, initReset };
+
+  // Dedicated ADMIN login (separate from the public user login). Authenticates,
+  // then verifies the account is an admin — non-admins are signed back out.
+  function initAdminLogin() {
+    if (API.isAuthed()) {
+      if (API.store.user && API.store.user.is_admin) { location.href = '/admin/'; return; }
+    }
+    const params = new URLSearchParams(location.search);
+    if (params.get('err') === 'notadmin') {
+      showError('That account is not an administrator. Use a user account at the user sign-in page.');
+    }
+    const b = el('#submit'); b.dataset.label = b.textContent;
+    el('#form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      el('#err').classList.add('hide');
+      busy(true);
+      try {
+        const data = await API.login(el('#email').value.trim(), el('#password').value);
+        if (!data.user || !data.user.is_admin) {
+          await API.logout();
+          showError('This is not an admin account. Please use the user sign-in.');
+          busy(false);
+          return;
+        }
+        toast('Welcome, admin', 'ok');
+        location.href = '/admin/';
+      } catch (err) {
+        showError(err.message, err.errors);
+        busy(false);
+      }
+    });
+  }
 
   function initForgot() {
     const b = el('#submit'); b.dataset.label = b.textContent;

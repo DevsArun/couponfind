@@ -516,6 +516,23 @@ body {
 .chat-support-scan { font-size: 0.72rem; color: var(--muted-2); margin-top: 0.4rem; }
 .chat-support-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.8rem; }
 
+/* ---- Custom promo banner (admin-defined, after chat responses) ---- */
+.chat-banner {
+  display: flex; align-items: center; gap: 0.9rem;
+  width: 100%; max-width: 760px; margin: 0.4rem auto 0;
+  border: 1px solid var(--border-strong); border-radius: 14px;
+  background: var(--card); padding: 0.8rem 0.95rem; box-shadow: var(--shadow-soft);
+  text-decoration: none; color: var(--text);
+  transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.18s ease;
+}
+a.chat-banner-link:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--accent); }
+.chat-banner-img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; flex: none; }
+.chat-banner-body { flex: 1; min-width: 0; }
+.chat-banner-title { font-weight: 700; font-size: 0.95rem; }
+.chat-banner-text { color: var(--muted); font-size: 0.85rem; line-height: 1.45; margin-top: 0.15rem; }
+.chat-banner-cta { margin-top: 0.55rem; }
+.chat-banner-raw { display: block; padding: 0; border: none; background: transparent; box-shadow: none; }
+
 
 /* =====================================================================
    Premium motion & polish (scroll reveal, icon micro-animations, marquee)

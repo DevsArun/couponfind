@@ -320,5 +320,48 @@
     },
   };
 
-  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect, Ads, Support };
+  // ---- Custom promo banner (admin-defined; shown after chat responses) ----
+  const Banner = {
+    count: 0,
+    async afterResponse(target) {
+      let cfg;
+      try { cfg = await Ads.config(); } catch (e) { return; }
+      const b = cfg && cfg.banner;
+      if (!b || !b.enabled) return;
+      if (!b.html && !b.image && !b.text && !b.title) return; // nothing configured
+      this.count += 1;
+      const freq = Math.max(1, parseInt(b.frequency, 10) || 2);
+      if (this.count % freq !== 0) return;
+      this.render(target, b);
+    },
+    render(target, b) {
+      // Raw HTML mode (full control) takes precedence if provided.
+      if (b.html && b.html.trim()) {
+        const box = h('div', { class: 'chat-banner chat-banner-raw' });
+        box.innerHTML = b.html;
+        // Re-execute any <script> tags the admin pasted.
+        Array.from(box.querySelectorAll('script')).forEach(old => {
+          const sc = document.createElement('script');
+          if (old.src) sc.src = old.src; else sc.textContent = old.textContent;
+          document.head.appendChild(sc);
+        });
+        target.appendChild(box);
+        return;
+      }
+      // Structured mode: image + title + text + CTA link.
+      const inner = [];
+      if (b.image) inner.push(h('img', { class: 'chat-banner-img', src: b.image, alt: b.title || 'promo', loading: 'lazy' }));
+      const body = [];
+      if (b.title) body.push(h('div', { class: 'chat-banner-title' }, b.title));
+      if (b.text) body.push(h('div', { class: 'chat-banner-text' }, b.text));
+      if (b.cta || b.link) body.push(h('a', { class: 'btn btn-primary btn-sm chat-banner-cta', href: b.link || '#', target: '_blank', rel: 'sponsored noopener' }, b.cta || 'Learn more →'));
+      inner.push(h('div', { class: 'chat-banner-body' }, body));
+      const card = b.link
+        ? h('a', { class: 'chat-banner chat-banner-link', href: b.link, target: '_blank', rel: 'sponsored noopener' }, inner)
+        : h('div', { class: 'chat-banner' }, inner);
+      target.appendChild(card);
+    },
+  };
+
+  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect, Ads, Support, Banner };
 })(window);

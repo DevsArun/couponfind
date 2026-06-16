@@ -293,6 +293,7 @@
           ChatStore.upsert(conv); renderHistory();
           UI.Ads.afterResponse(thread);
           UI.Support.afterResponse(thread);
+          UI.Banner.afterResponse(thread);
         } catch (e) {
           typing.remove();
           thread.appendChild(botRow(h('div', {}, [

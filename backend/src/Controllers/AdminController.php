@@ -464,6 +464,15 @@ final class AdminController
         \CouponFind\Core\Settings::set('support_pay_url', (string) $request->input('support_pay_url', ''));
         \CouponFind\Core\Settings::set('support_qr_url', (string) $request->input('support_qr_url', ''));
         \CouponFind\Core\Settings::set('support_frequency', (string) max(1, (int) $request->input('support_frequency', 3)));
+        // Generic custom promo banner (any image + text + link, or raw HTML).
+        \CouponFind\Core\Settings::set('banner_enabled', filter_var($request->input('banner_enabled', false), FILTER_VALIDATE_BOOLEAN) ? '1' : '0');
+        \CouponFind\Core\Settings::set('banner_image', (string) $request->input('banner_image', ''));
+        \CouponFind\Core\Settings::set('banner_title', (string) $request->input('banner_title', ''));
+        \CouponFind\Core\Settings::set('banner_text', (string) $request->input('banner_text', ''));
+        \CouponFind\Core\Settings::set('banner_link', (string) $request->input('banner_link', ''));
+        \CouponFind\Core\Settings::set('banner_cta', (string) $request->input('banner_cta', ''));
+        \CouponFind\Core\Settings::set('banner_html', (string) $request->input('banner_html', ''));
+        \CouponFind\Core\Settings::set('banner_frequency', (string) max(1, (int) $request->input('banner_frequency', 2)));
         \CouponFind\Core\Settings::clearCache();
         Audit::log((int) $request->userId(), 'admin.ads.update', 'setting', 'ads', ['network' => $data['network']], $request->ip());
         return Response::ok(\CouponFind\Controllers\AdsController::publicConfig(), 'Ad settings saved');

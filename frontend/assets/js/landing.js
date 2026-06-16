@@ -121,6 +121,7 @@
     thread.appendChild(botRow(block, true));
     UI.Ads.afterResponse(thread);
     UI.Support.afterResponse(thread);
+    UI.Banner.afterResponse(thread);
     scrollDown();
   }
 
