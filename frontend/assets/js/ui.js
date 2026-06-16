@@ -285,5 +285,40 @@
     },
   };
 
-  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect, Ads };
+  // ---- Support / donation promo (UPI / Razorpay QR after chat responses) ----
+  const Support = {
+    count: 0,
+    async afterResponse(target) {
+      let cfg;
+      try { cfg = await Ads.config(); } catch (e) { return; }
+      const s = cfg && cfg.support;
+      if (!s || !s.enabled) return;
+      if (!s.upi && !s.pay_url && !s.qr_url) return; // nothing configured yet
+      this.count += 1;
+      const freq = Math.max(1, parseInt(s.frequency, 10) || 3);
+      if (this.count % freq !== 0) return;
+      this.render(target, s);
+    },
+    render(target, s) {
+      const kids = [
+        h('div', { class: 'chat-support-head' }, [
+          h('span', { class: 'cs-ico', html: icon('heart') }),
+          h('strong', {}, s.title || 'Support Couponaut'),
+        ]),
+        h('p', { class: 'chat-support-msg' }, s.message || 'If Couponaut saved you money, consider chipping in so we can keep it fast & ad-light. 🙏'),
+      ];
+      if (s.qr_url) {
+        kids.push(h('img', { class: 'chat-support-qr', src: s.qr_url, alt: 'Scan to pay (UPI / Razorpay)', loading: 'lazy' }));
+        kids.push(h('div', { class: 'chat-support-scan' }, 'Scan with any UPI app to pay'));
+      }
+      const row = [];
+      if (s.pay_url) row.push(h('a', { class: 'btn btn-primary btn-sm', href: s.pay_url, target: '_blank', rel: 'noopener' }, 'Support / Pay →'));
+      if (s.upi) row.push(h('button', { class: 'btn btn-soft btn-sm', onclick: () => copyToClipboard(s.upi) },
+        ['UPI: ' + s.upi + '  ', h('span', { style: 'width:13px;height:13px;display:inline-block;vertical-align:-2px;', html: icon('copy') })]));
+      if (row.length) kids.push(h('div', { class: 'chat-support-actions' }, row));
+      target.appendChild(h('div', { class: 'chat-support' }, kids));
+    },
+  };
+
+  global.UI = { el, els, h, esc, toast, fmt, icon, modal, confirmDialog, setupCommandPalette, openCmdk, copyToClipboard, skeletonList, requireAuthRedirect, Ads, Support };
 })(window);

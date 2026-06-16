@@ -120,6 +120,7 @@
       `via ${data.source}${data.cache_hit ? ' · cached' : ''}${data.intent && data.intent.confidence ? ' · intent ' + Math.round(data.intent.confidence * 100) + '%' : ''}` + ((data.results || []).some(r => r && r.is_affiliate) ? ' · some links are affiliate links (we may earn a commission)' : '')));
     thread.appendChild(botRow(block, true));
     UI.Ads.afterResponse(thread);
+    UI.Support.afterResponse(thread);
     scrollDown();
   }
 

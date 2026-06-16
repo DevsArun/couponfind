@@ -456,6 +456,14 @@ final class AdminController
         \CouponFind\Core\Settings::set('ads_ezoic_id', (string) $request->input('ezoic_id', ''));
         \CouponFind\Core\Settings::set('ads_custom_code', (string) $request->input('custom_code', ''));
         \CouponFind\Core\Settings::set('ads_frequency', (string) max(1, (int) $request->input('frequency', 1)));
+        // Support / donation promo (UPI / Razorpay QR) shown after chat responses.
+        \CouponFind\Core\Settings::set('support_enabled', filter_var($request->input('support_enabled', false), FILTER_VALIDATE_BOOLEAN) ? '1' : '0');
+        \CouponFind\Core\Settings::set('support_title', (string) $request->input('support_title', ''));
+        \CouponFind\Core\Settings::set('support_message', (string) $request->input('support_message', ''));
+        \CouponFind\Core\Settings::set('support_upi', (string) $request->input('support_upi', ''));
+        \CouponFind\Core\Settings::set('support_pay_url', (string) $request->input('support_pay_url', ''));
+        \CouponFind\Core\Settings::set('support_qr_url', (string) $request->input('support_qr_url', ''));
+        \CouponFind\Core\Settings::set('support_frequency', (string) max(1, (int) $request->input('support_frequency', 3)));
         \CouponFind\Core\Settings::clearCache();
         Audit::log((int) $request->userId(), 'admin.ads.update', 'setting', 'ads', ['network' => $data['network']], $request->ip());
         return Response::ok(\CouponFind\Controllers\AdsController::publicConfig(), 'Ad settings saved');

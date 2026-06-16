@@ -35,6 +35,16 @@ final class AdsController
             'ezoic_id'       => Settings::get('ads_ezoic_id'),
             'custom_code'    => Settings::get('ads_custom_code'),
             'frequency'      => max(1, (int) (Settings::get('ads_frequency', null, '1') ?: '1')),
+            // "Support us" / donation promo shown after chat responses (UPI / Razorpay QR).
+            'support'        => [
+                'enabled'   => Settings::get('support_enabled', null, '0') === '1',
+                'title'     => Settings::get('support_title'),
+                'message'   => Settings::get('support_message'),
+                'upi'       => Settings::get('support_upi'),
+                'pay_url'   => Settings::get('support_pay_url'),
+                'qr_url'    => Settings::get('support_qr_url'),
+                'frequency' => max(1, (int) (Settings::get('support_frequency', null, '3') ?: '3')),
+            ],
         ];
     }
 

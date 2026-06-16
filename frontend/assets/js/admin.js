@@ -587,6 +587,33 @@
       const customSec = h('div', {}, [h('label', { class: 'label' }, 'Custom ad code (HTML/JS)'), custom]);
       const syncVis = () => { adsenseSec.style.display = net.value === 'adsense' ? '' : 'none'; ezoicSec.style.display = net.value === 'ezoic' ? '' : 'none'; customSec.style.display = net.value === 'custom' ? '' : 'none'; };
       net.addEventListener('change', syncVis);
+
+      // Support / donations (UPI / Razorpay QR shown after chat responses).
+      const sup = d.support || {};
+      const supEnabled = h('input', { type: 'checkbox' }); supEnabled.checked = !!sup.enabled;
+      const supTitle = h('input', { class: 'input', value: sup.title || '', placeholder: 'Support Couponaut' });
+      const supMsg = h('textarea', { class: 'input', rows: '2', placeholder: 'If Couponaut saved you money, consider chipping in 🙏' }, sup.message || '');
+      const supUpi = h('input', { class: 'input', value: sup.upi || '', placeholder: 'yourname@upi' });
+      const supPay = h('input', { class: 'input', value: sup.pay_url || '', placeholder: 'https://rzp.io/i/xxxx  (Razorpay payment link)' });
+      const supQr = h('input', { class: 'input', value: sup.qr_url || '', placeholder: 'https://.../your-upi-qr.png' });
+      const supFreq = h('input', { class: 'input', type: 'number', min: '1', value: sup.frequency || 3 });
+      const supportCard = h('div', { class: 'card p-6 grid gap-4 mt-5', style: 'max-width:700px;' }, [
+        h('div', {}, [h('h3', { class: 'font-bold' }, 'Support / Donations (UPI · Razorpay QR)'), h('p', { class: 'text-muted text-sm', style: 'margin-top:2px;' }, 'Show a "Support us" card with your UPI / Razorpay QR after chat responses — collect funds before launch. Works even with ads off, and shows for everyone.')]),
+        h('label', { class: 'flex items-center gap-3', style: 'cursor:pointer;' }, [supEnabled, h('span', { class: 'font-semibold' }, 'Enable support card after chat responses')]),
+        h('div', {}, [h('label', { class: 'label' }, 'Title'), supTitle]),
+        h('div', {}, [h('label', { class: 'label' }, 'Message'), supMsg]),
+        h('div', { class: 'grid sm:grid-cols-2 gap-4' }, [
+          h('div', {}, [h('label', { class: 'label' }, 'UPI ID'), supUpi]),
+          h('div', {}, [h('label', { class: 'label' }, 'Razorpay payment link'), supPay]),
+        ]),
+        h('div', {}, [h('label', { class: 'label' }, 'QR image URL (UPI / Razorpay)'), supQr]),
+        h('div', { style: 'max-width:220px;' }, [h('label', { class: 'label' }, 'Show every N responses'), supFreq]),
+        h('div', { class: 'flex items-center gap-3 mt-1' }, [
+          h('button', { class: 'btn btn-primary', onclick: save }, 'Save support settings'),
+          h('span', { class: 'badge ' + (sup.enabled ? 'badge-green' : 'badge-muted') }, sup.enabled ? 'Support ON' : 'Support OFF'),
+        ]),
+        h('p', { class: 'text-muted text-xs' }, 'Tip: make a UPI/Razorpay QR, host the image (or use a Razorpay payment-page link), paste the URL above. The QR renders right inside the chat for users to scan & pay.'),
+      ]);
       const wrap = h('div', {}, [
         title('Ads & Monetization', 'Show an ad after each chat response (like premium AI chat apps). Off by default — enable when ready.'),
         h('div', { class: 'card p-6 grid gap-5', style: 'max-width:700px;' }, [
@@ -600,6 +627,7 @@
           ]),
           h('p', { class: 'text-muted text-xs' }, 'Note: networks like AdSense/Ezoic must approve your live domain before real ads render. Custom code works with any network (Media.net, PropellerAds, etc.). Paid subscribers never see ads — they get an ad-free experience automatically.'),
         ]),
+        supportCard,
       ]);
       setView(wrap); syncVis();
 
@@ -609,8 +637,11 @@
             enabled: enabled.checked, network: net.value,
             adsense_client: f.adsense_client.value, adsense_slot: f.adsense_slot.value,
             ezoic_id: f.ezoic_id.value, custom_code: custom.value, frequency: Number(freq.value) || 1,
+            support_enabled: supEnabled.checked, support_title: supTitle.value, support_message: supMsg.value,
+            support_upi: supUpi.value, support_pay_url: supPay.value, support_qr_url: supQr.value,
+            support_frequency: Number(supFreq.value) || 3,
           });
-          toast('Ad settings saved', 'ok'); route();
+          toast('Settings saved', 'ok'); route();
         } catch (e) { toast(e.message, 'err'); }
       }
     },
