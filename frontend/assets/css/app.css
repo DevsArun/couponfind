@@ -952,3 +952,31 @@ a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
   .app-main { padding-bottom: 64px; }
   /* The chat-style sidebar becomes a drawer; the tab bar is the primary nav */
 }
+
+
+
+/* =====================================================================
+   Floating "Ask Couponaut AI" button (marketing pages) — premium AI chip
+   ===================================================================== */
+.ai-fab {
+  position: fixed; right: 18px; bottom: 18px; z-index: 80;
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.55rem 1rem 0.55rem 0.6rem; border-radius: 999px;
+  background: var(--brand-grad); color: #fff; text-decoration: none;
+  box-shadow: 0 14px 34px -10px rgba(99, 102, 241, 0.6), 0 2px 10px rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition: transform 0.18s ease, box-shadow 0.25s ease;
+  animation: fabIn 0.4s ease both;
+}
+.ai-fab:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -12px rgba(99, 102, 241, 0.7), 0 4px 14px rgba(0, 0, 0, 0.2); }
+.ai-fab .fab-ico { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.ai-fab .fab-ico svg { width: 19px; height: 19px; }
+.ai-fab .fab-text { display: flex; flex-direction: column; line-height: 1.12; }
+.ai-fab .fab-title { font-weight: 800; font-size: 0.9rem; }
+.ai-fab .fab-sub { font-size: 0.66rem; opacity: 0.88; font-weight: 500; }
+@keyframes fabIn { from { opacity: 0; transform: translateY(14px) scale(0.96); } }
+@media (max-width: 600px) {
+  .ai-fab .fab-text { display: none; }
+  .ai-fab { right: 14px; bottom: 16px; padding: 0.55rem; }
+}
+@media (prefers-reduced-motion: reduce) { .ai-fab { animation: none; } }
