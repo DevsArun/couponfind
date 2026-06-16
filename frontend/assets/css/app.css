@@ -980,3 +980,12 @@ a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
   .ai-fab { right: 14px; bottom: 16px; padding: 0.55rem; }
 }
 @media (prefers-reduced-motion: reduce) { .ai-fab { animation: none; } }
+
+
+
+/* Premium gradient text (used on hero highlights, like top SaaS landing pages) */
+.text-gradient {
+  background: var(--brand-grad);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
