@@ -296,7 +296,7 @@
       if (!s.upi && !s.pay_url && !s.qr_url) return; // nothing configured yet
       this.count += 1;
       const freq = Math.max(1, parseInt(s.frequency, 10) || 3);
-      if (this.count % freq !== 0) return;
+      if ((this.count - 1) % freq !== 0) return; // show on the 1st response, then every Nth
       this.render(target, s);
     },
     render(target, s) {
@@ -331,7 +331,7 @@
       if (!b.html && !b.image && !b.text && !b.title) return; // nothing configured
       this.count += 1;
       const freq = Math.max(1, parseInt(b.frequency, 10) || 2);
-      if (this.count % freq !== 0) return;
+      if ((this.count - 1) % freq !== 0) return; // show on the 1st response, then every Nth
       this.render(target, b);
     },
     render(target, b) {

@@ -320,6 +320,37 @@ final class AdminController
         return Response::ok(null, 'AI provider updated');
     }
 
+    /** Which AI keys are configured (never echo the secret values). */
+    public function aiKeys(Request $request): Response
+    {
+        return Response::ok($this->aiKeysStatus());
+    }
+
+    /** @return array<string,array{has_key:bool}> */
+    private function aiKeysStatus(): array
+    {
+        $set = static fn (string $k, string $env): bool => \CouponFind\Core\Settings::get($k, $env) !== '';
+        return [
+            'groq'   => ['has_key' => $set('ai_groq_key', 'GROQ_API_KEY')],
+            'gemini' => ['has_key' => $set('ai_gemini_key', 'GEMINI_API_KEY')],
+            'openai' => ['has_key' => $set('ai_openai_key', 'OPENAI_API_KEY')],
+        ];
+    }
+
+    /** Save AI provider API keys into settings (blank fields keep existing keys). */
+    public function updateAiKeys(Request $request): Response
+    {
+        foreach (['ai_groq_key', 'ai_gemini_key', 'ai_openai_key'] as $k) {
+            $v = $request->input($k);
+            if ($v !== null && $v !== '') {
+                \CouponFind\Core\Settings::set($k, (string) $v);
+            }
+        }
+        \CouponFind\Core\Settings::clearCache();
+        Audit::log((int) $request->userId(), 'admin.ai.keys', 'setting', 'ai_keys', ['updated' => true], $request->ip());
+        return Response::ok($this->aiKeysStatus(), 'AI keys saved');
+    }
+
     // ---- Payments + refunds ----
     public function payments(Request $request): Response
     {

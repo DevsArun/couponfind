@@ -363,7 +363,10 @@
 
     async ai() {
       loading();
-      const d = await API.get('/admin/ai/providers');
+      const [d, keys] = await Promise.all([
+        API.get('/admin/ai/providers'),
+        API.get('/admin/ai/keys').catch(() => ({ groq: {}, gemini: {}, openai: {} })),
+      ]);
       const wrap = h('div', {}, [title('AI Control Center', 'Provider fallback chain: Groq → Gemini → OpenAI')]);
       const grid = h('div', { class: 'grid md:grid-cols-3 gap-4' });
       d.providers.forEach(p => grid.appendChild(h('div', { class: 'card p-5' }, [
@@ -376,7 +379,36 @@
         ]),
       ])));
       wrap.appendChild(grid);
+
+      // ---- API Keys (saved securely in settings; engine + search use them) ----
+      const kf = {};
+      const keyRow = (label, fieldKey, status) => {
+        const inp = h('input', { class: 'input', type: 'password', autocomplete: 'off', placeholder: status && status.has_key ? '•••••••• (saved — leave blank to keep)' : 'Paste API key' });
+        kf[fieldKey] = inp;
+        return h('div', {}, [
+          h('label', { class: 'label flex items-center gap-2' }, [label, h('span', { class: 'badge ' + (status && status.has_key ? 'badge-green' : 'badge-muted'), style: 'font-size:0.6rem;' }, status && status.has_key ? 'set' : 'not set')]),
+          inp,
+        ]);
+      };
+      const keysCard = h('div', { class: 'card p-6 grid gap-4 mt-6', style: 'max-width:640px;' }, [
+        h('div', {}, [h('h3', { class: 'font-bold' }, 'AI Provider API Keys'), h('p', { class: 'text-muted text-sm', style: 'margin-top:2px;' }, 'Add your keys here — no server/.env editing needed. Used by both AI search and the coupon engine. Groq has a generous free tier; adding it noticeably improves coupon extraction.')]),
+        keyRow('Groq API key', 'ai_groq_key', keys.groq),
+        keyRow('Gemini API key', 'ai_gemini_key', keys.gemini),
+        keyRow('OpenAI API key', 'ai_openai_key', keys.openai),
+        h('div', { class: 'flex items-center gap-3 mt-1' }, [
+          h('button', { class: 'btn btn-primary', onclick: saveKeys }, 'Save API keys'),
+          h('span', { class: 'text-muted text-xs' }, 'Keys are stored server-side and never shown again.'),
+        ]),
+      ]);
+      wrap.appendChild(keysCard);
       setView(wrap);
+
+      async function saveKeys() {
+        const payload = {};
+        ['ai_groq_key', 'ai_gemini_key', 'ai_openai_key'].forEach(k => { if (kf[k] && kf[k].value.trim()) payload[k] = kf[k].value.trim(); });
+        try { await API.put('/admin/ai/keys', payload); toast('API keys saved', 'ok'); route(); }
+        catch (e) { toast(e.message, 'err'); }
+      }
       function editPriority(p) {
         const pr = h('input', { class: 'input', type: 'number', value: p.priority });
         const md = h('input', { class: 'input', value: p.model || '' });

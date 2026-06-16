@@ -81,7 +81,7 @@ final class AuthController
     {
         $data = Validator::make($request->all(), [
             'email'    => 'required|email',
-            'password' => 'required|string',
+            'password' => 'required|string|max:200',
         ]);
 
         $user = $this->users->findByEmail($data['email']);

@@ -13,6 +13,7 @@ import re
 import requests
 
 from .config import config
+from .db import db
 
 log = logging.getLogger("couponengine.ai")
 
@@ -82,16 +83,38 @@ def _call_gemini(model: str, key: str, user: str) -> str | None:
         return None
 
 
+def _setting(key: str) -> str:
+    """Read an admin-saved setting (e.g. API keys set from the admin panel)."""
+    try:
+        row = db().first("SELECT value FROM settings WHERE `key`=%s LIMIT 1", (key,))
+        if row:
+            return str(row.get("value") or "")
+    except Exception:  # pragma: no cover
+        pass
+    return ""
+
+
+def _keys() -> dict:
+    """Resolve API keys: admin settings win, then .env."""
+    cfg = config()
+    return {
+        "groq": _setting("ai_groq_key") or cfg.GROQ_API_KEY,
+        "gemini": _setting("ai_gemini_key") or cfg.GEMINI_API_KEY,
+        "openai": _setting("ai_openai_key") or cfg.OPENAI_API_KEY,
+    }
+
+
 def _complete(user_text: str) -> dict | None:
     cfg = config()
+    keys = _keys()
     for provider in cfg.AI_ORDER:
         text = None
         if provider == "groq":
-            text = _call_openai_compatible("https://api.groq.com/openai/v1/chat/completions", cfg.GROQ_API_KEY, cfg.GROQ_MODEL, user_text)
+            text = _call_openai_compatible("https://api.groq.com/openai/v1/chat/completions", keys["groq"], cfg.GROQ_MODEL, user_text)
         elif provider == "openai":
-            text = _call_openai_compatible("https://api.openai.com/v1/chat/completions", cfg.OPENAI_API_KEY, cfg.OPENAI_MODEL, user_text)
+            text = _call_openai_compatible("https://api.openai.com/v1/chat/completions", keys["openai"], cfg.OPENAI_MODEL, user_text)
         elif provider == "gemini":
-            text = _call_gemini(cfg.GEMINI_MODEL, cfg.GEMINI_API_KEY, user_text)
+            text = _call_gemini(cfg.GEMINI_MODEL, keys["gemini"], user_text)
         if text:
             parsed = _extract_json(text)
             if parsed:
@@ -104,7 +127,7 @@ def structure(coupon: dict) -> dict:
     """Refine a coupon dict via AI if confidence is low and a provider exists."""
     if coupon.get("confidence", 0) >= 0.75:
         return coupon
-    if not any([config().GROQ_API_KEY, config().GEMINI_API_KEY, config().OPENAI_API_KEY]):
+    if not any(_keys().values()):
         return coupon
 
     source_text = f"{coupon.get('title', '')}. {coupon.get('description', '')}"[:1500]

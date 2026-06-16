@@ -140,6 +140,8 @@ return function (Router $router, Container $container): void {
 
             $r->get('/ai/providers', $c('AdminController@aiProviders'));
             $r->put('/ai/providers/{id}', $c('AdminController@updateAiProvider'));
+            $r->get('/ai/keys', $c('AdminController@aiKeys'));
+            $r->put('/ai/keys', $c('AdminController@updateAiKeys'));
 
             $r->get('/engine/jobs', $c('AdminController@jobs'));
             $r->post('/engine/dispatch', $c('AdminController@dispatchJob'));

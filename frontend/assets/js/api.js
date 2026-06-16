@@ -108,4 +108,27 @@
   };
 
   global.API = API;
+
+  // ---- PWA setup (runs on every page that loads api.js) ----
+  (function setupPWA() {
+    try {
+      const head = document.head;
+      const ensure = (sel, make) => { if (!document.querySelector(sel)) head.appendChild(make()); };
+      const meta = (name, content) => { const m = document.createElement('meta'); m.name = name; m.content = content; return m; };
+      ensure('link[rel="manifest"]', () => { const l = document.createElement('link'); l.rel = 'manifest'; l.href = '/manifest.json'; return l; });
+      ensure('meta[name="theme-color"]', () => meta('theme-color', '#0a0a0a'));
+      ensure('meta[name="mobile-web-app-capable"]', () => meta('mobile-web-app-capable', 'yes'));
+      ensure('meta[name="apple-mobile-web-app-capable"]', () => meta('apple-mobile-web-app-capable', 'yes'));
+      ensure('meta[name="apple-mobile-web-app-status-bar-style"]', () => meta('apple-mobile-web-app-status-bar-style', 'black-translucent'));
+      ensure('meta[name="apple-mobile-web-app-title"]', () => meta('apple-mobile-web-app-title', 'Couponaut'));
+      ensure('link[rel="apple-touch-icon"]', () => { const l = document.createElement('link'); l.rel = 'apple-touch-icon'; l.href = '/icon.svg'; return l; });
+      ensure('link[rel="icon"]', () => { const l = document.createElement('link'); l.rel = 'icon'; l.type = 'image/svg+xml'; l.href = '/icon.svg'; return l; });
+    } catch (e) { /* non-fatal */ }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => { /* SW optional */ });
+      });
+    }
+  })();
 })(window);

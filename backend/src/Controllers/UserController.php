@@ -230,7 +230,7 @@ final class UserController
     public function changePassword(Request $request): Response
     {
         $data = Validator::make($request->all(), [
-            'current_password' => 'required|string',
+            'current_password' => 'required|string|max:200',
             'password'         => 'required|string|min:8|max:100',
         ]);
         $user = $this->users->findById((int) $request->userId());

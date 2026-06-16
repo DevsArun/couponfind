@@ -6,6 +6,7 @@ namespace CouponFind\Services;
 
 use CouponFind\Core\Database;
 use CouponFind\Core\Env;
+use CouponFind\Core\Settings;
 use CouponFind\Support\Http;
 
 /**
@@ -86,19 +87,19 @@ final class AiProviderManager
             return match ($slug) {
                 'groq'   => $this->callOpenAiCompatible(
                     'https://api.groq.com/openai/v1/chat/completions',
-                    Env::string('GROQ_API_KEY'),
+                    Settings::get('ai_groq_key', 'GROQ_API_KEY'),
                     $model ?: Env::string('GROQ_MODEL', 'llama-3.3-70b-versatile'),
                     $system, $user, $temp
                 ),
                 'openai' => $this->callOpenAiCompatible(
                     'https://api.openai.com/v1/chat/completions',
-                    Env::string('OPENAI_API_KEY'),
+                    Settings::get('ai_openai_key', 'OPENAI_API_KEY'),
                     $model ?: Env::string('OPENAI_MODEL', 'gpt-4o-mini'),
                     $system, $user, $temp
                 ),
                 'gemini' => $this->callGemini(
                     $model ?: Env::string('GEMINI_MODEL', 'gemini-1.5-flash'),
-                    Env::string('GEMINI_API_KEY'),
+                    Settings::get('ai_gemini_key', 'GEMINI_API_KEY'),
                     $system, $user, $temp
                 ),
                 default  => null,
