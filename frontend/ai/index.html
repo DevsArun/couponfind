@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Couponaut AI — Search any coupon</title>
+  <meta name="description" content="Ask for any coupon in plain language. Couponaut finds the brand, validates the codes, and shows the best working deals." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+  <div class="ai-page">
+    <!-- Top bar -->
+    <header class="ai-top glass">
+      <a href="/" class="ai-back" aria-label="Home"><span id="back-ico"></span></a>
+      <a href="/" class="flex items-center gap-2" style="text-decoration:none;color:var(--text);min-width:0;">
+        <span class="brand-mark" style="width:26px;height:26px;font-size:0.7rem;flex:none;">C</span>
+        <span class="font-extrabold" style="font-size:0.98rem;white-space:nowrap;">Couponaut <span style="color:var(--muted-2);font-weight:700;">AI</span></span>
+      </a>
+      <span class="badge badge-muted ai-count" id="found-counter" style="margin-left:auto;">0 found</span>
+      <a href="/app" class="btn btn-ghost btn-sm ai-signin" id="cta-link">Sign in</a>
+    </header>
+
+    <!-- Chat thread -->
+    <div class="ai-thread" id="thread"></div>
+
+    <!-- Composer -->
+    <div class="ai-composer-wrap">
+      <div class="ai-chips" id="examples"></div>
+      <div class="ai-composer">
+        <div class="ai-input-wrap">
+          <textarea id="q" rows="1" placeholder="Ask for a coupon… e.g. best nike coupon"></textarea>
+        </div>
+        <button class="chat-send" id="go" title="Search" aria-label="Search"></button>
+      </div>
+      <p class="ai-disclaimer">Some links may be affiliate links. Couponaut may earn a commission.</p>
+    </div>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/ai.js"></script>
+</body>
+</html>

@@ -13,6 +13,7 @@ use CouponFind\Repositories\UserRepository;
 use CouponFind\Security\Csrf;
 use CouponFind\Security\Jwt;
 use CouponFind\Security\Password;
+use CouponFind\Security\RateLimiter;
 use CouponFind\Services\Billing\BillingService;
 use CouponFind\Support\Audit;
 use CouponFind\Support\HttpException;
@@ -83,6 +84,14 @@ final class AuthController
             'email'    => 'required|email',
             'password' => 'required|string|max:200',
         ]);
+
+        // Brute-force protection: throttle by IP and by email (fails open if Redis is down).
+        $ip = $request->ip();
+        $rlIp = RateLimiter::hit('login_ip:' . $ip, 20, 900);
+        $rlEmail = RateLimiter::hit('login_email:' . strtolower((string) $data['email']), 8, 900);
+        if (!$rlIp['allowed'] || !$rlEmail['allowed']) {
+            throw new HttpException('Too many login attempts. Please wait a few minutes and try again.', 429);
+        }
 
         $user = $this->users->findByEmail($data['email']);
         if ($user === null || !Password::verify($data['password'], $user['password_hash'])) {

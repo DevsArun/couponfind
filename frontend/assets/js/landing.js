@@ -69,34 +69,8 @@
   async function send() {
     const q = input.value.trim();
     if (!q || busy) return;
-    busy = true; el('#go').disabled = true;
-
-    const es = el('#empty-state'); if (es) es.remove();
-    thread.appendChild(userRow(q));
-    input.value = ''; autogrow();
-    const typing = typingRow();
-    thread.appendChild(typing);
-    scrollDown();
-
-    try {
-      const data = await API.post('/search', { q });
-      typing.remove();
-      renderAnswer(q, data);
-    } catch (e) {
-      typing.remove();
-      if (e.status === 402) {
-        thread.appendChild(botRow(h('div', {}, [
-          h('p', { style: 'margin:0;' }, "You've used all your free guest searches for now. "),
-          h('p', { class: 'text-sm', style: 'margin:0.4rem 0 0;color:var(--muted);' }, e.message || ''),
-          h('a', { href: '/register', class: 'btn btn-primary btn-sm mt-3', style: 'display:inline-flex;' }, 'Sign up free — 10/day'),
-        ])));
-      } else {
-        thread.appendChild(botRow(h('span', {}, e.message || 'Something went wrong. Try again.')));
-      }
-    } finally {
-      busy = false; el('#go').disabled = false;
-      scrollDown(); input.focus();
-    }
+    // Coupon searches now open the dedicated /ai page (reply shows there).
+    location.href = '/ai?q=' + encodeURIComponent(q);
   }
 
   function answerLine(q, data) {
