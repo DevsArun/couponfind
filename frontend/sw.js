@@ -2,12 +2,14 @@
    Strategy: network-first for same-origin GET (so code/content stays fresh),
    falling back to cache when offline. API calls and non-GET are never handled
    by the SW (auth/data must always hit the network). */
-const CACHE = 'couponaut-v1';
+const CACHE = 'couponaut-v2';
 const PRECACHE = [
   '/',
+  '/ai',
   '/assets/css/app.css',
   '/assets/js/api.js',
   '/assets/js/ui.js',
+  '/assets/js/ai.js',
   '/manifest.json',
   '/icon.svg',
 ];

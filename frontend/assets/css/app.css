@@ -848,3 +848,107 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
 }
+
+
+
+/* =====================================================================
+   ✦ Premium color accent layer (green + blue + violet) — loaded last
+   Keeps the black/white base but adds tasteful color so the platform
+   feels more premium. (!important beats per-page inline <style> rules.)
+   ===================================================================== */
+:root {
+  --brand-grad: linear-gradient(135deg, #3b82f6 0%, #6366f1 48%, #8b5cf6 100%);
+  --brand-grad-soft: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.12));
+  --brand-blue: #2563eb;
+  --brand-green: #15a35a;
+}
+
+/* Colorful, premium logo + AI avatar + feature tiles */
+.brand-mark { background-image: var(--brand-grad) !important; box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 6px 18px -8px rgba(99,102,241,0.55) !important; }
+.chat-avatar.bot { background: var(--brand-grad) !important; box-shadow: 0 4px 12px -4px rgba(99,102,241,0.5) !important; }
+.feature-ico { background: var(--brand-grad) !important; box-shadow: 0 8px 20px -10px rgba(99,102,241,0.55); }
+
+/* "Live" dot turns green */
+.pulse-dot, .pulse-dot::after { background: var(--brand-green) !important; }
+
+/* Eyebrow chips + section accents pick up a subtle blue→violet tint */
+.eyebrow-chip { background: var(--brand-grad-soft); color: #4f46e5; border: 1px solid rgba(99,102,241,0.22); }
+
+/* Save badge / positive savings reads green */
+.save-badge { background: rgba(21,163,90,0.14) !important; color: var(--brand-green) !important; }
+
+/* Affiliate tag gets a friendly blue */
+.badge-muted[title="Affiliate partner deal"] { background: rgba(37,99,235,0.12); color: var(--brand-blue); }
+
+/* Blue focus ring + selection = modern, premium */
+:root { --ring: 0 0 0 3px rgba(37, 99, 235, 0.22); }
+::selection { background: rgba(99, 102, 241, 0.20); }
+a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
+
+/* Featured pricing card glows blue/violet instead of plain ink */
+.price-card.featured, .plan-card.featured {
+  border-color: rgba(99,102,241,0.55) !important;
+  box-shadow: 0 0 0 1.5px rgba(99,102,241,0.55), 0 24px 48px -18px rgba(99,102,241,0.35) !important;
+}
+
+/* Primary CTA keeps premium ink but gains a soft colored lift on hover */
+.btn-primary:hover { box-shadow: 0 1px 0 rgba(255,255,255,0.14) inset, 0 16px 30px -12px rgba(37,99,235,0.45) !important; }
+
+/* Subtle colored mesh behind hero auroras (a touch more visible, still classy) */
+.hero-aurora span:nth-child(1) { background: radial-gradient(circle, rgba(59,130,246,0.30), transparent 70%) !important; }
+.hero-aurora span:nth-child(2) { background: radial-gradient(circle, rgba(139,92,246,0.26), transparent 70%) !important; }
+.hero-aurora span:nth-child(3) { background: radial-gradient(circle, rgba(21,163,90,0.20), transparent 70%) !important; }
+
+/* =====================================================================
+   ✦ Native-app feel on mobile + installed PWA
+   ===================================================================== */
+@media (max-width: 768px) {
+  .btn, .nav-item, .chip, .acct-btn, .ai-back, .menu-btn, .code-pill, .chat-send, .badge {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
+  }
+  .app-shell, .ai-page { overscroll-behavior-y: contain; }
+  /* /ai top bar: avoid the cramped overlap on small phones */
+  .ai-count { display: none; }
+}
+@media (min-width: 520px) { .ai-count { display: inline-flex; } }
+
+/* Brand text never collides with the rest of the /ai bar */
+.ai-top .brand-mark { flex: none; }
+.ai-top a.flex { min-width: 0; overflow: hidden; }
+
+/* When launched as an installed PWA, respect the device status bar */
+@media (display-mode: standalone) {
+  .ai-top { padding-top: max(0.55rem, env(safe-area-inset-top)); }
+  .app-header, header.glass { padding-top: max(0px, env(safe-area-inset-top)); }
+  body { overscroll-behavior: none; }
+}
+
+
+
+/* =====================================================================
+   Mobile bottom tab bar (dashboard) — native app navigation
+   ===================================================================== */
+.mobile-tabbar { display: none; }
+@media (max-width: 768px) {
+  .mobile-tabbar {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mobile-tabbar .tab {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    padding: 0.5rem 0.25rem 0.45rem; background: none; border: none; cursor: pointer;
+    color: var(--muted-2); font-size: 0.64rem; font-weight: 600; text-decoration: none;
+    -webkit-tap-highlight-color: transparent; transition: color 0.15s;
+  }
+  .mobile-tabbar .tab svg { width: 22px; height: 22px; }
+  .mobile-tabbar .tab.active { color: var(--brand-blue); }
+  .mobile-tabbar .tab:active { transform: scale(0.94); }
+  /* Keep content clear of the fixed bar */
+  .app-main { padding-bottom: 64px; }
+  /* The chat-style sidebar becomes a drawer; the tab bar is the primary nav */
+}
