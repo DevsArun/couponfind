@@ -1217,3 +1217,29 @@ body {
 @supports not (background: color-mix(in srgb, red 10%, white)) {
   .stat-ico { background: rgba(37, 99, 235, 0.10); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22); }
 }
+
+
+
+/* =====================================================================
+   Hero trust row — avatar stack + rating (premium social proof)
+   ===================================================================== */
+.hero-trust {
+  display: flex; align-items: center; justify-content: center; gap: 0.85rem;
+  margin-top: 1.6rem; flex-wrap: wrap;
+}
+.avatar-stack { display: inline-flex; }
+.avatar-stack span {
+  width: 38px; height: 38px; border-radius: 50%; margin-left: -10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 0.8rem;
+  background: linear-gradient(135deg, var(--a), var(--b));
+  border: 2.5px solid var(--bg); box-shadow: 0 4px 10px -4px rgba(16,24,40,0.4);
+}
+.avatar-stack span:first-child { margin-left: 0; }
+.hero-trust-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; font-size: 0.9rem; }
+.hero-stars { display: inline-flex; gap: 1px; color: #f59e0b; }
+.hero-stars svg { width: 15px; height: 15px; }
+@media (max-width: 480px) {
+  .hero-trust { gap: 0.6rem; }
+  .hero-trust-text { align-items: center; text-align: center; }
+}

@@ -9,6 +9,8 @@
   el('#pill-ico').innerHTML = icon('sparkles');
   el('#go').innerHTML = icon('send');
   ['t1', 't2', 't3'].forEach(id => el('#' + id).innerHTML = icon('check'));
+  const heroStars = el('#hero-stars');
+  if (heroStars) heroStars.innerHTML = Array(5).fill(icon('star')).join('');
 
   // ---------- Chat state ----------
   const thread = el('#thread');
