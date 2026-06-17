@@ -1289,3 +1289,43 @@ body {
 .prose a { color: var(--brand-blue) !important; text-decoration: underline; text-underline-offset: 2px; }
 .page-hero .eyebrow-chip { display: inline-flex; margin-bottom: 0.4rem; }
 .page-wrap .h-display { letter-spacing: -0.03em; }
+
+
+
+/* =====================================================================
+   ✦✦ Stripe/dub-grade FORMS & SECTIONS (refined, loaded last)
+   Tighter, more refined inputs + dark labels + clean provider tiles —
+   lifts every form-heavy page (admin, app, auth) to a pro dashboard feel.
+   ===================================================================== */
+.input, select.input, textarea.input {
+  padding: 0.6rem 0.85rem; font-size: 0.9rem; border-radius: 10px;
+  border: 1px solid var(--border-strong); background: var(--card); color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:hover { border-color: #c7cdd6; }
+.input:focus, .input:focus-visible {
+  outline: none; border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+.input::placeholder { color: #9aa3b2; }
+.label { font-size: 0.78rem; font-weight: 650; color: var(--text); letter-spacing: -0.005em; margin-bottom: 0.4rem; display: block; }
+
+/* Clean, neutral provider/brand tile (Stripe-style rows) */
+.prov-ico {
+  width: 40px; height: 40px; border-radius: 10px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-2); border: 1px solid var(--border); color: var(--text);
+}
+.prov-ico svg { width: 20px; height: 20px; }
+
+/* Admin/app page titles: refined Stripe-like hierarchy */
+.app-main .h-display, #view .h-display { letter-spacing: -0.03em; }
+
+/* Section cards: crisp hairline + soft shadow (no heavy borders) */
+#view .card, .app-main .card { border-color: var(--border); box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 8px 24px -18px rgba(16,24,40,0.16); }
+
+/* Buttons in dashboards a touch tighter/refined */
+.btn-sm { padding: 0.45rem 0.8rem; font-size: 0.82rem; border-radius: 9px; }
+
+/* Select dropdown arrow breathing room */
+select.input { padding-right: 2rem; }

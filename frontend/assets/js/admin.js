@@ -536,7 +536,7 @@
         const active = d.active === key;
         grid.appendChild(h('div', { class: 'card p-5', style: active ? 'border-color:var(--brand-blue);box-shadow:0 0 0 1.5px var(--brand-blue), 0 20px 44px -22px rgba(37,99,235,0.45);' : '' }, [
           h('div', { class: 'flex items-center justify-between' }, [
-            h('div', { class: 'flex items-center gap-2' }, [h('span', { class: 'feature-ico', style: 'width:34px;height:34px;', html: icon('card') }), h('h3', { class: 'font-bold', style: 'font-size:1.15rem;' }, label)]),
+            h('div', { class: 'flex items-center gap-2' }, [h('span', { class: 'prov-ico', html: icon('card') }), h('h3', { class: 'font-bold', style: 'font-size:1.15rem;' }, label)]),
             active ? h('span', { class: 'badge badge-accent' }, 'Active') : h('button', { class: 'btn btn-soft btn-sm', onclick: () => setActive(key) }, 'Make active'),
           ]),
           h('div', { class: 'flex items-center gap-2 mt-3' }, [
