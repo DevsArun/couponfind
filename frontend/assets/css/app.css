@@ -1417,3 +1417,27 @@ select.input { padding-right: 2rem; }
   /* App-like: prevent text-size auto-inflation + tap highlight on the shell */
   html { -webkit-text-size-adjust: 100%; }
 }
+
+
+
+/* =====================================================================
+   ✦ Organized account menu (grouped) + refined /ai app header
+   ===================================================================== */
+.acct-menu { max-height: 72vh; overflow-y: auto; padding: 0.4rem; }
+.acct-group {
+  font-size: 0.62rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--muted-2); padding: 0.6rem 0.7rem 0.25rem;
+}
+.acct-item svg { color: var(--muted); }
+.acct-item:hover svg, .acct-item.active svg { color: var(--brand-blue); }
+
+/* /ai page: more native app-bar feel */
+.ai-top {
+  box-shadow: 0 1px 0 var(--border);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px);
+}
+.ai-top .brand-mark { width: 30px; height: 30px; }
+.ai-top .ai-back { border-radius: 50%; width: 40px; height: 40px; }
+.ai-top .ai-back:hover { background: var(--brand-grad-soft); border-color: var(--brand-blue); color: var(--brand-blue); }
+.ai-signin.btn { border-radius: 999px; }

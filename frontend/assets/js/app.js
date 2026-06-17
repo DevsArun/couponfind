@@ -23,19 +23,26 @@
     const inView = el('#view-found'); if (inView) inView.textContent = sessionFound + ' found';
   }
 
-  // ---- Secondary menu (lives in the bottom account popover, chat-style) ----
-  const MENU = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-    { id: 'saved', label: 'Saved Coupons', icon: 'bookmark' },
-    { id: 'watchlist', label: 'Watchlist', icon: 'eye' },
-    { id: 'alerts', label: 'Deal Alerts', icon: 'bolt' },
-    { id: 'notifications', label: 'Notifications', icon: 'bell' },
-    { id: 'history', label: 'Search History', icon: 'clock' },
-    { id: 'billing', label: 'Billing & Plans', icon: 'card' },
-    { id: 'invoices', label: 'Invoices', icon: 'list' },
-    { id: 'referrals', label: 'Referrals', icon: 'gift' },
-    { id: 'profile', label: 'Profile & Settings', icon: 'settings' },
+  // ---- Secondary menu (grouped, lives in the bottom account popover) ----
+  const MENU_GROUPS = [
+    { items: [{ id: 'dashboard', label: 'Dashboard', icon: 'dashboard' }] },
+    { group: 'My Coupons', items: [
+      { id: 'saved', label: 'Saved Coupons', icon: 'bookmark' },
+      { id: 'watchlist', label: 'Watchlist', icon: 'eye' },
+      { id: 'alerts', label: 'Deal Alerts', icon: 'bolt' },
+    ] },
+    { group: 'Activity', items: [
+      { id: 'notifications', label: 'Notifications', icon: 'bell' },
+      { id: 'history', label: 'Search History', icon: 'clock' },
+    ] },
+    { group: 'Account', items: [
+      { id: 'billing', label: 'Billing & Plans', icon: 'card' },
+      { id: 'invoices', label: 'Invoices', icon: 'list' },
+      { id: 'referrals', label: 'Referrals', icon: 'gift' },
+      { id: 'profile', label: 'Profile & Settings', icon: 'settings' },
+    ] },
   ];
+  const MENU = MENU_GROUPS.flatMap(g => g.items);
 
   // ---- Chat history store (persisted per-user in localStorage) ----
   const ChatStore = {
@@ -69,9 +76,12 @@
 
   // ---- Account popover (bottom-left, chat-style) ----
   const acctMenu = el('#acct-menu');
-  MENU.forEach(m => acctMenu.appendChild(h('a', { class: 'acct-item', href: '#' + m.id }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon(m.icon) }), h('span', {}, m.label)])));
-  if (me.is_admin) acctMenu.appendChild(h('a', { class: 'acct-item', href: '/admin/' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('shield') }), h('span', {}, 'Admin console')]));
+  MENU_GROUPS.forEach(g => {
+    if (g.group) acctMenu.appendChild(h('div', { class: 'acct-group' }, g.group));
+    g.items.forEach(m => acctMenu.appendChild(h('a', { class: 'acct-item', href: '#' + m.id }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon(m.icon) }), h('span', {}, m.label)])));
+  });
   acctMenu.appendChild(h('div', { class: 'acct-sep' }));
+  if (me.is_admin) acctMenu.appendChild(h('a', { class: 'acct-item', href: '/admin/' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('shield') }), h('span', {}, 'Admin console')]));
   acctMenu.appendChild(h('button', { id: 'logout', class: 'acct-item', style: 'width:100%;color:var(--red);' }, [h('span', { style: 'width:16px;height:16px;display:inline-flex;', html: icon('logout') }), h('span', {}, 'Log out')]));
   el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/login'; });
   el('#account-btn').addEventListener('click', (e) => { e.stopPropagation(); acctMenu.classList.toggle('hide'); });
