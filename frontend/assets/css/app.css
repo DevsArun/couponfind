@@ -1108,3 +1108,91 @@ body {
 
 /* ---- Pricing featured ribbon pop ---- */
 .plan-pop, .badge-accent { letter-spacing: 0.02em; }
+
+
+
+/* =====================================================================
+   ✦✦✦ PREMIUM THEME v4 — TripCash palette (clean teal + blue duo)
+   Fixes the clashy violet+green+blue mix. Two-color brand system:
+   TEAL/EMERALD + BLUE (headline gradient teal→blue, solid-blue CTAs).
+   Violet is reserved ONLY for the AI identity (avatar + AI button).
+   Loaded last → wins. Colors only, no layout changes.
+   ===================================================================== */
+:root {
+  --brand-blue: #2563eb;
+  --brand-blue-600: #1d4ed8;
+  --brand-teal: #10b981;
+  --brand-green: #10b981;
+  --brand-grad: linear-gradient(95deg, #0d9488 0%, #2563eb 100%);
+  --brand-grad-soft: linear-gradient(135deg, rgba(16,185,129,0.10), rgba(37,99,235,0.10));
+  --ai-grad: linear-gradient(135deg, #7c3aed, #6366f1);
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.22);
+}
+
+/* Clean light background: emerald (left) + blue (right) — exactly the
+   calm, premium wash from the reference. */
+body {
+  background:
+    radial-gradient(820px 420px at 0% -8%, rgba(16,185,129,0.07), transparent 60%),
+    radial-gradient(820px 420px at 100% -8%, rgba(37,99,235,0.07), transparent 60%),
+    #ffffff;
+}
+
+/* SOLID blue primary buttons (crisp, premium — not a busy gradient) */
+.btn-primary {
+  background: var(--brand-blue) !important;
+  background-image: none !important;
+  border: 1px solid transparent !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px -8px rgba(37,99,235,0.55) !important;
+}
+.btn-primary:hover { background: var(--brand-blue-600) !important; transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(37,99,235,0.62) !important; }
+.btn-primary:active { transform: translateY(0); }
+
+/* Logo: emerald→sky (premium brand mark) */
+.brand-mark { background-image: linear-gradient(135deg, #10b981, #0ea5e9) !important; box-shadow: 0 6px 16px -8px rgba(13,148,136,0.55) !important; }
+
+/* Hero headline gradient: teal→blue (like "earn while you travel") */
+.text-gradient { background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+
+/* Feature tiles: teal→blue */
+.feature-ico { background: var(--brand-grad) !important; box-shadow: 0 8px 20px -10px rgba(13,148,136,0.5) !important; }
+
+/* AI identity = violet (avatar + floating button), distinct from the brand */
+.chat-avatar.bot { background: var(--ai-grad) !important; box-shadow: 0 4px 12px -4px rgba(124,58,237,0.5) !important; }
+.ai-fab { background: var(--ai-grad) !important; box-shadow: 0 14px 34px -10px rgba(124,58,237,0.55), 0 2px 10px rgba(0,0,0,0.16) !important; }
+
+/* Discount / "most popular" badges: clean solid blue */
+.badge-accent { background: var(--brand-blue) !important; background-image: none !important; color: #fff !important; }
+
+/* Savings / valid reads emerald */
+.save-badge { background: rgba(16,185,129,0.14) !important; color: #0d9488 !important; }
+.badge-green { background: rgba(16,185,129,0.14) !important; color: #0d9488 !important; }
+
+/* Stat accent + sidebar active + featured plan → teal/blue (no violet) */
+.stat-card::before { background: var(--brand-grad) !important; }
+.nav-item.active { background: var(--brand-grad-soft) !important; box-shadow: inset 3px 0 0 var(--brand-teal) !important; }
+.nav-item.active svg { color: var(--brand-teal) !important; }
+.price-card.featured, .plan-card.featured {
+  border-color: rgba(37,99,235,0.5) !important;
+  box-shadow: 0 0 0 1.5px rgba(37,99,235,0.5), 0 24px 48px -18px rgba(16,185,129,0.3) !important;
+}
+
+/* Live dot = emerald */
+.pulse-dot, .pulse-dot::after, .dot.ok { background: #10b981 !important; }
+
+/* Hero auroras → emerald + blue (drop violet) */
+.hero-aurora span:nth-child(1) { background: radial-gradient(circle, rgba(16,185,129,0.30), transparent 70%) !important; }
+.hero-aurora span:nth-child(2) { background: radial-gradient(circle, rgba(37,99,235,0.26), transparent 70%) !important; }
+.hero-aurora span:nth-child(3) { background: radial-gradient(circle, rgba(13,148,136,0.20), transparent 70%) !important; }
+
+/* Chips + ghost hover → clean blue tint */
+.chip:hover, .btn-ghost:hover { color: var(--brand-blue) !important; border-color: var(--brand-blue) !important; background: var(--brand-grad-soft) !important; }
+
+/* Eyebrow chips → teal/blue tint (not violet) */
+.eyebrow-chip { background: var(--brand-grad-soft) !important; color: #0d9488 !important; border: 1px solid rgba(16,185,129,0.22) !important; }
+
+/* Links + accents → brand blue */
+.text-accent { color: var(--brand-blue) !important; }
+.cmdk-item.active, .cmdk-item:hover, .table tbody tr:hover { background: var(--brand-grad-soft) !important; }
+.nav-item.active { color: var(--text) !important; }
