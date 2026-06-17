@@ -2,45 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Sign in — Couponaut</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
 <body>
-  <div class="min-h-screen flex items-center justify-center px-5 relative" style="overflow:hidden;">
-    <div class="hero-aurora" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="grid-bg" style="position:absolute;inset:0;height:340px;"></div>
-    <div class="card auth-card p-8 w-full fade-up" style="max-width:420px;position:relative;">
-      <a href="/" class="flex items-center gap-2 mb-6" style="text-decoration:none;color:var(--text);">
-        <span class="brand-mark" style="width:30px;height:30px;">C</span>
-        <span class="font-extrabold">Couponaut</span>
-      </a>
-      <h1 class="h-display" style="font-size:1.6rem;">Welcome back</h1>
-      <p class="text-muted text-sm mt-1">Sign in to your account to continue.</p>
-
-      <form id="form" class="mt-6 grid gap-4">
-        <div>
-          <label class="label">Email</label>
-          <input id="email" type="email" class="input" placeholder="you@example.com" required />
-        </div>
-        <div>
-          <label class="label">Password</label>
-          <input id="password" type="password" class="input" placeholder="••••••••" required />
-          <div class="text-right mt-1"><a href="/forgot-password" class="text-muted" style="font-size:0.78rem;text-decoration:none;">Forgot password?</a></div>
-        </div>
-        <div id="err" class="badge badge-red hide"></div>
-        <button id="submit" class="btn btn-primary" type="submit">Sign in</button>
-      </form>
-
-      <div class="mt-4 text-sm text-muted text-center">
-        No account? <a href="/register" class="text-accent" style="text-decoration:none;">Create one</a>
+  <div class="auth-split">
+    <!-- Brand panel -->
+    <aside class="auth-aside">
+      <a href="/" class="auth-logo"><span class="brand-mark" style="width:30px;height:30px;">C</span> Couponaut</a>
+      <div>
+        <h2 class="auth-aside-title">Find the coupon that <u>actually works</u>.</h2>
+        <ul class="auth-aside-list">
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> AI search — typos &amp; slang welcome</li>
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> Validated, working codes only</li>
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> 10 free searches every day</li>
+        </ul>
       </div>
-      <div class="mt-5 p-3 rounded-lg text-xs text-muted" style="background:var(--bg-2);border:1px solid var(--border);">
-        <strong class="text-accent">Demo:</strong> admin@couponfind.local / Admin@12345 · user@couponfind.local / User@12345
+      <div class="auth-aside-foot">
+        <span class="stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.4 14 7.6l5.7.8-4.1 4 1 5.7-5.1-2.7L6.3 18l1-5.7-4.1-4 5.7-.8z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.4 14 7.6l5.7.8-4.1 4 1 5.7-5.1-2.7L6.3 18l1-5.7-4.1-4 5.7-.8z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.4 14 7.6l5.7.8-4.1 4 1 5.7-5.1-2.7L6.3 18l1-5.7-4.1-4 5.7-.8z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.4 14 7.6l5.7.8-4.1 4 1 5.7-5.1-2.7L6.3 18l1-5.7-4.1-4 5.7-.8z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2.4 14 7.6l5.7.8-4.1 4 1 5.7-5.1-2.7L6.3 18l1-5.7-4.1-4 5.7-.8z"/></svg></span>
+        <span>4.8/5 — loved by 12,000+ smart shoppers</span>
       </div>
-    </div>
+    </aside>
+
+    <!-- Form -->
+    <main class="auth-main">
+      <div class="auth-form-wrap fade-up">
+        <a href="/" class="flex items-center gap-2 mb-6 md:hidden" style="text-decoration:none;color:var(--text);">
+          <span class="brand-mark" style="width:30px;height:30px;">C</span><span class="font-extrabold">Couponaut</span>
+        </a>
+        <h1 class="h-display" style="font-size:1.7rem;">Welcome back</h1>
+        <p class="text-muted text-sm mt-1">Sign in to your account to continue.</p>
+
+        <form id="form" class="mt-7 grid gap-4">
+          <div>
+            <label class="label">Email</label>
+            <input id="email" type="email" class="input" placeholder="you@example.com" required autocomplete="username" />
+          </div>
+          <div>
+            <label class="label">Password</label>
+            <input id="password" type="password" class="input" placeholder="••••••••" required autocomplete="current-password" />
+            <div class="text-right mt-1"><a href="/forgot-password" class="text-muted" style="font-size:0.78rem;text-decoration:none;">Forgot password?</a></div>
+          </div>
+          <div id="err" class="badge badge-red hide"></div>
+          <button id="submit" class="btn btn-primary btn-lg" type="submit">Sign in</button>
+        </form>
+
+        <div class="mt-5 text-sm text-muted text-center">
+          No account? <a href="/register" class="text-accent" style="text-decoration:none;font-weight:600;">Create one free</a>
+        </div>
+      </div>
+    </main>
   </div>
   <script src="/assets/js/api.js"></script>
   <script src="/assets/js/ui.js"></script>

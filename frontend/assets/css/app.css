@@ -1243,3 +1243,49 @@ body {
   .hero-trust { gap: 0.6rem; }
   .hero-trust-text { align-items: center; text-align: center; }
 }
+
+
+
+/* =====================================================================
+   ✦ Premium AUTH split-layout (brand panel + form) — Linear/Stripe style
+   ===================================================================== */
+.auth-split { display: grid; grid-template-columns: 1.05fr 1fr; min-height: 100vh; min-height: 100dvh; }
+.auth-aside {
+  position: relative; overflow: hidden; color: #fff;
+  background: linear-gradient(150deg, #0d9488 0%, #2563eb 100%);
+  display: flex; flex-direction: column; justify-content: space-between; padding: 2.6rem;
+}
+.auth-aside.admin { background: linear-gradient(150deg, #0f172a 0%, #1e293b 60%, #2563eb 130%); }
+.auth-aside::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(600px 320px at 18% -5%, rgba(255,255,255,0.22), transparent 60%),
+    radial-gradient(500px 300px at 100% 110%, rgba(255,255,255,0.12), transparent 60%); }
+.auth-aside::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+  background-image: radial-gradient(rgba(255,255,255,0.14) 1px, transparent 1px); background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%); }
+.auth-aside > * { position: relative; z-index: 1; }
+.auth-logo { display: inline-flex; align-items: center; gap: 0.6rem; color: #fff; text-decoration: none; font-weight: 800; font-size: 1.08rem; }
+.auth-logo .brand-mark { background: rgba(255,255,255,0.2) !important; box-shadow: none !important; color: #fff; }
+.auth-aside-title { font-size: clamp(1.7rem, 2.6vw, 2.5rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; max-width: 460px; }
+.auth-aside-title u { text-decoration-thickness: 3px; text-underline-offset: 5px; text-decoration-color: rgba(255,255,255,0.6); }
+.auth-aside-list { list-style: none; padding: 0; margin: 1.4rem 0 0; display: grid; gap: 0.75rem; }
+.auth-aside-list li { display: flex; align-items: center; gap: 0.65rem; font-size: 1rem; color: rgba(255,255,255,0.94); }
+.auth-aside-list .tick { width: 22px; height: 22px; border-radius: 50%; flex: none; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.22); }
+.auth-aside-list .tick svg { width: 13px; height: 13px; }
+.auth-aside-foot { display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; color: rgba(255,255,255,0.9); }
+.auth-aside-foot .stars { color: #fde68a; display: inline-flex; gap: 1px; }
+.auth-aside-foot .stars svg { width: 14px; height: 14px; }
+.auth-main { display: flex; align-items: center; justify-content: center; padding: 2.2rem 1.25rem; background: var(--bg); }
+.auth-form-wrap { width: 100%; max-width: 400px; }
+.auth-form-wrap .brand-mark { width: 34px; height: 34px; }
+@media (max-width: 860px) {
+  .auth-split { grid-template-columns: 1fr; }
+  .auth-aside { display: none; }
+}
+
+
+
+/* Marketing + legal page polish */
+.prose a { color: var(--brand-blue) !important; text-decoration: underline; text-underline-offset: 2px; }
+.page-hero .eyebrow-chip { display: inline-flex; margin-bottom: 0.4rem; }
+.page-wrap .h-display { letter-spacing: -0.03em; }
