@@ -989,3 +989,38 @@ a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
 }
+
+
+
+/* =====================================================================
+   ✦ Premium app + admin polish (vibrant, Silicon-Valley style)
+   ===================================================================== */
+/* Stat cards: colored gradient top accent + lift */
+.stat-card { position: relative; overflow: hidden; border-color: var(--border); transition: transform 0.2s ease, box-shadow 0.25s ease; }
+.stat-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--brand-grad); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 22px 44px -24px rgba(99, 102, 241, 0.45); }
+
+/* Sidebar active item → premium blue/violet instead of flat black */
+.nav-item.active {
+  color: var(--text) !important;
+  background: var(--brand-grad-soft) !important;
+  box-shadow: inset 3px 0 0 var(--brand-blue) !important;
+  font-weight: 650 !important;
+}
+.nav-item.active span[class] svg, .nav-item.active svg { color: var(--brand-blue); }
+
+/* Cards a touch richer everywhere */
+.card { border-radius: 16px; }
+
+/* Admin/app headers: subtle premium glass */
+.app-header { background: rgba(255,255,255,0.72); backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px); }
+.app-sidebar { background: linear-gradient(180deg, #ffffff, #fbfbfd); }
+
+/* Section headings get tighter, premium tracking */
+.h-display { letter-spacing: -0.035em; }
+
+/* "All systems operational" style dot already green via --brand-green */
+.dot.ok { background: var(--brand-green) !important; }
+
+/* List rows (top queries, tables) — gentle hover */
+.table tbody tr:hover { background: var(--brand-grad-soft); }

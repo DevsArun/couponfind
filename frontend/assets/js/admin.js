@@ -50,23 +50,31 @@
   const setView = (n) => { view.innerHTML = ''; view.appendChild(n); };
   const loading = () => setView(UI.skeletonList(6, '64px'));
   const title = (t, s, a) => h('div', { class: 'flex items-end justify-between mb-6 fade-up' }, [h('div', {}, [h('h1', { class: 'h-display', style: 'font-size:1.6rem;' }, t), s ? h('p', { class: 'text-muted text-sm mt-1' }, s) : null]), a || h('div')]);
-  const stat = (label, val, sub, ic) => h('div', { class: 'card p-5' }, [
-    h('div', { class: 'flex items-center justify-between' }, [h('span', { class: 'text-muted text-xs uppercase tracking-wide' }, label), h('span', { class: 'feature-ico', style: 'width:30px;height:30px;', html: icon(ic) })]),
-    h('div', { class: 'h-display mt-3', style: 'font-size:1.7rem;' }, val), sub ? h('div', { class: 'text-muted text-xs mt-1' }, sub) : null,
+  const stat = (label, val, sub, ic) => h('div', { class: 'card stat-card p-5' }, [
+    h('div', { class: 'flex items-center justify-between' }, [h('span', { class: 'text-muted text-xs uppercase tracking-wide' }, label), h('span', { class: 'feature-ico', style: 'width:32px;height:32px;', html: icon(ic) })]),
+    h('div', { class: 'h-display mt-3', style: 'font-size:1.9rem;font-variant-numeric:tabular-nums;' }, val), sub ? h('div', { class: 'text-muted text-xs mt-1' }, sub) : null,
   ]);
 
-  // ---- Tiny SVG bar chart ----
-  function barChart(data, xKey, yKey, opts = {}) {
-    const w = 640, hgt = 180, pad = 24;
-    if (!data || !data.length) return h('div', { class: 'text-muted text-sm p-4' }, 'No data');
+  // ---- Premium SVG bar chart (gradient bars, no giant blocks) ----
+  function barChart(data, xKey, yKey) {
+    const w = 640, hgt = 200, padX = 18, padTop = 16, padBottom = 30;
+    if (!data || !data.length) return h('div', { class: 'card p-8 text-muted text-sm text-center' }, 'No data yet — activity will appear here.');
     const max = Math.max(...data.map(d => Number(d[yKey]) || 0), 1);
-    const bw = (w - pad * 2) / data.length;
+    const slot = (w - padX * 2) / data.length;
+    const barW = Math.min(slot - 8, 44);
+    const baseY = hgt - padBottom;
     const bars = data.map((d, i) => {
-      const bh = ((Number(d[yKey]) || 0) / max) * (hgt - pad * 2);
-      const x = pad + i * bw, y = hgt - pad - bh;
-      return `<rect x="${x + 2}" y="${y}" width="${Math.max(2, bw - 6)}" height="${bh}" rx="3" fill="var(--accent)" opacity="0.85"><title>${esc(d[xKey])}: ${esc(d[yKey])}</title></rect>`;
+      const v = Number(d[yKey]) || 0;
+      const bh = v > 0 ? Math.max(4, (v / max) * (baseY - padTop)) : 0;
+      const x = padX + i * slot + (slot - barW) / 2;
+      const y = baseY - bh;
+      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="6" fill="url(#barGrad)"><title>${esc(d[xKey])}: ${esc(v)}</title></rect>`;
     }).join('');
-    return h('div', { class: 'card p-4', style: 'overflow:auto;' }, h('div', { html: `<svg viewBox="0 0 ${w} ${hgt}" style="width:100%;height:${hgt}px;">${bars}</svg>` }));
+    const svg = `<svg viewBox="0 0 ${w} ${hgt}" preserveAspectRatio="none" style="width:100%;height:${hgt}px;display:block;">`
+      + `<defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="55%" stop-color="#6366f1"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>`
+      + `<line x1="${padX}" y1="${baseY + 0.5}" x2="${w - padX}" y2="${baseY + 0.5}" stroke="var(--border)" stroke-width="1"/>`
+      + bars + `</svg>`;
+    return h('div', { class: 'card p-5', style: 'overflow:hidden;' }, h('div', { html: svg }));
   }
 
   const Views = {
