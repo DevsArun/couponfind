@@ -1024,3 +1024,87 @@ a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
 
 /* List rows (top queries, tables) — gentle hover */
 .table tbody tr:hover { background: var(--brand-grad-soft); }
+
+
+
+/* =====================================================================
+   ✦✦ PREMIUM THEME v3 — cohesive Silicon-Valley pass (loaded last)
+   Lifts every screen at once (landing, /ai, app, admin, auth) via the
+   shared component classes. Colors/shadows/radii/hovers only — no layout
+   changes, so it's safe.
+   ===================================================================== */
+
+/* ---- Surfaces & depth ---- */
+body {
+  background:
+    radial-gradient(900px 460px at 100% -10%, rgba(59,130,246,0.06), transparent 60%),
+    radial-gradient(900px 460px at 0% -10%, rgba(139,92,246,0.06), transparent 60%),
+    var(--bg);
+}
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 10px 28px -18px rgba(16,24,40,0.22);
+}
+
+/* ---- Primary buttons → vibrant blue→violet gradient (matches reference) ---- */
+.btn { border-radius: 12px; font-weight: 650; letter-spacing: -0.01em; }
+.btn-primary {
+  background-image: var(--brand-grad);
+  border: 1px solid transparent;
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.2) inset, 0 12px 26px -12px rgba(79,70,229,0.7);
+}
+.btn-primary:hover { filter: brightness(1.04); transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255,255,255,0.22) inset, 0 18px 34px -12px rgba(79,70,229,0.8); }
+.btn-primary:active { transform: translateY(0); filter: brightness(0.98); }
+.btn-ghost { border: 1px solid var(--border-strong); background: rgba(255,255,255,0.6); }
+.btn-ghost:hover { border-color: var(--brand-blue); color: var(--brand-blue); background: var(--brand-grad-soft); }
+
+/* ---- Inputs: premium focus ---- */
+.input { border-radius: 11px; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+.input:focus, .input:focus-visible { outline: none; border-color: var(--brand-blue); box-shadow: var(--ring); }
+
+/* ---- Chips ---- */
+.chip { border-radius: 999px; transition: all 0.15s; }
+.chip:hover { border-color: var(--brand-blue); color: var(--brand-blue); background: var(--brand-grad-soft); transform: translateY(-1px); }
+
+/* ---- Coupon cards: premium lift + accent edge ---- */
+.coupon-card { border-radius: 16px; }
+.coupon-card:hover { transform: translateY(-3px); box-shadow: 0 24px 48px -22px rgba(79,70,229,0.4); border-color: rgba(99,102,241,0.4); }
+
+/* ---- Discount badge: punchy gradient ---- */
+.badge-accent { background-image: var(--brand-grad); color: #fff; }
+
+/* ---- Tables: premium header + row hover ---- */
+.table thead th { background: var(--bg-2); color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.05em; }
+.table tbody tr { transition: background 0.12s; }
+.table tbody tr:hover { background: var(--brand-grad-soft); }
+
+/* ---- Modals: premium ---- */
+.modal { border-radius: 18px; box-shadow: 0 40px 80px -24px rgba(16,24,40,0.5); }
+
+/* ---- Code pill: dashed → crisp, tappable ---- */
+.code-pill { border-radius: 10px; font-weight: 700; }
+
+/* ---- Toasts ---- */
+.toast { border-radius: 12px; box-shadow: 0 16px 36px -16px rgba(16,24,40,0.45); }
+
+/* ---- Command palette ---- */
+#cmdk .panel { border-radius: 18px; box-shadow: 0 40px 90px -30px rgba(16,24,40,0.55); }
+.cmdk-item.active, .cmdk-item:hover { background: var(--brand-grad-soft); color: var(--brand-blue); }
+
+/* ---- Premium thin scrollbars in app/admin scroll areas ---- */
+.ai-thread::-webkit-scrollbar, .app-sidebar #nav::-webkit-scrollbar, .modal::-webkit-scrollbar { width: 8px; }
+.ai-thread::-webkit-scrollbar-thumb, .app-sidebar #nav::-webkit-scrollbar-thumb, .modal::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 8px; }
+
+/* ---- Empty states feel intentional, not bare ---- */
+.chat-empty { color: var(--muted); }
+
+/* ---- Section eyebrows + headings stay crisp ---- */
+.label { font-weight: 600; color: var(--muted); }
+
+/* ---- Links inside content get the brand blue ---- */
+.text-accent { color: var(--brand-blue) !important; }
+
+/* ---- Pricing featured ribbon pop ---- */
+.plan-pop, .badge-accent { letter-spacing: 0.02em; }
