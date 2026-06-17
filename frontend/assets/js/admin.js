@@ -534,7 +534,7 @@
       [['stripe', 'Stripe'], ['razorpay', 'Razorpay']].forEach(([key, label]) => {
         const g = d.gateways[key] || {};
         const active = d.active === key;
-        grid.appendChild(h('div', { class: 'card p-5', style: active ? 'border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);' : '' }, [
+        grid.appendChild(h('div', { class: 'card p-5', style: active ? 'border-color:var(--brand-blue);box-shadow:0 0 0 1.5px var(--brand-blue), 0 20px 44px -22px rgba(37,99,235,0.45);' : '' }, [
           h('div', { class: 'flex items-center justify-between' }, [
             h('div', { class: 'flex items-center gap-2' }, [h('span', { class: 'feature-ico', style: 'width:34px;height:34px;', html: icon('card') }), h('h3', { class: 'font-bold', style: 'font-size:1.15rem;' }, label)]),
             active ? h('span', { class: 'badge badge-accent' }, 'Active') : h('button', { class: 'btn btn-soft btn-sm', onclick: () => setActive(key) }, 'Make active'),
@@ -814,7 +814,7 @@
       const wrap = h('div', {}, [title('Messages', (d.new || 0) + ' new · ' + d.messages.length + ' total — queries from the contact form')]);
       if (!d.messages.length) { wrap.appendChild(h('div', { class: 'card p-10 text-center text-muted' }, 'No messages yet.')); setView(wrap); return; }
       const list = h('div', { class: 'grid gap-3' });
-      d.messages.forEach(m => list.appendChild(h('div', { class: 'card p-5', style: m.status === 'new' ? 'border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);' : '' }, [
+      d.messages.forEach(m => list.appendChild(h('div', { class: 'card p-5', style: m.status === 'new' ? 'border-color:var(--brand-blue);box-shadow:0 0 0 1px var(--brand-blue);' : '' }, [
         h('div', { class: 'flex items-start justify-between gap-3' }, [
           h('div', { style: 'min-width:0;' }, [
             h('div', { class: 'font-bold' }, m.subject || '(no subject)'),

@@ -504,7 +504,7 @@
 
   function planCard(p, cur) {
     const isCurrent = cur && cur.plan_id === p.id;
-    return h('div', { class: 'card p-5 flex flex-col', style: isCurrent ? 'border-color:var(--accent);' : '' }, [
+    return h('div', { class: 'card p-5 flex flex-col', style: isCurrent ? 'border-color:var(--brand-blue);box-shadow:0 0 0 1.5px var(--brand-blue);' : '' }, [
       h('h3', { class: 'font-bold' }, p.name),
       h('div', { class: 'h-display mt-1', style: 'font-size:1.5rem;' }, p.price_cents === 0 ? 'Free' : fmt.money(p.price_cents, p.currency)),
       h('div', { class: 'text-muted text-xs' }, p.price_cents ? 'per ' + p.interval : 'forever'),
