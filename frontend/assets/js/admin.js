@@ -10,33 +10,55 @@
 
   let livePoll = null; // active interval for the Live Logs view
 
-  const NAV = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-    { id: 'users', label: 'Users', icon: 'users' },
-    { id: 'messages', label: 'Messages', icon: 'message' },
-    { id: 'plans', label: 'Plans', icon: 'card' },
-    { id: 'subscriptions', label: 'Subscriptions', icon: 'list' },
-    { id: 'revenue', label: 'Revenue', icon: 'chart' },
-    { id: 'payments', label: 'Payments', icon: 'card' },
-    { id: 'gateway', label: 'Payment Gateway', icon: 'lock' },
-    { id: 'ads', label: 'Ads & Monetization', icon: 'chart' },
-    { id: 'coupons', label: 'Coupons', icon: 'tag' },
-    { id: 'merchants', label: 'Merchants', icon: 'store' },
-    { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
-    { id: 'affiliate', label: 'Affiliate Networks', icon: 'globe' },
-    { id: 'search', label: 'Search Analytics', icon: 'search' },
-    { id: 'ai', label: 'AI Control Center', icon: 'cpu' },
-    { id: 'engine', label: 'Engine Control', icon: 'spider' },
-    { id: 'live', label: 'Live Logs', icon: 'activity' },
-    { id: 'flags', label: 'Feature Flags', icon: 'flag' },
-    { id: 'logs', label: 'Logs & Audit', icon: 'activity' },
-    { id: 'health', label: 'System Health', icon: 'shield' },
-    { id: 'settings', label: 'Settings', icon: 'settings' },
-    { id: 'email', label: 'Email & SMTP', icon: 'message' },
+  const NAV_GROUPS = [
+    { group: 'Overview', items: [
+      { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+      { id: 'revenue', label: 'Revenue', icon: 'chart' },
+      { id: 'search', label: 'Search Analytics', icon: 'search' },
+      { id: 'live', label: 'Live Logs', icon: 'activity' },
+    ] },
+    { group: 'Users & Plans', items: [
+      { id: 'users', label: 'Users', icon: 'users' },
+      { id: 'messages', label: 'Messages', icon: 'message' },
+      { id: 'subscriptions', label: 'Subscriptions', icon: 'list' },
+      { id: 'plans', label: 'Plans', icon: 'card' },
+    ] },
+    { group: 'Catalog', items: [
+      { id: 'coupons', label: 'Coupons', icon: 'tag' },
+      { id: 'merchants', label: 'Merchants', icon: 'store' },
+      { id: 'sources', label: 'Coupon Sources', icon: 'spider' },
+      { id: 'affiliate', label: 'Affiliate Networks', icon: 'globe' },
+    ] },
+    { group: 'Finance', items: [
+      { id: 'payments', label: 'Payments', icon: 'card' },
+      { id: 'gateway', label: 'Payment Gateway', icon: 'lock' },
+      { id: 'ads', label: 'Ads & Monetization', icon: 'chart' },
+    ] },
+    { group: 'System', items: [
+      { id: 'ai', label: 'AI Control Center', icon: 'cpu' },
+      { id: 'engine', label: 'Engine Control', icon: 'spider' },
+      { id: 'flags', label: 'Feature Flags', icon: 'flag' },
+      { id: 'logs', label: 'Logs & Audit', icon: 'activity' },
+      { id: 'health', label: 'System Health', icon: 'shield' },
+      { id: 'settings', label: 'Settings', icon: 'settings' },
+      { id: 'email', label: 'Email & SMTP', icon: 'message' },
+    ] },
   ];
+  const NAV = NAV_GROUPS.flatMap(g => g.items);
   const nav = el('#nav');
-  NAV.forEach(n => nav.appendChild(h('a', { class: 'nav-item', 'data-route': n.id, href: '#' + n.id }, [h('span', { html: icon(n.icon) }), h('span', {}, n.label)])));
+  NAV_GROUPS.forEach(g => {
+    nav.appendChild(h('div', { class: 'admin-nav-group' }, g.group));
+    g.items.forEach(n => nav.appendChild(h('a', { class: 'nav-item', 'data-route': n.id, href: '#' + n.id }, [h('span', { html: icon(n.icon) }), h('span', {}, n.label)])));
+  });
   const setActive = (r) => els('.nav-item', nav).forEach(a => a.classList.toggle('active', a.getAttribute('data-route') === r));
+
+  // Sidebar profile card + sign-out
+  (function () {
+    const u = (API.store && API.store.user) || {};
+    const nm = el('#side-name'); if (nm && u.name) nm.textContent = u.name;
+    const av = el('#side-avatar'); if (av) av.textContent = (u.name || 'A').trim().charAt(0).toUpperCase();
+    const lo = el('#logout-side'); if (lo) lo.addEventListener('click', async () => { await API.logout(); location.href = '/admin/login'; });
+  })();
 
   el('#logout').addEventListener('click', async () => { await API.logout(); location.href = '/admin/login'; });
 

@@ -12,14 +12,24 @@
   <div class="app-shell">
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <aside id="sidebar" class="app-sidebar glass" style="width:256px;">
-      <div class="px-5 h-16 flex items-center gap-2 border-b hairline">
-        <span class="brand-mark" style="width:28px;height:28px;">C</span>
-        <div style="line-height:1.05;"><div class="font-extrabold text-sm">Couponaut</div><div class="text-muted" style="font-size:0.68rem;">Mission Control</div></div>
+    <aside id="sidebar" class="app-sidebar admin-dark" style="width:264px;">
+      <div class="admin-side-head">
+        <a href="/" class="admin-brand">
+          <span class="brand-mark" style="width:32px;height:32px;">C</span>
+          <span><span class="admin-brand-name">Couponaut</span><span class="admin-brand-sub">Mission Control</span></span>
+        </a>
       </div>
-      <nav id="nav" class="p-3 grid gap-1" style="flex:1;overflow-y:auto;"></nav>
-      <div class="p-3 border-t hairline">
-        <a href="/app" class="nav-item">← Back to app</a>
+      <div class="admin-profile">
+        <span class="admin-avatar" id="side-avatar">A</span>
+        <div style="min-width:0;">
+          <div class="admin-profile-name" id="side-name">Administrator</div>
+          <div class="admin-profile-role">Super Admin</div>
+        </div>
+      </div>
+      <nav id="nav" class="admin-nav"></nav>
+      <div class="admin-side-foot">
+        <a href="/app" class="admin-foot-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg> Visit app</a>
+        <button id="logout-side" class="admin-foot-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sign out</button>
       </div>
     </aside>
     <main class="app-main">
