@@ -1374,3 +1374,32 @@ select.input { padding-right: 2rem; }
 .admin-foot-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.7rem; border-radius: 9px; color: #94a3b8; background: none; border: none; cursor: pointer; font-size: 0.85rem; text-decoration: none; width: 100%; text-align: left; font-family: inherit; }
 .admin-foot-link:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
 .admin-foot-link svg { width: 17px; height: 17px; flex: none; }
+
+
+
+/* =====================================================================
+   ✦ User panel (app dashboard) — fix sidebar scroll bug + premium polish
+   ===================================================================== */
+/* BUG FIX: chat titles weren't allowed to shrink → horizontal scrollbar */
+.app-sidebar:not(.admin-dark) #nav { overflow-x: hidden; }
+.app-sidebar .nav-item { min-width: 0; }
+.app-sidebar .nav-item > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-hist-title { min-width: 0; }
+
+/* Premium "New chat" button */
+#new-chat { border: 1px solid var(--border-strong); border-radius: 11px; font-weight: 650; }
+#new-chat:hover { border-color: var(--brand-blue); color: var(--brand-blue); background: var(--brand-grad-soft); }
+
+/* Refined chat-history rows */
+.app-sidebar:not(.admin-dark) .chat-hist { border-radius: 9px; }
+.app-sidebar:not(.admin-dark) .chat-hist.active { background: var(--brand-grad-soft) !important; box-shadow: inset 2px 0 0 var(--brand-blue) !important; color: var(--text); }
+.app-sidebar:not(.admin-dark) .chat-hist.active svg { color: var(--brand-blue); }
+
+/* Premium account button + gradient avatar */
+.acct-btn { border-radius: 12px; border: 1px solid transparent; transition: background 0.15s, border-color 0.15s; }
+.acct-btn:hover { background: var(--brand-grad-soft); border-color: var(--border); }
+.acct-avatar { background: linear-gradient(135deg, #10b981, #2563eb) !important; border-radius: 10px !important; }
+.acct-item.active { background: var(--brand-grad-soft) !important; color: var(--brand-blue) !important; }
+
+/* Sidebar header brand spacing */
+.app-sidebar:not(.admin-dark) { background: linear-gradient(180deg, #ffffff, #fafbfc) !important; }

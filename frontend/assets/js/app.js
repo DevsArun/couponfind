@@ -112,13 +112,15 @@
     ]);
   }
 
-  function statCard(label, value, sub, ic) {
-    return h('div', { class: 'card p-5' }, [
+  const STAT_TONES = { blue: '#2563eb', emerald: '#059669', violet: '#7c3aed', amber: '#d97706' };
+  function statCard(label, value, sub, ic, tone) {
+    const c = STAT_TONES[tone] || STAT_TONES.blue;
+    return h('div', { class: 'card stat-card p-5', style: '--tone:' + c + ';' }, [
       h('div', { class: 'flex items-center justify-between' }, [
         h('span', { class: 'text-muted text-xs uppercase tracking-wide' }, label),
-        h('span', { class: 'feature-ico', style: 'width:30px;height:30px;', html: icon(ic) }),
+        h('span', { class: 'stat-ico', html: icon(ic) }),
       ]),
-      h('div', { class: 'h-display mt-3', style: 'font-size:1.8rem;' }, value),
+      h('div', { class: 'h-display mt-3', style: 'font-size:1.8rem;font-variant-numeric:tabular-nums;' }, value),
       sub ? h('div', { class: 'text-muted text-xs mt-1' }, sub) : null,
     ]);
   }
@@ -168,10 +170,10 @@
       const wrap = h('div', {}, [
         pageTitle('Dashboard', 'Welcome back, ' + (me.name || '') + ' 👋'),
         h('div', { class: 'grid md:grid-cols-4 gap-4 stagger' }, [
-          statCard('Searches used', q.unlimited ? '∞' : (q.used + ' / ' + q.limit), 'per ' + (q.window || 'day') + ' · ' + (q.plan || 'free'), 'search'),
-          statCard('Saved coupons', fmt.num(d.saved_count), 'in your library', 'bookmark'),
-          statCard('Watching', fmt.num(d.watch_count), 'merchants & keywords', 'eye'),
-          statCard('Unread', fmt.num(d.unread), 'notifications', 'bell'),
+          statCard('Searches used', q.unlimited ? '∞' : (q.used + ' / ' + q.limit), 'per ' + (q.window || 'day') + ' · ' + (q.plan || 'free'), 'search', 'blue'),
+          statCard('Saved coupons', fmt.num(d.saved_count), 'in your library', 'bookmark', 'emerald'),
+          statCard('Watching', fmt.num(d.watch_count), 'merchants & keywords', 'eye', 'violet'),
+          statCard('Unread', fmt.num(d.unread), 'notifications', 'bell', 'amber'),
         ]),
         h('div', { class: 'grid md:grid-cols-2 gap-5 mt-6' }, [
           (function () {
