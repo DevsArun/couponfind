@@ -1196,3 +1196,24 @@ body {
 .text-accent { color: var(--brand-blue) !important; }
 .cmdk-item.active, .cmdk-item:hover, .table tbody tr:hover { background: var(--brand-grad-soft) !important; }
 .nav-item.active { color: var(--text) !important; }
+
+
+
+/* =====================================================================
+   ✦ Premium stat-card icons (Stripe/Linear style soft pastel tiles)
+   Replaces the clunky dark gradient squares with refined tinted tiles.
+   ===================================================================== */
+.stat-ico {
+  width: 40px; height: 40px; border-radius: 12px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--tone, #2563eb);
+  background: color-mix(in srgb, var(--tone, #2563eb) 13%, #ffffff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, #2563eb) 24%, transparent);
+}
+.stat-ico svg { width: 20px; height: 20px; }
+/* The thin top accent of each stat card follows its tone */
+.stat-card::before { background: var(--tone, #2563eb) !important; height: 3px !important; opacity: 0.95; }
+/* Fallback for browsers without color-mix: still readable (colored icon, faint bg) */
+@supports not (background: color-mix(in srgb, red 10%, white)) {
+  .stat-ico { background: rgba(37, 99, 235, 0.10); box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22); }
+}

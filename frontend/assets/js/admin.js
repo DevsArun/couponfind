@@ -50,10 +50,18 @@
   const setView = (n) => { view.innerHTML = ''; view.appendChild(n); };
   const loading = () => setView(UI.skeletonList(6, '64px'));
   const title = (t, s, a) => h('div', { class: 'flex items-end justify-between mb-6 fade-up' }, [h('div', {}, [h('h1', { class: 'h-display', style: 'font-size:1.6rem;' }, t), s ? h('p', { class: 'text-muted text-sm mt-1' }, s) : null]), a || h('div')]);
-  const stat = (label, val, sub, ic) => h('div', { class: 'card stat-card p-5' }, [
-    h('div', { class: 'flex items-center justify-between' }, [h('span', { class: 'text-muted text-xs uppercase tracking-wide' }, label), h('span', { class: 'feature-ico', style: 'width:32px;height:32px;', html: icon(ic) })]),
-    h('div', { class: 'h-display mt-3', style: 'font-size:1.9rem;font-variant-numeric:tabular-nums;' }, val), sub ? h('div', { class: 'text-muted text-xs mt-1' }, sub) : null,
-  ]);
+  const STAT_TONES = { blue: '#2563eb', emerald: '#059669', violet: '#7c3aed', amber: '#d97706', teal: '#0d9488' };
+  const stat = (label, val, sub, ic, tone) => {
+    const c = STAT_TONES[tone] || STAT_TONES.blue;
+    return h('div', { class: 'card stat-card p-5', style: '--tone:' + c + ';' }, [
+      h('div', { class: 'flex items-center justify-between' }, [
+        h('span', { class: 'text-muted text-xs uppercase tracking-wide' }, label),
+        h('span', { class: 'stat-ico', html: icon(ic) }),
+      ]),
+      h('div', { class: 'h-display mt-3', style: 'font-size:1.9rem;font-variant-numeric:tabular-nums;' }, val),
+      sub ? h('div', { class: 'text-muted text-xs mt-1' }, sub) : null,
+    ]);
+  };
 
   // ---- Premium SVG bar chart (gradient bars, no giant blocks) ----
   function barChart(data, xKey, yKey) {
@@ -84,10 +92,10 @@
       setView(h('div', {}, [
         title('Dashboard', 'Real-time platform overview'),
         h('div', { class: 'grid md:grid-cols-4 gap-4 stagger' }, [
-          stat('Total users', fmt.num(d.users_total), fmt.num(d.users_active_24h) + ' active 24h', 'users'),
-          stat('MRR', fmt.moneyVal(d.mrr), fmt.num(d.subscriptions) + ' active subs', 'chart'),
-          stat('Active coupons', fmt.num(d.coupons_active), 'of ' + fmt.num(d.coupons_total) + ' total', 'tag'),
-          stat('Searches 24h', fmt.num(d.searches_24h), d.avg_latency_ms + 'ms avg', 'search'),
+          stat('Total users', fmt.num(d.users_total), fmt.num(d.users_active_24h) + ' active 24h', 'users', 'blue'),
+          stat('MRR', fmt.moneyVal(d.mrr), fmt.num(d.subscriptions) + ' active subs', 'chart', 'emerald'),
+          stat('Active coupons', fmt.num(d.coupons_active), 'of ' + fmt.num(d.coupons_total) + ' total', 'tag', 'violet'),
+          stat('Searches 24h', fmt.num(d.searches_24h), d.avg_latency_ms + 'ms avg', 'search', 'amber'),
         ]),
         h('div', { class: 'grid lg:grid-cols-2 gap-5 mt-6' }, [
           h('div', {}, [h('h3', { class: 'font-bold mb-3' }, 'Search volume (14d)'), barChart(d.search_volume, 'day', 'hits')]),
