@@ -932,7 +932,7 @@ a:not(.btn):not(.nav-item):not(.footer-link):hover { color: var(--brand-blue); }
 .mobile-tabbar { display: none; }
 @media (max-width: 768px) {
   .mobile-tabbar {
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px);
@@ -1403,3 +1403,17 @@ select.input { padding-right: 2rem; }
 
 /* Sidebar header brand spacing */
 .app-sidebar:not(.admin-dark) { background: linear-gradient(180deg, #ffffff, #fafbfc) !important; }
+
+
+
+/* =====================================================================
+   ✦ Instagram-style global mobile bottom nav (marketing/content pages)
+   ===================================================================== */
+@media (max-width: 768px) {
+  /* When the bottom nav is present, keep content clear of it */
+  body.has-tabbar { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+  /* Bottom nav replaces the floating button on phones (cleaner, native) */
+  body.has-tabbar .ai-fab { display: none; }
+  /* App-like: prevent text-size auto-inflation + tap highlight on the shell */
+  html { -webkit-text-size-adjust: 100%; }
+}

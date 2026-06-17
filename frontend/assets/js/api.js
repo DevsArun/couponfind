@@ -152,3 +152,43 @@
     } catch (e) { /* non-fatal */ }
   })();
 })(window);
+
+
+
+/* =====================================================================
+   Instagram-style mobile bottom tab bar on marketing/content pages.
+   (The /app dashboard ships its own tab bar; /ai uses its composer.)
+   ===================================================================== */
+(function () {
+  try {
+    var p = location.pathname;
+    if (/^\/(app|admin|ai|login|register|forgot-password|reset-password)(\/|$)/.test(p)) return;
+    var add = function () {
+      if (!document.body || document.querySelector('.mobile-tabbar')) return;
+      var authed = !!(window.API && API.isAuthed && API.isAuthed());
+      var acctHref = authed ? '/app' : '/login';
+      var acctLabel = authed ? 'Account' : 'Sign in';
+      var ico = {
+        home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
+        ai: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>',
+        tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.59 2.59A2 2 0 0 0 11.17 2H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.7 8.7a2.43 2.43 0 0 0 3.42 0l6.58-6.58a2.43 2.43 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>',
+        user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      };
+      var nav = document.createElement('nav');
+      nav.className = 'mobile-tabbar';
+      nav.setAttribute('aria-label', 'Primary');
+      nav.innerHTML =
+        '<a href="/" class="tab" data-p="/">' + ico.home + '<span>Home</span></a>' +
+        '<a href="/ai" class="tab" data-p="/ai">' + ico.ai + '<span>AI Search</span></a>' +
+        '<a href="/pricing" class="tab" data-p="/pricing">' + ico.tag + '<span>Pricing</span></a>' +
+        '<a href="' + acctHref + '" class="tab" data-p="acct">' + ico.user + '<span>' + acctLabel + '</span></a>';
+      document.body.appendChild(nav);
+      document.body.classList.add('has-tabbar');
+      var cur = (location.pathname.replace(/\/+$/, '') || '/');
+      Array.prototype.forEach.call(nav.querySelectorAll('.tab'), function (t) {
+        if (t.getAttribute('data-p') === cur) t.classList.add('active');
+      });
+    };
+    if (document.body) add(); else document.addEventListener('DOMContentLoaded', add);
+  } catch (e) { /* non-fatal */ }
+})();
